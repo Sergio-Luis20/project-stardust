@@ -1,0 +1,15 @@
+minigames:
+  capture:
+    class: net.stardust.minigames.capture.Capture
+    name: Capture
+    min-players: 2
+    max-players: 40
+    map-path: mgmaps/capture
+    lobby: capture-lobby
+    signs:
+      - -1,-52,15
+      - -1,-52,16
+      - -1,-52,17
+      - -1,-53,15
+      - -1,-53,16
+      - -1,-53,17

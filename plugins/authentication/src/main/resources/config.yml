@@ -1,0 +1,3 @@
+min-pw-length: 8
+max-time: 60
+authorization-messages-interval: 5

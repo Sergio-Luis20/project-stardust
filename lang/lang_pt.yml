@@ -1,0 +1,244 @@
+command:
+  can-only-be-executed-by: » Este comando só pode ser executado por {0}
+  no-permission: » Você não tem permissão para executar este comando
+currency:
+  bronze:
+    name: Bronze
+    symbol: B
+    colored:
+      name: <gold>Bronze
+      symbol: <gold>B
+      legacy:
+        name: §6Bronze
+        symbol: §6B
+  silver:
+    name: Prata
+    symbol: P
+    colored:
+      name: <gray>Prata
+      symbol: <gray>P
+      legacy:
+        name: §7Prata
+        symbol: §7P
+  gold:
+    name: Ouro
+    symbol: O
+    colored:
+      name: <yellow>Ouro
+      symbol: <yellow>O
+      legacy:
+        name: §eOuro
+        symbol: §eO
+transaction:
+  buy:
+    name: Comprar
+    prefix: C
+    sign: C {0}
+    not-yourself: » Você não pode comprar de si mesmo
+    fail-key:
+      seller-item: » O vendedor não tem os itens necessários para vender
+      buyer-money: » Você não tem dinheiro suficiente para comprar
+      space: » Você não tem espaço suficiente para alocar os itens
+      cant-buy: » Você não pode comprar, apenas vender
+    bought: » Você comprou {0} por {1} de {2}
+  sell:
+    name: Vender
+    prefix: V
+    sign: V {0}
+    not-yourself: » Você não pode vender para si mesmo
+    fail-key:
+      seller-item: » Você não tem os itens necessários para vender
+      buyer-money: » O comprador não tem dinheiro suficente para comprar
+      space: » O comprador não tem espaço suficiente para alocar os itens
+      cant-sell: » Você não pode vender, apenas comprar
+    sold: » Você vendeu {0} por {1} para {2}
+  paid: » Você pagou {0} para usar isso
+  need-pay: » Você precisa pagar {0} para usar isso
+  min-money: » Você precisa ter ao menos {0} para usar isso
+  item:
+    bought: » Você comprou um item
+    sold: » Você vendeu um item
+shop:
+  sign:
+    in-state: » Você está no modo de configuração de placa de loja por {0} segundos
+    already-in-state: » Você já está no modo de configuração de placa de loja
+    not-in-state: » Você não está no modo de configuração de placa de loja
+    not-in-state-anymore: » Você não está mais no modo de configuração de placa de loja
+    state-cancel: » Modo de configuração de placa de loja cancelado
+    configured: » Placa configurada
+    config-usage: '» Use: /configsign <comprar|vender> <preço> ou /configsign <preço de compra> <preço de venda>'
+    not-a-chest: » O bloco no qual a placa está apoiada deve ser um baú
+    presentation:
+      header: '» Placa de loja:'
+      owner: '» Dono da placa: {0}'
+      item: '» Item: {0}'
+      buy-price: '» Preço de compra: {0}'
+      sell-price: '» Preço de venda: {0}'
+block:
+  owner:
+    not-owner: » Você não é o dono do bloco
+  option-disabled-for-public-blocks: » Opção desativada para blocos públicos
+  could-not-identify: » Não foi possível identificar o bloco
+  click-block-to-view-info: » Clique num bloco para ver informações
+  block-info:
+    header: '» Informações do bloco:'
+    owner: '» Dono: {0}'
+world:
+  home:
+    home-arg: Casa {0}
+    dont-have-any: » Você não tem nenhuma casa
+    created-at: '» Casa criada em {0}'
+    changed-to: '» Localização da casa {0} mudada para {0}'
+    limit-reached: » Você chegou ao limite máximo de casas
+    removed: » Casa {0} removida
+    cannot-create-home-in-this-world: » Não é possível criar uma casa neste mundo
+login:
+  message: » Use /login <senha> para entrar
+  welcome-back: » Bem vindo de volta, {0}
+  usage: '» Use: /login <senha>'
+  wrong-pw: » Senha incorreta
+  not-registered: » Você não está registrado. Usa /register para se registrar
+register:
+  message: » Use /register <email> <senha> <confirmar senha> para se registrar
+  verifying: » Verificando...
+  already-registered: » Você já está registrado
+  usage: '» Use: /register <email> <senha> <confirmar senha>'
+  min-pw-len: » A senha deve ter pelo menos {0} caracteres
+  pw-dont-match: » As senhas não coincidem, tente novamente
+  could-not-register: » Não foi possível concluir o registro, por favor tente novamente. Se isto persistir, contate a staff no nosso servidor do discord.
+  success: » Registrado com sucesso
+kick:
+  unauthorized: Você demorou muito para fazer login ({0} segundos)
+  invalid-nick: <red>Nick inválido, escolha outro
+money:
+  format: '» O formato da representação de dinheiro é "quantidade numérica + símbolo da moeda em inglês", em que a quantidade numérica deve ser um inteiro positivo e o símbolo da moeda é B para bronze, S para prata e G para ouro. Exemplo: 15S para 15 moedas de prata. Regex: \\A\\d+[BSGbsg]\\z'
+  help:
+    m0: '<light_purple>» Lista de opções para o comando <red>/wallet<light_purple>:'
+    m1: <green>» /wallet <yellow>-> <aqua>Mostra os dados da sua própria carteira
+    m2: <green>» /wallet <gold><jogador> <yellow>-> <aqua>Mostra os dados da carteira do jogador fornecido
+    m3: <green>» /wallet <light_purple>get <gold><jogador> <yellow>-> <aqua>Mostra os dados da carteira do jogador fornecido
+    m4: <green>» /wallet <light_purple>rank <gold><jogador> <yellow>-> <aqua>Mostra a posição no rank de dinheiro do jogador fornecido
+    m5: <green>» /wallet <light_purple>rank <gold><posição> <yellow>-> <aqua>Mostra o jogador na posição do rank de dinheiro fornecida
+    m6: <green>» /wallet <light_purple>pay <gold><jogador> <moeda> <valor> <yellow>-> <aqua>Envia uma quantidade de dinheiro ao jogador fornecido
+    m7: <green>» /wallet <light_purple>set <gold><jogador> <moeda> <valor> <yellow>-> <aqua>Define a quantidade de dinheiro que um jogador possui para uma determinada moeda
+  rank:
+    wallet: "» Posições no rank de dinheiro de {0}:"
+    pos: '» Posição {0}:'
+    bronze-pos: '» Posição no rank de bronze: {0}'
+    silver-pos: '» Posição no rank de prata: {0}'
+    gold-pos: '» Posição no rank de ouro: {0}'
+  value:
+    header: "» Carteira de {0}:"
+    bronze: '» Bronze: {0}'
+    silver: '» Prata: {0}'
+    gold: '» Ouro: {0}'
+  sent: » Você enviou {0} para {1}
+  received: » Você recebeu {0} de {1}
+  cannot-pay-yourself: » Você não pode enviar dinheiro para si mesmo
+  dont-have-enough: » Você não tem dinheiro suficiente para transferir
+rank:
+  message: '» Rank de {0}: {1}'
+  help:
+    m0: '<light_purple>» Lista de opções para o comando <red>/rank <light_purple>:'
+    m1: <green>» /rank <yellow>-> <aqua>Mostra o próprio rank
+    m2: <green>» /rank <gold><jogador> <yellow>-> <aqua>Mostra o rank do jogador fornecido
+    m3: <green>» /rank <light_purple>get <gold><jogador> <yellow>-> <aqua>Mostra o rank do jogador fornecido
+    m4: <green>» /rank <light_purple>set <gold><jogador> <rank> <yellow>-> <aqua>Define o rank do jogador fornecido
+channel:
+  low-rank: » Você precisa ter rank mínimo {0} para usar este canal
+  cooldown: » Espere <dark_red>{0} segundos antes de enviar outra mensagem neste canal
+  cooldown-time: » Este canal tem um cooldown de {0} segundos
+  muted: » Você está mutado neste canal
+  no-money: » Dinheiro insuficiente, você deve pagar {0} para usar este canal
+  ad:
+    name: Anúncio
+    paid-off: » Você pagou {0} para desativar o canal de anúncios por {1} segundos
+    no-money-disable: » Dinheiro insuficiente, você deve pagar {0} para desativar o canal de anúncios
+    max-queue-capacity: » A fila está cheia, tente novamente mais tarde
+    message-will-be-sent: » Sua mensagem foi adicionada à fila e será enviada quando chegar sua vez
+    usage: '» Use: /a <mensagem>'
+  global:
+    name: Global
+    usage: '» Use: /g <mensagem>'
+  enabled: Habilitado
+  enable: habilitar
+  disabled: Desabilitado
+  disable: desabilitar
+  turn: Clique aqui para {0} este canal
+  disabled-channel: » Você desativou este canal aqui
+error:
+  internal: » Erro interno. Informe isto à staff através do nosso discord.
+  login: » Não foi possível criar todos os componentes durante o login, infome à staff através do nosso discord.
+minigame:
+  sign:
+    available: <green>Disponível
+    running: <red>Em andamento
+    waiting: <blue><bold>Aguardando
+  match:
+    full: <red>» Partida cheia
+    entering: <green>» Entrando na partida
+    running: <red>» Partida em andamento
+    not-open: <red>Esta partida não está aberta
+    interrupted: » Partida interrompida
+  team:
+    usage: '<red>» Use: /equipe <mensagem>'
+  shop: Loja
+  bought:
+    self: » Você pagou {0} por esse item
+    others: » {0} comprou um item por {1} na loja
+  to-start:
+    plural:
+      time: {0} segundos restantes para começar
+      player: {0} jogadores restantes para começar
+    single:
+      time: {0} segundo restante para começar
+      player: {0} jogador restante para começar
+  win: Você venceu a partida e ganhou {0}!
+  loss: Você perdeu a partida!
+  rank-message: '{0} <aqua>é o jogador top {1} <aqua>do rank deste minigame e entrou na partida!' #originalmente terminaria com "e conectou no servidor o/"
+  no-squad: » O comando /equipe não funciona aqui
+  capture:
+    team:
+      red: Vermelho
+      blue: Azul
+      police: Polícia
+      thief: Ladrão
+    time: <green>Você tem {0} segundos para levar os jogadores para sua base!
+    cant-escape: <red>Você não pode fugir!
+    you-are-capturing: <green>Você está capturando <aqua>{0}<green>. Leve-o para sua base!
+    you-are-saving: <green>Você está salvando <aqua>{0}<green>. Leve-o para sua base!
+    you-are-being-captured: <red>Você está sendo capturado!
+    you-are-being-saved: <green>Você está sendo salvo!
+    you-have-been-captured: <red>Você foi capturado!
+    you-have-been-saved: <green>Você foi salvo!
+    failed-to-capture: <green>{0} falhou ao tentar capturá-lo!
+    failed-to-save: <red>{0} falhou ao tentar salvá-lo!
+    captured: '{0} <gold>foi capturado por {1}'
+    saved: '{0} <gold>foi salvo por {1}'
+    void: '{0} <gold>foi burro o suficiente para se autocapturar'
+word:
+  player: Jogador
+  command: Comando
+  channels: Canais
+  unknown: Desconhecido
+  home: Casa
+  tracker: Rastreador
+pageable:
+  negative-page: » Página negativa
+  greater-page: » Página maior que a quantidade máxima existente
+  home-list: '» Lista das casas que você possui {0}:'
+custom-enchant:
+  glow: Brilho
+color:
+  blue: Azul
+  red: Vermelho
+authorized: » Você já está autorizado
+paid: » Você pagou {0} para usar essa ferramenta
+decimal-separator: ','
+not-found: » {0} não encontrado
+teleporting-to: » Teleportando para {0}
+no-empty-slot: » Você não tem nenhum slot vazio
+must-hold-item: » Você precisa segurar algum item na mão principal
+click-to-copy: Clique para copiar
+dont-have-money: » Você não tem dinheiro suficiente para comprar isso
+track: '<gray>Jogador: {0}, distância: {1}'

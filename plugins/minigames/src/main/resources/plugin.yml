@@ -1,0 +1,13 @@
+name: minigames
+version: 1.0
+main: net.stardust.minigames.MinigamesPlugin
+api-version: 1.19
+depend: [general-commands]
+commands:
+  sign:
+    aliases: [placa]
+  spawn:
+    aliases: [lobby, entrada]
+  team:
+    aliases: [time, equipo, squad, equipe]
+  capture:

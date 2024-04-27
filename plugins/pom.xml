@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>net.stardust</groupId>
+  <artifactId>plugins</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+  <parent>
+    <groupId>net.stardust</groupId>
+    <artifactId>stardust</artifactId>
+    <version>1.0</version>
+  </parent>
+
+  <modules>
+    <module>authentication</module>
+    <module>channels</module>
+    <module>communication</module>
+    <module>delay</module>
+    <module>general-commands</module>
+    <module>minigames</module>
+    <module>repository-pattern</module>
+    <module>shop-plugin</module>
+    <module>terrains</module>
+    <module>throwables</module>
+  </modules>
+
+  <dependencies>
+    <dependency>
+      <groupId>net.stardust</groupId>
+      <artifactId>base</artifactId>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
+</project>

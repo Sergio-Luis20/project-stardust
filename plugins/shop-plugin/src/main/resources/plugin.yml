@@ -1,0 +1,7 @@
+name: shop
+version: 1.0
+main: net.stardust.shop.ShopPlugin
+api-version: 1.19
+commands:
+  configsign:
+    aliases: [configplaca]

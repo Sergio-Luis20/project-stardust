@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<inventory size="9" title="Channels">
+  <item slot="3">
+    <material>CLAY_BALL</material>
+    <amount>1</amount>
+    <customLabels>
+      <customLabel>
+        <key>channel</key>
+        <value>global</value>
+      </customLabel>
+    </customLabels>
+  </item>
+  <item slot="5">
+    <material>SLIME_BALL</material>
+    <amount>1</amount>
+    <customLabels>
+      <customLabel>
+        <key>channel</key>
+        <value>ad</value>
+      </customLabel>
+    </customLabels>
+  </item>
+</inventory>

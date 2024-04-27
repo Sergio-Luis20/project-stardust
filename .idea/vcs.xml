@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/base" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/plugins/authentication" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/plugins/channels" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/plugins/communication" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/plugins/delay" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/plugins/general-commands" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/plugins/minigames" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/plugins/repository-pattern" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/plugins/shop-plugin" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/plugins/terrains" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/plugins/throwables" vcs="Git" />
+  </component>
+</project>

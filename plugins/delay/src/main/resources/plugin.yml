@@ -1,0 +1,4 @@
+name: delay
+version: 1.0
+main: net.stardust.delay.DelayPlugin
+api-version: 1.20

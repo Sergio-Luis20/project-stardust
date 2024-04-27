@@ -1,0 +1,10 @@
+name: authentication
+version: 1.0
+main: net.stardust.authentication.StardustAuthentication
+api-version: 1.19
+depend: [repository]
+commands:
+  login:
+    aliases: [logar, entrar, enter]
+  register:
+    aliases: [registrar]

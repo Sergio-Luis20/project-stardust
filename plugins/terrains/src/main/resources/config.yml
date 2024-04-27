@@ -1,0 +1,5 @@
+load-terrains-on-startup: true
+terrains-batch-size: 5
+homes-limit-per-player: 10
+terrains:
+  - terrainWorld-0

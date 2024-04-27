@@ -1,0 +1,245 @@
+command:
+  can-only-be-executed-by: » This command can only be executed by {0}
+  no-permission: » You don't have permission to execute this command
+currency:
+  bronze:
+    name: Bronze
+    symbol: B
+    colored:
+      name: <gold>Bronze
+      symbol: <gold>B
+      legacy:
+        name: §6Bronze
+        symbol: §6B
+  silver:
+    name: Silver
+    symbol: S
+    colored:
+      name: <gray>Silver
+      symbol: <gray>S
+      legacy:
+        name: §7Silver
+        symbol: §7S
+  gold:
+    name: Gold
+    symbol: G
+    colored:
+      name: <yellow>Gold
+      symbol: <yellow>G
+      legacy:
+        name: §eGold
+        symbol: §eG
+transaction:
+  buy:
+    name: Buy
+    prefix: B
+    sign: B {0}
+    not-yourself: » You can't buy from yourself
+  fail-key:
+    seller-item: » The seller doesn't have the necessary items to sell
+    buyer-money: » You don't have enough money to buy
+    space: » You don't have enough space to allocate the items
+    cant-buy: » You can't buy, only sell
+  bought: » You bought {0} for {1} from {2}
+  sell:
+    name: Sell
+    prefix: S
+    sign: S {0}
+    not-yourself: » You can't sell to yourself
+    fail-key:
+      seller-item: » You don't have the necessary items to sell
+      buyer-money: » The buyer doesn't have enough money to buy
+      space: » The buyer doesn't have enough space to allocate the items
+      cant-sell: » You can't sell, only buy
+    sold: » You sold {0} for {1} to {2}
+  paid: » You paid {0} to use this
+  need-pay: » You need to pay {0} to use this
+  min-money: » You need to have at least {0} to use this
+  item:
+    bought: » You bought an item
+    sold: » You sold an item
+shop:
+  sign:
+    in-state: » You are in shop sign configuration mode for {0} seconds
+    already-in-state: » You are already in shop sign configuration mode
+    not-in-state: » You are not in shop sign configuration mode
+    not-in-state-anymore: » You are no longe in shop sign configuration state
+    state-cancel: » Shop sign configuration mode cancelled
+    configured: » Sign configured
+    config-usage: '» Usage: /configsign <buy|sell> <price> or /configsign <buy price> <sell price>'
+    not-a-chest: » The block where the sign is attached must be a chest
+    presentation:
+      header: '» Shop sign:'
+      owner: '» Sign owner: {0}'
+      item: '» Item: {0}'
+      buy-price: '» Buy price: {0}'
+      sell-price: '» Sell price: {0}'
+block:
+  owner:
+    not-owner: » You are not the owner of the block
+  option-disabled-for-public-blocks: » Option disabled for public blocks
+  could-not-identify: » Could not identify the block
+  click-block-to-view-info: » Click on a block to view information
+  block-info:
+    header: '» Block information:'
+    owner: '» Owner: {0}'
+world:
+  home:
+    home-arg: Home {0}
+    dont-have-any: » You don't have any home
+    created-at: '» Home created at {0}'
+    changed-to: '» Location of home {0} changed to {0}'
+    limit-reached: » You've reached the homes limit
+    removed: » Home {0} removed
+    cannot-create-home-in-this-world: » Cannot create a home in this world
+login:
+  message: » Use /login <password> to log in
+  error: » Server error, please contact the staff through our discord server.
+  welcome-back: » Welcome back, {0}
+  usage: '» Usage: /login <password>'
+  wrong-pw: » Wrong password
+  not-registered: » You are not registered. Use /register to register
+register:
+  message: » Use /register <email> <password> <confirm password> to register
+  verifying: » Verifying...
+  already-registered: » You are already registered
+  could-not-verify: » Could not complete the verification, please try again. If this persists, contact the staff through our discord and report the incident.
+  usage: '» Usage: /register <email> <password> <confirm password>'
+  min-pw-len: » The password must have at least {0} characters
+  pw-dont-match: » Passwords don't match, try again
+  could-not-register: » Could not complete the registration, please try again. If this persists, contact the staff through our discord and report the incident.
+  success: » Successfully registered
+  error: » Internal error. Report this to the staff through our discord.
+kick:
+  unauthorized: You took too long to log in ({0} seconds)
+  invalid-nick: Invalid nick, choose other
+money:
+  format: '» The money representation format is "numeric quantity + currency symbol in english", where the numeric quantity must be a positive integer and the currency symbol is B for bronze, S for silver, and G for gold. Example: 15S for 15 silver coins. Regex: \\A\\d+[BSGbsg]\\z'
+  help:
+    m0: '<light_purple>» List of options for the <red>/wallet <light_purple>command:'
+    m1: <green>» /wallet <yellow>-> <aqua>Displays data for your own wallet
+    m2: <green>» /wallet <gold><player> <yellow>-> <aqua>Displays data of the provided player's wallet
+    m3: <green>» /wallet <light_purple>get <gold><player> <yellow>-> <aqua>Displays data of the provided player's wallet
+    m4: <green>» /wallet <light_purple>rank <gold><player> <yellow>-> <aqua>Displays the money ranking position of the provided player
+    m5: <green>» /wallet <light_purple>rank <gold><position> <yellow>-> <aqua>Displays the player situated at the provided money ranking position
+    m6: <green>» /wallet <light_purple>pay <gold><player> <currency> <value> <yellow>-> <aqua>Sends an amount of money to the provided player
+    m7: <green>» /wallet <light_purple>set <gold><player> <currency> <value> <yellow>-> <aqua>Defines a value amount of a currency of provided player
+  rank:
+    wallet: "» {0}'s money rank positions:"
+    pos: '» Position {0}:'
+    bronze-pos: '» Bronze rank position: {0}'
+    silver-pos: '» Silver rank position: {0}'
+    gold-pos: '» Gold rank position: {0}'
+  values:
+    header: "» {0}'s wallet:"
+    bronze: '» Bronze: {0}'
+    silver: '» Silver: {0}'
+    gold: '» Gold: {0}'
+  sent: » You sent {0} to {1}
+  received: » You received {0} from {1}
+  cannot-pay-yourself: » You cannot send money to yourself
+  dont-have-enough: » You don't have enough money to transfer
+rank:
+  help:
+    m0: '<light_purple>» List of options for the <red>/rank <light_purple>command:'
+    m1: <green>» /rank <yellow>-> <aqua>Displays your rank
+    m2: <green>» /rank <gold><player> <yellow>-> <aqua>Displays the rank of the provided player
+    m3: <green>» /rank <light_purple>get <gold><player> <yellow>-> <aqua>Displays the rank of the provided player
+    m4: <green>» /rank <light_purple>set <gold><player> <rank> <yellow>-> <aqua>Sets the rank of the provided player
+channel:
+  low-rank: » You need at least rank {0} to use this channel
+  cooldown: » You need to wait {0} seconds before sending another message in this channel
+  cooldown-time: » This channel has a {0} seconds cooldown
+  muted: » You are muted on this channel
+  no-money: » Insufficient funds, you must pay {0} to use this channel
+  ad:
+    name: Ad
+    paid-off: » You paid {0} to disable the advertising channel for {1} seconds
+    no-money-disable: » Insufficient funds, you must pay {0} to disable the advertising channel
+    max-queue-capacity: » The queue is full, try again later
+    message-will-be-sent: » Your message has been added to the queue and will be sent when it's your turn
+    usage: '» Usage: /a <message>'
+  global:
+    name: Global
+    usage: '» Usage: /g <message>'
+  enabled: Enabled
+  enable: enable
+  disabled: Disabled
+  disable: disable
+  turn: Click here to {0} this channel
+  disabled-channel: » You disabled this channel here
+error:
+  internal: » Internal server error
+minigame:
+  sign:
+    available: <green>Available
+    running: <red>Running
+    waiting: <blue><bold>Waiting
+  match:
+    full: <red>» Full match
+    entering: <green>» Entering the match
+    running: <red>» Running match
+    not-open: <red>This match is not open
+    interrupted: » Match interrupted
+  team:
+    usage: '<red>» Usage: /team <message>'
+  shop: Shop
+  tracker: Tracker
+  track: '<gray>Player: {0}, distance: {1}'
+  bought:
+    self: » You paid {0} for that item
+    others: » {0} has bought an item for {1} in the shop
+  to-start:
+    plural:
+      time: <aqua>{0} {1}seconds left to start
+      player: <aqua>{0} <light_purple>players left to start
+    single:
+      time: <aqua>1 {0}second left to start
+      player: <aqua>1 <light_purple>player left to start
+  win: You won the match and earned {0}!
+  loss: You lost the match!
+  rank-message: '{0} <aqua>is the top {1} <aqua>ranked player in this minigame and has joined this match!'
+  no-squad: » The command /squad do not work here
+  capture:
+    team:
+      red: Red
+      blue: Blue
+      police: Police
+      Thief: Thief
+    time: <green>You have {0} seconds to bring the players to your base!
+    cant-escape: <red>You can't escape!
+    you-are-capturing: <green>You are capturing <aqua>{0}<green>. Take him to your base!
+    you-are-saving: <green>You are saving <aqua>{0}<green>. Take him to your base!
+    you-are-being-captured: <red>You are being captured!
+    you-are-being-saved: <green>You are being saved!
+    you-have-been-captured: <red>You have been captured!
+    you-have-been-saved: <green>You have been saved!
+    failed-to-capture: <green>{0} failed to capture you!
+    failed-to-save: <red>{0} failed to save you!
+    captured: '{0} <gold>was captured by {1}'
+    saved: '{0} <gold>was saved by {1}'
+    void: '{0} <gold>was stupid enough to capture itself'
+word:
+  player: Player
+  command: Command
+  channels: Channels
+  unknown: Unknown
+  Home: Home
+pageable:
+  negative-page: » Negative page
+  greater-page: Page larger than the maximum existing quantity
+  home-list: '» Your homes list {0}:'
+custom-enchant:
+  glow: Glow
+color:
+  blue: Blue
+  red: Red
+authorized: » You are already authorized
+paid: » You paid {0} to use this tool
+decimal-separator: '.'
+not-found: » {0} not found
+teleporting-to: » Teleporting to {0}
+no-empty-slot: You don't have any empty slot
+must-hold-item: » You need to hold an item in your main hand
+click-to-copy: Click to copy
+dont-have-money: » You don't have enought money to buy that

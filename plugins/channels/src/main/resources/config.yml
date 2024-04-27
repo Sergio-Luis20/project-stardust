@@ -1,0 +1,8 @@
+max-local-distance: 250
+no-ad-time: 7200 #2 hours
+global-required-rank: D
+ad-required-rank: D
+ad-usage-price: 3000B
+ad-deactivation-price: 5000B
+discord-bot-token: empty for git
+discord-channel-id: empty for git

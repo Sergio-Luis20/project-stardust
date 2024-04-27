@@ -1,0 +1,47 @@
+bronze-aliases:
+  - bronze
+  - bronce
+silver-aliases:
+  - silver
+  - prata
+  - plata
+gold-aliases:
+  - gold
+  - ouro
+  - oro
+help-aliases:
+  - help
+  - ayuda
+  - ajuda
+get-aliases:
+  - get
+  - obter
+  - pegar
+  - obtener
+  - ver
+set-aliases:
+  - set
+  - definir
+  - def
+pay-aliases:
+  - pay
+  - pagar
+  - transfer
+  - transferir
+  - send
+  - mandar
+  - enviar
+rank-aliases:
+  - rank
+  - ranking
+  - rango
+staff:
+  - FarBlue
+  - Felipstein
+  - Sammycm_
+  - iceseconds
+  - trion_pieba27
+  - AlfaBoy_
+not-allowed-nicks:
+  - help
+  - rank

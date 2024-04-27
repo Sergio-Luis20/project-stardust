@@ -1,0 +1,25 @@
+name: channels
+version: 1.0
+main: net.stardust.channels.ChannelsPlugin
+api-version: 1.19
+depend: [general-commands]
+commands:
+  g:
+    aliases: [global]
+  tell:
+    aliases: [t]
+  r:
+    aliases: [re, retell]
+  team:
+    aliases: [e, equipe, squad, time, equipo]
+  ad:
+    aliases: [a, anuncio]
+  clan:
+    aliases: [c, cla]
+  group:
+    aliases: [gp, grupo, party, p]
+  channels:
+    aliases: [canais, canales, ch, cn]
+  discordchat:
+    aliases: [dcchat, dcc]
+  local:

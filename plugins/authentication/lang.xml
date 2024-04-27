@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<inventory size="54" title="Select your language">
+  <item slot="21">
+    <material>PLAYER_HEAD</material>
+    <amount>1</amount>
+    <displayName>English</displayName>
+    <lore>
+      <loreLine>Select language</loreLine>
+    </lore>
+  </item>
+  <item slot="22">
+    <material>PLAYER_HEAD</material>
+    <amount>1</amount>
+    <displayName>Português</displayName>
+    <lore>
+      <loreLine>Selecionar língua</loreLine>
+    </lore>
+  </item>
+  <item slot="23">
+    <material>PLAYER_HEAD</material>
+    <amount>1</amount>
+    <displayName>Español</displayName>
+    <lore>
+      <loreLine>Seleccionar lenguage</loreLine>
+    </lore>
+  </item>
+</inventory>

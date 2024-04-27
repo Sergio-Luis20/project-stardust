@@ -1,0 +1,5 @@
+name: repository
+version: 1.0
+main: net.stardust.repository.RepositoryPlugin
+api-version: 1.19
+depend: [throwables]

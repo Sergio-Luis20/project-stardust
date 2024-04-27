@@ -1,0 +1,20 @@
+name: general-commands
+version: 1.0
+main: net.stardust.generalcmd.GeneralCommandsPlugin
+api-version: 1.19
+depend: [authentication]
+commands:
+  money:
+    aliases: [dinheiro, dinero, wallet, billetera, carteira]
+  rank:
+    aliases: [ranking, rango]
+  lang:
+    aliases: [leng, ling, language, lenguage, linguagem, idioma]
+  tpw:
+    aliases: [tpm]
+  cw:
+    aliases: [createworld, crearmundo, criarmundo, cm]
+  dw:
+    aliases: [deleteworld, deletarmundo, apagarmundo, dm]
+  uid:
+    aliases: [uuid]

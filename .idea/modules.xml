@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/plugins/authentication/authentication.iml" filepath="$PROJECT_DIR$/plugins/authentication/authentication.iml" />
+      <module fileurl="file://$PROJECT_DIR$/base/base.iml" filepath="$PROJECT_DIR$/base/base.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plugins/channels/channels.iml" filepath="$PROJECT_DIR$/plugins/channels/channels.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plugins/communication/communication.iml" filepath="$PROJECT_DIR$/plugins/communication/communication.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plugins/delay/delay.iml" filepath="$PROJECT_DIR$/plugins/delay/delay.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plugins/general-commands/general-commands.iml" filepath="$PROJECT_DIR$/plugins/general-commands/general-commands.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plugins/minigames/minigames.iml" filepath="$PROJECT_DIR$/plugins/minigames/minigames.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plugins/plugins.iml" filepath="$PROJECT_DIR$/plugins/plugins.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plugins/repository-pattern/repository.iml" filepath="$PROJECT_DIR$/plugins/repository-pattern/repository.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plugins/shop-plugin/shop-plugin.iml" filepath="$PROJECT_DIR$/plugins/shop-plugin/shop-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/stardust.iml" filepath="$PROJECT_DIR$/stardust.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plugins/terrains/terrains.iml" filepath="$PROJECT_DIR$/plugins/terrains/terrains.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plugins/throwables/throwables.iml" filepath="$PROJECT_DIR$/plugins/throwables/throwables.iml" />
+    </modules>
+  </component>
+</project>

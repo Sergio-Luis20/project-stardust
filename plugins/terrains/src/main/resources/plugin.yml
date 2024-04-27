@@ -1,0 +1,12 @@
+name: terrains
+version: 1.0
+main: net.stardust.terrains.TerrainsPlugin
+api-version: 1.19
+commands:
+  blockservermode:
+    aliases: [bsm]
+  terrains:
+  blockinfo:
+    aliases: [bi]
+  home:
+    aliases: [casa]

@@ -1,0 +1,5 @@
+name: throwables
+version: 1.0
+main: net.stardust.throwables.ThrowableManager
+api-version: 1.19
+depend: [communication]
