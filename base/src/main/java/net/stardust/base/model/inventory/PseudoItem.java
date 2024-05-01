@@ -21,7 +21,7 @@ import lombok.Setter;
 import lombok.ToString;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.stardust.base.utils.ItemUtils;
+import net.stardust.base.utils.item.ItemUtils;
 import net.stardust.base.utils.PseudoObject;
 import net.stardust.base.utils.persistence.DataManager;
 

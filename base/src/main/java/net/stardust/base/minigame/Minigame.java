@@ -3,6 +3,7 @@ package net.stardust.base.minigame;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.events.WorldListener;
@@ -11,12 +12,13 @@ import net.stardust.base.model.economy.wallet.Money;
 import net.stardust.base.model.economy.wallet.PlayerWallet;
 import net.stardust.base.model.minigame.MinigameData;
 import net.stardust.base.model.minigame.MinigamePlayer;
+import net.stardust.base.utils.AutomaticMessages;
+import net.stardust.base.utils.BossBarUtils;
 import net.stardust.base.utils.PlayerSnapshot;
 import net.stardust.base.utils.Throwables;
 import net.stardust.base.utils.database.crud.MinigameDataCrud;
 import net.stardust.base.utils.database.crud.PlayerWalletCrud;
 import net.stardust.base.utils.plugin.PluginConfig;
-import net.stardust.base.utils.world.MapDrawer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -27,7 +29,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public abstract class Minigame implements Listener {
@@ -44,12 +45,15 @@ public abstract class Minigame implements Listener {
 
     @Getter
     private PreMatchStopwatch stopwatch;
-    private Listener preMatchTraffic, preMatchListener;
 
-    @Getter
-    @Setter(AccessLevel.PROTECTED)
+    @Getter(AccessLevel.PACKAGE)
+    private BossBar preMatchBar;
+    private Listener preMatchTraffic;
+    private Listener defaultListener;
+
     private Listener matchListener;
 
+    @Getter(AccessLevel.PROTECTED)
     private PlayerSnapshot snapshot;
 
     @Getter
@@ -58,12 +62,18 @@ public abstract class Minigame implements Listener {
     private List<TickListener> tickListeners;
     private BukkitRunnable ticker;
 
+    @Getter
+    @Setter(AccessLevel.PROTECTED)
+    private MinigameShop shop;
+    private WorldListener shopWorldListener;
+
     public Minigame(MinigameInfo info) {
         this.info = Objects.requireNonNull(info, "info");
         snapshot = new PlayerSnapshot();
         stateListeners = new ArrayList<>();
         tickListeners = new ArrayList<>();
         postMatchTime = DEFAULT_POST_MATCH_TIME;
+        preMatchBar = BossBarUtils.newDefaultBar();
         ticker = new BukkitRunnable() {
 
             @Override
@@ -81,25 +91,24 @@ public abstract class Minigame implements Listener {
             Bukkit.unloadWorld(world, false);
         }
         world = info.mapDrawer().drawMap();
+        String worldName = world.getName();
         if(stopwatch != null) {
             stopwatch.cancel();
         }
         stopwatch = newStopwatch();
         stopwatch.runTaskTimer(PluginConfig.get().getPlugin(), 0, 20);
-        if(preMatchTraffic != null) {
-            HandlerList.unregisterAll(preMatchTraffic);
-        }
-        if(preMatchListener != null) {
-            HandlerList.unregisterAll(preMatchListener);
-        }
         preMatchTraffic = new PreMatchTrafficListener(this);
-        preMatchListener = new WorldListener(newPreMatchListener(), world.getName());
-        PluginConfig.get().registerEvents(preMatchTraffic, preMatchListener);
+        defaultListener = new WorldListener(newPreMatchListener(), worldName);
+        PluginConfig.get().registerEvents(preMatchTraffic, defaultListener);
+        if(shop != null) {
+            shopWorldListener = new WorldListener(shop, worldName);
+            PluginConfig.get().registerEvents(shopWorldListener);
+        }
         stateListeners.forEach(listener -> listener.onLatePreMatch(this));
     }
 
     protected Listener newPreMatchListener() {
-        return new DefaultPreMatchListener(this);
+        return new DefaultListener(this);
     }
 
     protected PreMatchStopwatch newStopwatch() {
@@ -109,6 +118,8 @@ public abstract class Minigame implements Listener {
     protected void endMatch(List<Player> winners, List<Player> losers) {
         setState(MinigameState.END_MATCH);
         unregisterMatchListener();
+        unregisterShop();
+        registerListener(defaultListener);
         MinigameDataCrud dataCrud = new MinigameDataCrud();
         PlayerWalletCrud walletCrud = new PlayerWalletCrud();
         MinigameData data = dataCrud.getOrNull(info.name());
@@ -139,9 +150,9 @@ public abstract class Minigame implements Listener {
         Location lobby = info.lobby();
         Bukkit.getScheduler().runTaskLater(PluginConfig.get().getPlugin(), () -> {
             snapshot.restoreAll();
-            winners.forEach(p -> p.teleport(lobby));
-            losers.forEach(p -> p.teleport(lobby));
             ticker.cancel();
+            getWorld().getPlayers().forEach(player -> player.teleport(lobby));
+            unregisterDefaultListener();
             stateListeners.forEach(listener -> listener.onLateEndMatch(this));
         }, 20 * postMatchTime);
     }
@@ -165,24 +176,47 @@ public abstract class Minigame implements Listener {
     }
 
     void enterMatchProcess() {
+        unregisterPreMatchListeners();
         setState(MinigameState.MATCH);
-        takeSnapshot();
+        BossBarUtils.removeAll(preMatchBar);
         registerMatchListener();
         match();
     }
 
     protected abstract void match();
 
+    protected abstract void onSpawnCommand(Player player);
+
+    public final void spawnCommandIssued(Player player) {
+        switch(state) {
+            case PRE_MATCH -> {
+                preMatchBar.removeViewer(player);
+                player.teleport(info.lobby());
+                snapshot.restore(player);
+            }
+            case MATCH -> onSpawnCommand(player);
+            case END_MATCH -> player.sendMessage(Component.translatable("minigame.spawn-in-end-match", NamedTextColor.YELLOW));
+            default -> {
+                IllegalStateException e = new IllegalStateException("Player " + player.getName()
+                        + " (UID: " + player.getUniqueId() + ") issued spawn command in minigame "
+                        + info.name() + " without a predefined state: " + Arrays.toString(MinigameState.values()));
+                player.sendMessage(AutomaticMessages.internalServerError());
+                Throwables.sendAndThrow(e);
+            }
+        }
+    }
+
     public void interruptMatch() {
         setState(MinigameState.END_MATCH);
+        unregisterPreMatchListeners();
         unregisterMatchListener();
-        snapshot.restoreAll();
         Component interruptedMessage = Component.translatable("minigame.match.interrupted", NamedTextColor.RED);
         Location lobby = info.lobby();
         world.getPlayers().forEach(player -> {
             player.sendMessage(interruptedMessage);
             player.teleport(lobby);
         });
+        snapshot.restoreAll();
         try {
             ticker.cancel();
         } catch(IllegalStateException e) {
@@ -199,37 +233,51 @@ public abstract class Minigame implements Listener {
         this.postMatchTime = postMatchTime;
     }
 
-    public Location getLobby() {
-        return info.lobby().clone();
+    private void registerMatchListener() {
+        if(matchListener == null) {
+            matchListener = new WorldListener(this, world.getName());
+        } else if(!(matchListener instanceof WorldListener)) {
+            matchListener = new WorldListener(matchListener, world.getName());
+        }
+        PluginConfig.get().registerEvents(matchListener);
     }
 
-    void takeSnapshot() {
-        snapshot.takeSnapshot(world.getPlayers());
+    private void unregisterMatchListener() {
+        unregisterListener(matchListener);
     }
 
-    void registerMatchListener() {
-        doWithMatchListener(listener -> PluginConfig.get().registerEvents(listener));
+    private void unregisterPreMatchListeners() {
+        unregisterListener(preMatchTraffic);
+        unregisterDefaultListener();
     }
 
-    void unregisterMatchListener() {
-        doWithMatchListener(HandlerList::unregisterAll);
+    private void unregisterDefaultListener() {
+        unregisterListener(defaultListener);
     }
 
-    void setState(MinigameState state) {
+    private void unregisterShop() {
+        unregisterListener(shopWorldListener);
+    }
+
+    private void unregisterListener(Listener listener) {
+        if(listener != null) {
+            HandlerList.unregisterAll(listener);
+        }
+    }
+
+    private void registerListener(Listener listener) {
+        if(listener != null) {
+            PluginConfig.get().registerEvents(listener);
+        }
+    }
+
+    private void setState(MinigameState state) {
         this.state = Objects.requireNonNull(state, "state");
         switch(state) {
             case PRE_MATCH -> stateListeners.forEach(listener -> listener.onPreMatch(this));
             case MATCH -> stateListeners.forEach(listener -> listener.onMatch(this));
             case END_MATCH -> stateListeners.forEach(listener -> listener.onEndMatch(this));
         };
-    }
-
-    private void doWithMatchListener(Consumer<Listener> action) {
-        Listener matchListener = getMatchListener();
-        if(matchListener == null) {
-            matchListener = this;
-        }
-        action.accept(matchListener);
     }
 
     public void addStateListener(StateListener stateListener) {
@@ -246,6 +294,22 @@ public abstract class Minigame implements Listener {
 
     public void removeTickListener(TickListener tickListener) {
         tickListeners.remove(Objects.requireNonNull(tickListener, "tickListeners"));
+    }
+
+    public boolean containsStateListener(StateListener stateListener) {
+        return stateListeners.contains(stateListener);
+    }
+
+    public boolean containsTickListener(TickListener tickListener) {
+        return tickListeners.contains(tickListener);
+    }
+
+    public final Listener getMatchListener() {
+        return matchListener;
+    }
+
+    protected final void setMatchListener(Listener matchListener) {
+        this.matchListener = matchListener;
     }
 
     public enum MinigameState {

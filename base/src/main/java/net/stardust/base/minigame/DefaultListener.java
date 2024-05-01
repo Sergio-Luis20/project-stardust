@@ -18,11 +18,11 @@ import org.bukkit.event.player.PlayerPickupArrowEvent;
 import java.util.Objects;
 
 @Getter
-public class DefaultPreMatchListener implements Listener {
+public class DefaultListener implements Listener {
 
     private Minigame parent;
 
-    public DefaultPreMatchListener(Minigame parent) {
+    public DefaultListener(Minigame parent) {
         this.parent = Objects.requireNonNull(parent, "parent");
     }
 

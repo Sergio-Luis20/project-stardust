@@ -2,12 +2,8 @@ package net.stardust.base.minigame;
 
 import lombok.Getter;
 import net.kyori.adventure.bossbar.BossBar;
-import net.kyori.adventure.bossbar.BossBar.Color;
-import net.kyori.adventure.bossbar.BossBar.Overlay;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.stardust.base.minigame.Minigame.MinigameState;
-import net.stardust.base.utils.PlayerSnapshot;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Objects;
@@ -18,9 +14,6 @@ public class PreMatchStopwatch extends BukkitRunnable {
 
     @Getter
     private Minigame parent;
-
-    @Getter
-    private BossBar bar;
 
     private final int preMatchTime;
     private int time;
@@ -36,11 +29,11 @@ public class PreMatchStopwatch extends BukkitRunnable {
         }
         this.preMatchTime = preMatchTime;
         time = preMatchTime;
-        bar = BossBar.bossBar(Component.empty(), 1, Color.PINK, Overlay.PROGRESS);
     }
 
     @Override
     public void run() {
+        BossBar bar = parent.getPreMatchBar();
         int playerDiff = parent.getInfo().minPlayers() - parent.getWorld().getPlayerCount();
         if(playerDiff > 0) {
             time = preMatchTime;

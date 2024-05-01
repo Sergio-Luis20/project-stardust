@@ -171,20 +171,20 @@ error:
   login: » Não foi possível criar todos os componentes durante o login, infome à staff através do nosso discord.
 minigame:
   sign:
-    available: <green>Disponível
-    running: <red>Em andamento
-    waiting: <blue><bold>Aguardando
+    available: Disponível
+    running: Em andamento
+    waiting: Aguardando
   match:
-    full: <red>» Partida cheia
-    entering: <green>» Entrando na partida
-    running: <red>» Partida em andamento
-    not-open: <red>Esta partida não está aberta
+    full: » Partida cheia
+    entering: » Entrando em {0}
+    running: » Partida em andamento
+    not-open-yet: » Esta partida não está aberta
     interrupted: » Partida interrompida
   team:
-    usage: '<red>» Use: /equipe <mensagem>'
+    usage: '» Uso: /equipe <mensagem>'
   shop: Loja
   bought:
-    self: » Você pagou {0} por esse item
+    self: » Você pagou {0} nesse item
     others: » {0} comprou um item por {1} na loja
   to-start:
     plural:
@@ -195,30 +195,34 @@ minigame:
       player: {0} jogador restante para começar
   win: Você venceu a partida e ganhou {0}!
   loss: Você perdeu a partida!
-  rank-message: '{0} <aqua>é o jogador top {1} <aqua>do rank deste minigame e entrou na partida!' #originalmente terminaria com "e conectou no servidor o/"
+  rank-message: '{0} é o jogador top {1} do rank deste minigame e entrou na partida!' #originalmente terminaria com "e conectou no servidor o/"
   no-squad: » O comando /equipe não funciona aqui
+  not-in-match-state: » A partida não está em andamento
+  not-in-match: » Você não está numa partida de minigame
+  spawn-in-end-match: » A partida já terminou. Aguarde um instante e você será levado para o spawn.
   capture:
     team:
       red: Vermelho
       blue: Azul
       police: Polícia
       thief: Ladrão
-    time: <green>Você tem {0} segundos para levar os jogadores para sua base!
-    cant-escape: <red>Você não pode fugir!
-    you-are-capturing: <green>Você está capturando <aqua>{0}<green>. Leve-o para sua base!
-    you-are-saving: <green>Você está salvando <aqua>{0}<green>. Leve-o para sua base!
-    you-are-being-captured: <red>Você está sendo capturado!
-    you-are-being-saved: <green>Você está sendo salvo!
-    you-have-been-captured: <red>Você foi capturado!
-    you-have-been-saved: <green>Você foi salvo!
-    failed-to-capture: <green>{0} falhou ao tentar capturá-lo!
-    failed-to-save: <red>{0} falhou ao tentar salvá-lo!
-    captured: '{0} <gold>foi capturado por {1}'
-    saved: '{0} <gold>foi salvo por {1}'
-    void: '{0} <gold>foi burro o suficiente para se autocapturar'
+    time: Você tem {0} segundos para levar os jogadores para sua base!
+    cant-escape: Você não pode fugir!
+    you-are-capturing: Você está capturando {0}. Leve-o para sua base!
+    you-are-saving: Você está salvando {0}. Leve-o para sua base!
+    you-are-being-captured: Você está sendo capturado!
+    you-are-being-saved: Você está sendo salvo!
+    you-have-been-captured: Você foi capturado!
+    you-have-been-saved: Você foi salvo!
+    failed-to-capture: {0} falhou ao tentar capturá-lo!
+    failed-to-save: {0} falhou ao tentar salvá-lo!
+    captured: '{0} foi capturado por {1}'
+    saved: '{0} foi salvo por {1}'
+    dumb: '{0} foi burro o suficiente para se autocapturar'
 word:
   player: Jogador
   command: Comando
+  shop: Loja
   channels: Canais
   unknown: Desconhecido
   home: Casa

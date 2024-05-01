@@ -169,56 +169,59 @@ error:
   internal: » Error interno del servidor
 minigame:
   sign:
-    available: <green>Disponible
-    running: <red>En ejecución
-    waiting: <blue><bold>Esperando
+    available: Disponible
+    running: En ejecución
+    waiting: Esperando
   match:
-    full: <red>» Partida llena
-    entering: <green>» Entrando a la partida
-    running: <red>» Partida en ejecución
-    not-open: <red>Esta partida no está abierta
+    full: » Partida llena
+    entering: » Entrando en {0}
+    running: » Partida en ejecución
+    not-open-yet: » Esta partida no está abierta
     interrupted: » Partida interrumpida
   team:
-    usage: '<red>» Uso: /equipo <mensaje>'
+    usage: '» Uso: /equipo <mensaje>'
   shop: Tienda
   tracker: Rastreador
-  track: '<gray>Jugador: {0}, distancia: {1}'
+  track: 'Jugador: {0}, distancia: {1}'
   bought:
     self: » Pagaste {0} por ese objeto
     others: » {0} ha comprado un objeto por {1} en la tienda
   to-start:
     plural:
-      time: <aqua>{0} {1}segundos restantes para comenzar
-      player: <aqua>{0} <light_purple>jugadores restantes para comenzar
+      time: {0} segundos restantes para comenzar
+      player: {0} jugadores restantes para comenzar
     single:
-      time: <aqua>1 {0}segundo restante para comenzar
-      player: <aqua>1 <light_purple>jugador restante para comenzar
+      time: {0} segundo restante para comenzar
+      player: {0} jugador restante para comenzar
   win: ¡Ganaste la partida y recibiste {0}!
   loss: ¡Perdiste la partida!
-  rank-message: '{0} <aqua>es el jugador top {1} <aqua>del rank de este minigame y se ha unido a esta partida!'
+  rank-message: '{0} es el jugador top {1} del rank de este minigame y se ha unido a esta partida!'
   no-squad: » El comando /equipo no funciona acá
+  not-in-match-state: » La partida no está en desarrollo
+  not-in-match: » No estás en una partida de minigame
   capture:
     team:
       red: Rojo
       blue: Azul
       police: Policía
       thief: Ladrón
-    time: <green>Tienes {0} segundos para llevar a los jugadores a tu base!
-    cant-escape: <red>¡No puedes escapar!
-    you-are-capturing: <green>Estás capturando a <aqua>{0}<green>. ¡Llévalo a tu base!
-    you-are-saving: <green>Estás salvando a <aqua>{0}<green>. ¡Llévalo a tu base!
-    you-are-being-captured: <red>¡Te están capturando!
-    you-are-being-saved: <green>¡Te están salvando!
-    you-have-been-captured: <red>¡Te han capturado!
-    you-have-been-saved: <green>¡Te han salvado!
-    failed-to-capture: <green>{0} no pudo capturarte
-    failed-to-save: <red>{0} no pudo salvarte
-    captured: '{0} <gold>fue capturado por {1}'
-    saved: '{0} <gold>fue salvado por {1}'
-    void: '{0} <gold>fue lo suficientemente tonto como para capturarse a sí mismo'
+    time: Tienes {0} segundos para llevar a los jugadores a tu base!
+    cant-escape: ¡No puedes escapar!
+    you-are-capturing: Estás capturando a {0}. ¡Llévalo a tu base!
+    you-are-saving: Estás salvando a {0}. ¡Llévalo a tu base!
+    you-are-being-captured: ¡Te están capturando!
+    you-are-being-saved: ¡Te están salvando!
+    you-have-been-captured: ¡Te han capturado!
+    you-have-been-saved: ¡Te han salvado!
+    failed-to-capture: {0} no pudo capturarte
+    failed-to-save: {0} no pudo salvarte
+    captured: '{0} fue capturado por {1}'
+    saved: '{0} fue salvado por {1}'
+    dumb: '{0} fue lo suficientemente tonto como para capturarse a sí mismo'
 word:
   player: Jugador
   command: Comando
+  shop: Tienda
   channels: Canales
   unknown: Desconocido
   home: Casa

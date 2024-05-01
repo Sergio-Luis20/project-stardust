@@ -1,16 +1,16 @@
 package net.stardust.minigames.signs;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.stardust.base.minigame.Minigame;
 import net.stardust.base.minigame.MinigameInfo;
 import net.stardust.base.minigame.StateListener;
 import net.stardust.base.minigame.TickListener;
 import net.stardust.base.utils.ranges.Ranges;
+import net.stardust.minigames.MinigamesPlugin;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -19,10 +19,9 @@ import org.bukkit.block.sign.Side;
 import org.bukkit.block.sign.SignSide;
 import org.bukkit.entity.Player;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.stardust.base.minigame.Minigame;
-import net.stardust.minigames.MinigamesPlugin;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Getter
 public class MatchSign {
@@ -84,14 +83,6 @@ public class MatchSign {
     public Minigame getMatch() {
         return minigame;
     }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
-    }
     
     public void setMatch(Minigame match) {
         if(minigame != null) {
@@ -104,7 +95,7 @@ public class MatchSign {
     }
 
     private void updateSign() {
-        updateSign0(minigame.getLobby().getWorld().getPlayers());
+        updateSign0(minigame.getInfo().lobby().getWorld().getPlayers());
     }
 
     private void updateSign0(List<Player> players) {
@@ -114,13 +105,13 @@ public class MatchSign {
         lines.add(serializer.deserialize(info.name() + " " + index));
         switch(state) {
             case AVAILABLE -> {
-                lines.add(Component.translatable("minigame.sign.available"));
+                lines.add(Component.translatable("minigame.sign.available", NamedTextColor.GREEN));
                 lines.add(Component.text(minigame.getWorld().getPlayerCount() + "/" + info.maxPlayers(),
                         NamedTextColor.WHITE, TextDecoration.BOLD));
                 lines.add(Component.text("» ONLINE «", NamedTextColor.AQUA, TextDecoration.BOLD));
             }
             case RUNNING -> {
-                lines.add(Component.translatable("minigame.sign.running"));
+                lines.add(Component.translatable("minigame.sign.running", NamedTextColor.RED));
                 lines.add(Component.text(minigame.getWorld().getPlayerCount() + "/" + info.maxPlayers(),
                         NamedTextColor.WHITE, TextDecoration.BOLD));
                 lines.add(Component.text("» ONLINE «", NamedTextColor.AQUA, TextDecoration.BOLD));
@@ -128,7 +119,7 @@ public class MatchSign {
             case WAITING -> {
                 lines.add(Component.empty());
                 lines.add(Component.text("-/-", NamedTextColor.WHITE, TextDecoration.BOLD));
-                lines.add(Component.translatable("minigame.sign.waiting"));
+                lines.add(Component.translatable("minigame.sign.waiting", NamedTextColor.RED, TextDecoration.BOLD));
             }
         }
         Sign virtualSign = (Sign) sign.getBlockData().createBlockState();
@@ -136,6 +127,10 @@ public class MatchSign {
         side.lines().addAll(lines);
         virtualSign.update();
         players.forEach(p -> p.sendBlockUpdate(location, virtualSign));
+    }
+
+    public String getLabel() {
+        return minigame.getInfo().name() + " " + index;
     }
 
     @Override

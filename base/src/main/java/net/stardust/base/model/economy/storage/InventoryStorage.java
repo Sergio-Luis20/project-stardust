@@ -6,7 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import net.stardust.base.utils.InventoryUtils;
+import net.stardust.base.utils.inventory.InventoryUtils;
 
 public class InventoryStorage implements Storage {
 

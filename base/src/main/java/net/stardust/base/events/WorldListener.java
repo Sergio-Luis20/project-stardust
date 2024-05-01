@@ -1,10 +1,8 @@
 package net.stardust.base.events;
 
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
+import lombok.Getter;
+import net.stardust.base.Communicable;
+import net.stardust.base.utils.Throwables;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.Event;
@@ -16,9 +14,8 @@ import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.weather.WeatherEvent;
 import org.bukkit.event.world.WorldEvent;
 
-import lombok.Getter;
-import net.stardust.base.Communicable;
-import net.stardust.base.utils.Throwables;
+import java.lang.reflect.Method;
+import java.util.*;
 
 public class WorldListener implements Listener, Communicable {
     
@@ -27,8 +24,9 @@ public class WorldListener implements Listener, Communicable {
 
     @Getter
     private String worldName;
+    private World world;
 
-    private Map<String, Method> childMethods;
+    private Map<String, List<Method>> childMethods;
     
     public WorldListener(Listener child, String worldName) {
         this.child = Objects.requireNonNull(child, "child");
@@ -55,18 +53,22 @@ public class WorldListener implements Listener, Communicable {
             if(!Event.class.isAssignableFrom(param)) {
                 throw new InvalidEventClassException(className + " has a method annotated with EventHandler with a parameter that's not a subclass of " + Event.class.getName());
             }
-            childMethods.put(param.getName(), method);
+            String name = param.getName();
+            childMethods.computeIfAbsent(name, n -> new ArrayList<>());
+            childMethods.get(name).add(method);
         }
     }
 
     @EventHandler
     public void onEvent(Event event) {
-        Method method = childMethods.get(event.getClass().getName());
-        if(method != null) {
-            World world = Bukkit.getWorld(worldName);
+        List<Method> methods = childMethods.get(event.getClass().getName());
+        if(methods != null) {
+            World world = getWorld();
             if(world != null && world.equals(getEventWorld(event))) {
                 try {
-                    method.invoke(child, event);
+                    for(Method method : methods) {
+                        method.invoke(child, event);
+                    }
                 } catch(Exception e) {
                     Throwables.sendAndThrow(worldName, e);
                 }
@@ -91,6 +93,13 @@ public class WorldListener implements Listener, Communicable {
             return weatherEvent.getWorld();
         }
         return null;
+    }
+
+    private World getWorld() {
+        if(world == null) {
+            world = Bukkit.getWorld(worldName);
+        }
+        return world;
     }
 
     @Override

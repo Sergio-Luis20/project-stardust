@@ -1,7 +1,7 @@
 package net.stardust.base.utils;
 
-import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -24,6 +24,18 @@ public class PlayerSnapshot {
 
     public void takeSnapshot(Player player) {
         snapshots.put(player, new Snapshot(player));
+        Component name = player.name();
+        player.getInventory().clear();
+        player.setLevel(0);
+        player.setExp(0);
+        player.clearActivePotionEffects();
+        player.setInvisible(false);
+        player.setInvulnerable(false);
+        player.displayName(name);
+        player.playerListName(name);
+        player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+        player.setHealth(20);
+        player.setGameMode(GameMode.SURVIVAL);
     }
 
     public void restore(Player player) {
@@ -51,24 +63,26 @@ public class PlayerSnapshot {
         snapshots.remove(player);
     }
 
-    public record Snapshot(ItemStack[] contents, float exp, Collection<PotionEffect> effects,
-                           boolean invisible, boolean invulnerable, Component displayName, Scoreboard scoreboard,
-                           double health, GameMode gamemode) {
+    public record Snapshot(ItemStack[] contents, int level, float exp, Collection<PotionEffect> effects,
+                           boolean invisible, boolean invulnerable, Component displayName, Component listName,
+                           Scoreboard scoreboard, double health, GameMode gamemode) {
 
         public Snapshot(Player player) {
-            this(player.getInventory().getContents(), player.getExp(), player.getActivePotionEffects(),
-                    player.isInvisible(), player.isInvulnerable(), player.displayName(), player.getScoreboard(),
-                    player.getHealth(), player.getGameMode());
+            this(player.getInventory().getContents(), player.getLevel(), player.getExp(), player.getActivePotionEffects(),
+                    player.isInvisible(), player.isInvulnerable(), player.displayName(), player.playerListName(),
+                    player.getScoreboard(), player.getHealth(), player.getGameMode());
         }
 
         public void apply(Player player) {
             player.getInventory().setContents(contents);
+            player.setLevel(level);
             player.setExp(exp);
             player.clearActivePotionEffects();
             player.addPotionEffects(effects);
             player.setInvisible(invisible);
             player.setInvulnerable(invulnerable);
             player.displayName(displayName);
+            player.playerListName(listName);
             player.setScoreboard(scoreboard);
             player.setHealth(health);
             player.setGameMode(gamemode);

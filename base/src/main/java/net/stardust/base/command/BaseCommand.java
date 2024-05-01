@@ -13,6 +13,7 @@ public @interface BaseCommand {
     
     // Name of the command
     String value();
+    String usageKey() default "";
     SenderType[] types() default SenderType.ALL;
     boolean opOnly() default false;
 

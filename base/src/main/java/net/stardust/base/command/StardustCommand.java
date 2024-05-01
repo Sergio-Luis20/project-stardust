@@ -1,24 +1,5 @@
 package net.stardust.base.command;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.logging.Level;
-
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import br.sergio.utils.Pair;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
@@ -30,6 +11,20 @@ import net.stardust.base.utils.AutomaticMessages;
 import net.stardust.base.utils.Messager;
 import net.stardust.base.utils.StardustThreads;
 import net.stardust.base.utils.Throwables;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.logging.Level;
 
 @Getter
 public abstract sealed class StardustCommand<T extends BasePlugin> implements CommandExecutor, Communicable permits SyncCommand, AsyncCommand, DirectCommand, VirtualCommand {
@@ -40,6 +35,7 @@ public abstract sealed class StardustCommand<T extends BasePlugin> implements Co
 	protected final MiniMessage miniMessage;
 	protected final Set<SenderType> senderTypes;
 	protected final boolean opOnly;
+	protected final Component failMessage;
 	
 	private Map<Thread, CommandSender> senders;
 	private MethodCommandScanner scanner;
@@ -49,6 +45,9 @@ public abstract sealed class StardustCommand<T extends BasePlugin> implements Co
 		BaseCommand ann = getClass().getAnnotation(BaseCommand.class);
 		this.name = ann.value();
 		this.opOnly = ann.opOnly();
+		String usageKey = ann.usageKey();
+		this.failMessage = usageKey.isEmpty() ? AutomaticMessages.notFound("word.command") :
+				Component.translatable(usageKey, NamedTextColor.RED);
 
 		// Types validation
 		SenderType[] types = ann.types();
@@ -118,7 +117,7 @@ public abstract sealed class StardustCommand<T extends BasePlugin> implements Co
 						}
 					});
 				} else {
-					messager.message(sender, AutomaticMessages.notFound("word.command"));
+					messager.message(sender, failMessage);
 				}
         	});
         	return true;

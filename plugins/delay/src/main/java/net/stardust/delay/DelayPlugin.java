@@ -14,9 +14,7 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.SmithingTransformRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import net.stardust.base.utils.ItemUtils;
-
-import java.util.Arrays;
+import net.stardust.base.utils.item.ItemUtils;
 
 public class DelayPlugin extends JavaPlugin implements Listener {
 

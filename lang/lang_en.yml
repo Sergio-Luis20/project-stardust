@@ -172,56 +172,59 @@ error:
   internal: » Internal server error
 minigame:
   sign:
-    available: <green>Available
-    running: <red>Running
-    waiting: <blue><bold>Waiting
+    available: Available
+    running: Running
+    waiting: Waiting
   match:
-    full: <red>» Full match
-    entering: <green>» Entering the match
-    running: <red>» Running match
-    not-open: <red>This match is not open
+    full: » Full match
+    entering: » Entering in {0}
+    running: » Running match
+    not-open-yet: » This match is not open
     interrupted: » Match interrupted
   team:
-    usage: '<red>» Usage: /team <message>'
+    usage: '» Usage: /team <message>'
   shop: Shop
   tracker: Tracker
-  track: '<gray>Player: {0}, distance: {1}'
+  track: 'Player: {0}, distance: {1}'
   bought:
     self: » You paid {0} for that item
     others: » {0} has bought an item for {1} in the shop
   to-start:
     plural:
-      time: <aqua>{0} {1}seconds left to start
-      player: <aqua>{0} <light_purple>players left to start
+      time: {0} seconds left to start
+      player: {0} players left to start
     single:
-      time: <aqua>1 {0}second left to start
-      player: <aqua>1 <light_purple>player left to start
+      time: {0} second left to start
+      player: {0} player left to start
   win: You won the match and earned {0}!
   loss: You lost the match!
-  rank-message: '{0} <aqua>is the top {1} <aqua>ranked player in this minigame and has joined this match!'
+  rank-message: '{0} is the top {1} ranked player in this minigame and has joined this match!'
   no-squad: » The command /squad do not work here
+  not-in-match-state: » The match is not running
+  not-in-match: » You are not in a minigame match
   capture:
     team:
       red: Red
       blue: Blue
       police: Police
       Thief: Thief
-    time: <green>You have {0} seconds to bring the players to your base!
-    cant-escape: <red>You can't escape!
-    you-are-capturing: <green>You are capturing <aqua>{0}<green>. Take him to your base!
-    you-are-saving: <green>You are saving <aqua>{0}<green>. Take him to your base!
-    you-are-being-captured: <red>You are being captured!
-    you-are-being-saved: <green>You are being saved!
-    you-have-been-captured: <red>You have been captured!
-    you-have-been-saved: <green>You have been saved!
-    failed-to-capture: <green>{0} failed to capture you!
-    failed-to-save: <red>{0} failed to save you!
-    captured: '{0} <gold>was captured by {1}'
-    saved: '{0} <gold>was saved by {1}'
-    void: '{0} <gold>was stupid enough to capture itself'
+    time: You have {0} seconds to bring the players to your base!
+    cant-escape: You can't escape!
+    you-are-capturing: You are capturing {0}. Take him to your base!
+    you-are-saving: You are saving {0}. Take him to your base!
+    you-are-being-captured: You are being captured!
+    you-are-being-saved: You are being saved!
+    you-have-been-captured: You have been captured!
+    you-have-been-saved: You have been saved!
+    failed-to-capture: {0} failed to capture you!
+    failed-to-save: {0} failed to save you!
+    captured: '{0} was captured by {1}'
+    saved: '{0} was saved by {1}'
+    dumb: '{0} was stupid enough to capture itself'
 word:
   player: Player
   command: Command
+  shop: Shop
   channels: Channels
   unknown: Unknown
   Home: Home

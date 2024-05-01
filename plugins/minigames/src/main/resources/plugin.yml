@@ -5,9 +5,9 @@ api-version: 1.19
 depend: [general-commands]
 commands:
   sign:
-    aliases: [placa]
+    aliases: [placa, letrero]
   spawn:
     aliases: [lobby, entrada]
-  team:
-    aliases: [time, equipo, squad, equipe]
+  squad:
+    aliases: [time, equipo, team, equipe, e, sq, tm]
   capture:

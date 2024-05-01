@@ -1,17 +1,20 @@
-package net.stardust.base.utils;
+package net.stardust.base.utils.inventory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import net.stardust.base.utils.ranges.Ranges;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public final class InventoryUtils {
+
+    public static final int DEFAULT_INVENTORY_SIZE = sizeForRows(6);
     
     private InventoryUtils() {}
 
@@ -45,6 +48,10 @@ public final class InventoryUtils {
         Inventory copy = Bukkit.createInventory(null, size);
         copy.setStorageContents(inventory.getStorageContents());
         return copy;
+    }
+
+    public static int sizeForRows(int rows) {
+        return 9 * Ranges.rangeInclusive(rows, 1, 6, "rows");
     }
 
 }

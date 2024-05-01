@@ -32,6 +32,10 @@ public final class AutomaticMessages {
         return Component.translatable("pageable." + subkey, NamedTextColor.GOLD, page);
     }
 
+    public static Component internalServerError() {
+        return Component.translatable("error.internal", NamedTextColor.RED);
+    }
+
     private static Component build(String mainKey, TextColor mainColor, Component... args) {
         return Component.translatable(mainKey, mainColor, args);
     }

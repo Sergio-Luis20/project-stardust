@@ -1,9 +1,10 @@
-package net.stardust.base.utils;
+package net.stardust.base.utils.item;
 
-import java.lang.reflect.Field;
-import java.util.UUID;
-import java.util.logging.Level;
-
+import br.sergio.utils.Pair;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import net.stardust.base.utils.Throwables;
+import net.stardust.base.utils.plugin.PluginConfig;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.attribute.Attribute;
@@ -14,11 +15,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
-
-import br.sergio.utils.Pair;
-import net.stardust.base.utils.plugin.PluginConfig;
+import java.lang.reflect.Field;
+import java.util.UUID;
+import java.util.logging.Level;
 
 public class ItemUtils {
 
@@ -55,6 +54,16 @@ public class ItemUtils {
                 , "Exceção ao obter cabeça", Throwables.send("ItemUtils/createHead", e));
         }
         return head;
+    }
+
+    public static ItemStack withEnchants(ItemStack item, Enchant... enchants) {
+        item = item(item);
+        ItemMeta meta = item.getItemMeta();
+        for(Enchant ench : enchants) {
+            ench.addTo(meta);
+        }
+        item.setItemMeta(meta);
+        return item;
     }
     
     private static ItemStack axe(ItemStack item) {
