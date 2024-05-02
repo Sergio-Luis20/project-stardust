@@ -2,7 +2,7 @@ name: minigames
 version: 1.0
 main: net.stardust.minigames.MinigamesPlugin
 api-version: 1.19
-depend: [general-commands]
+depend: [general-commands, channels]
 commands:
   sign:
     aliases: [placa, letrero]
@@ -10,4 +10,9 @@ commands:
     aliases: [lobby, entrada]
   squad:
     aliases: [time, equipo, team, equipe, e, sq, tm]
+  minigame:
+    aliases: [mg, minijogo, minijuego, mj]
+  mgdata:
+    aliases: [mgd, minigamedata]
   capture:
+    aliases: [cap, cpt, cptr]

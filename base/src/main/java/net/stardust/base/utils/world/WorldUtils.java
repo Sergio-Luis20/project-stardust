@@ -1,12 +1,13 @@
 package net.stardust.base.utils.world;
 
 import net.stardust.base.utils.Throwables;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
+import net.stardust.base.utils.plugin.PluginConfig;
+import org.apache.commons.io.FileUtils;
+import org.bukkit.*;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -16,9 +17,13 @@ public final class WorldUtils {
 
     private WorldUtils() {}
 
-    public static World getLoadedWorld(String name) {
+    public static World loadWorld(String name) {
         WorldCreator creator = new WorldCreator(name);
         return creator.createWorld();
+    }
+
+    public static boolean isLoaded(String name) {
+        return Bukkit.getWorld(name) != null;
     }
 
     public static UUID readWorldUUID(File folder) {
@@ -54,6 +59,36 @@ public final class WorldUtils {
             loc.subtract(0, 1, 0);
         }
         return true;
+    }
+
+    public static void deleteUIDDat(String name) throws IOException {
+        if(isLoaded(name)) {
+            throw buildException("World name: " + name, Bukkit.getWorld(name));
+        }
+        Files.deleteIfExists(Paths.get(name, "uid.dat"));
+    }
+
+    public static File copyMapToServerFolder(File map, String suffix) {
+        String finalName = map.getName() + suffix;
+        if(isLoaded(finalName)) {
+            throw buildException("World name: " + finalName, Bukkit.getWorld(finalName));
+        }
+        try {
+            File serverFolder = PluginConfig.get().getPlugin().getServerFolder();
+            File finalFolder = new File(serverFolder, finalName);
+            FileUtils.copyDirectory(map, finalFolder);
+            deleteUIDDat(finalName);
+            return finalFolder;
+        } catch(IOException e) {
+            Throwables.sendAndThrow(e);
+            return null;
+        }
+    }
+
+    private static WorldInUseException buildException(String message, World world) {
+        WorldInUseException e = new WorldInUseException(message);
+        e.setWorld(world);
+        return e;
     }
 
 }

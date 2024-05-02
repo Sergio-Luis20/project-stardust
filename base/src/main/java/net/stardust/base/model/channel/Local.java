@@ -1,22 +1,20 @@
 package net.stardust.base.model.channel;
 
+import lombok.Getter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.stardust.base.BasePlugin;
+import net.stardust.base.Stardust;
+import net.stardust.base.utils.StardustThreads;
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.stardust.base.Stardust;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import lombok.Getter;
-import net.kyori.adventure.text.Component;
-import net.stardust.base.BasePlugin;
-import net.stardust.base.utils.ChatUtils;
-import net.stardust.base.utils.StardustThreads;
 
 @Getter
 @ChannelProperties({"status", "minigame", "dungeon"})
@@ -55,9 +53,10 @@ public class Local extends SimpleCooldownChannel {
     public void sendMessage(CommandSender sender, Component component) {
         if(!containsParticipant(sender)) return;
         if(!canSendMessages(sender)) return;
+        Component message = formatMessage(sender, component);
         if(sender instanceof Player player) {
-            if(StardustThreads.call(plugin, () -> player.isOp())) {
-                messager.message(participants, component);
+            if(StardustThreads.call(plugin, player::isOp)) {
+                messager.message(participants, message);
                 return;
             }
             AtomicBoolean fine = new AtomicBoolean();
@@ -65,11 +64,11 @@ public class Local extends SimpleCooldownChannel {
                 if(world.equals(player.getWorld())) {
                     participants.forEach(participant -> {
                         if(!(participant instanceof Player other)) {
-                            messager.message(participant, component);
+                            messager.message(participant, message);
                             return;
                         }
                         if(player.getLocation().distance(other.getLocation()) <= maxDistance) {
-                            messager.message(other, component);
+                            messager.message(other, message);
                         }
                     });
                     fine.set(true);
@@ -80,7 +79,7 @@ public class Local extends SimpleCooldownChannel {
                         + StardustThreads.call(plugin, () -> world.getName()) + "\" and is somehow participating of its local chat");
             }
         }
-        messager.message(participants, component);
+        messager.message(participants, message);
     }
 
     @Override

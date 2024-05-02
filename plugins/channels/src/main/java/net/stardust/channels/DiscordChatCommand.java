@@ -1,14 +1,5 @@
 package net.stardust.channels;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
-
 import net.dv8tion.jda.api.OnlineStatus;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -21,6 +12,14 @@ import net.stardust.base.command.SenderType;
 import net.stardust.base.command.VirtualCommand;
 import net.stardust.base.utils.BatchList;
 import net.stardust.base.utils.StardustThreads;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @BaseCommand(value = "discordchat", types = SenderType.PLAYER)
 public class DiscordChatCommand extends VirtualCommand<ChannelsPlugin> {
@@ -201,7 +200,7 @@ public class DiscordChatCommand extends VirtualCommand<ChannelsPlugin> {
                 .hoverEvent(hover).clickEvent(ClickEvent.copyToClipboard(nick == null ? "null" : nick));
             Component idPiece = idComp.append(Component.text(id, NamedTextColor.AQUA)).hoverEvent(hover)
                 .clickEvent(ClickEvent.copyToClipboard(id));
-            Component mentionPiece = mention.clickEvent(ClickEvent.suggestCommand(member.getAsMention()));
+            Component mentionPiece = mention.clickEvent(ClickEvent.suggestCommand(member.getAsMention() + " "));
             return namePiece.append(comma).append(nickPiece).append(comma).append(idPiece)
                 .append(comma).append(mentionPiece);
         }).collect(BatchList.collector(5));

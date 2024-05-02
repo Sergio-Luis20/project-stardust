@@ -1,20 +1,19 @@
 package net.stardust.base.utils.plugin;
 
-import java.lang.reflect.Constructor;
-import java.util.Objects;
-import java.util.Set;
-
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
-import org.reflections.Reflections;
-import org.reflections.util.ConfigurationBuilder;
-
 import net.stardust.base.BasePlugin;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.events.BaseListener;
-import net.stardust.base.events.WorldListener;
 import net.stardust.base.utils.Throwables;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.PluginManager;
+import org.reflections.Reflections;
+import org.reflections.util.ConfigurationBuilder;
+
+import java.lang.reflect.Constructor;
+import java.util.Objects;
+import java.util.Set;
 
 public final class PluginConfig {
 
@@ -26,15 +25,9 @@ public final class PluginConfig {
     private PluginConfig() {}
 
     public void registerEvents(Listener... listeners) {
+        PluginManager manager = plugin.getServer().getPluginManager();
         for(Listener listener : listeners) {
-            BaseListener ann = listener.getClass().getAnnotation(BaseListener.class);
-            if(ann != null) {
-                String worldName = ann.value();
-                if(!worldName.isBlank()) {
-                    listener = new WorldListener(listener, worldName);
-                }
-            }
-            plugin.getServer().getPluginManager().registerEvents(listener, plugin);
+            manager.registerEvents(listener, plugin);
         }
     }
     

@@ -19,7 +19,8 @@ public final class BossBarUtils {
     }
 
     public static void removeAll(BossBar bar) {
-        viewers(bar).forEach(bar::removeViewer);
+        List<Player> viewers = new ArrayList<>(viewers(bar));
+        viewers.forEach(bar::removeViewer);
     }
 
     public static boolean contains(BossBar bar, Player player) {

@@ -1,5 +1,12 @@
 package net.stardust.base;
 
+import lombok.Getter;
+import net.stardust.base.utils.Messager;
+import net.stardust.base.utils.StardustThreads;
+import net.stardust.base.utils.Throwables;
+import net.stardust.base.utils.plugin.PluginConfig;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,14 +16,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
-
-import org.bukkit.plugin.java.JavaPlugin;
-
-import lombok.Getter;
-import net.stardust.base.utils.Messager;
-import net.stardust.base.utils.StardustThreads;
-import net.stardust.base.utils.Throwables;
-import net.stardust.base.utils.plugin.PluginConfig;
 
 @Getter
 public abstract class BasePlugin extends JavaPlugin implements Communicable {
@@ -71,7 +70,7 @@ public abstract class BasePlugin extends JavaPlugin implements Communicable {
 	}
 
 	public File getServerFolder() {
-		return getDataFolder().getParentFile().getParentFile();
+		return new File(".");
 	}
 
 	@Override

@@ -4,13 +4,18 @@ import lombok.Getter;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.stardust.base.utils.SoundPack;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.List;
 import java.util.Objects;
 
 public class PreMatchStopwatch extends BukkitRunnable {
 
     public static final int DEFAULT_PRE_MATCH_TIME = 60;
+    public static final SoundPack STARTING = new SoundPack(Sound.BLOCK_STONE_BUTTON_CLICK_OFF, 0.5f);
 
     @Getter
     private Minigame parent;
@@ -34,7 +39,8 @@ public class PreMatchStopwatch extends BukkitRunnable {
     @Override
     public void run() {
         BossBar bar = parent.getPreMatchBar();
-        int playerDiff = parent.getInfo().minPlayers() - parent.getWorld().getPlayerCount();
+        List<Player> players = parent.getWorld().getPlayers();
+        int playerDiff = parent.getInfo().minPlayers() - players.size();
         if(playerDiff > 0) {
             time = preMatchTime;
             bar.name(getBarTitle(playerDiff, true));
@@ -47,6 +53,9 @@ public class PreMatchStopwatch extends BukkitRunnable {
         } else {
             bar.name(getBarTitle(time, false));
             bar.progress((float) time / preMatchTime);
+            if(time <= 10) {
+                players.forEach(STARTING::play);
+            }
             time--;
         }
     }

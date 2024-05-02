@@ -1,13 +1,11 @@
 package net.stardust.channels;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiConsumer;
-
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.stardust.base.events.BaseListener;
 import net.stardust.base.model.channel.Channel;
+import net.stardust.base.model.channel.Local;
+import net.stardust.base.utils.MentionService;
+import net.stardust.base.utils.SingletonException;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -15,14 +13,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
-import io.papermc.paper.event.player.AsyncChatEvent;
-import net.stardust.base.events.BaseListener;
-import net.stardust.base.model.channel.Local;
-import net.stardust.base.utils.MentionService;
-import net.stardust.base.utils.SingletonException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
 
 @BaseListener
 public class LocalChat implements Listener {
@@ -67,6 +67,17 @@ public class LocalChat implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         playerAction(event.getPlayer(), Channel::removeParticipant);
+    }
+
+    @EventHandler
+    public void onTeleport(PlayerTeleportEvent event) {
+        World from = event.getFrom().getWorld();
+        World to = event.getTo().getWorld();
+        if(!from.equals(to)) {
+            Player player = event.getPlayer();
+            getLocal(from).removeParticipant(player);
+            getLocal(to).addParticipant(player);
+        }
     }
 
     @EventHandler

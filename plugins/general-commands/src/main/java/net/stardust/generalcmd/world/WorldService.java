@@ -1,23 +1,19 @@
 package net.stardust.generalcmd.world;
 
+import org.bukkit.*;
+import org.bukkit.World.Environment;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.World.Environment;
-import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class WorldService {
     
     private static final WorldService SINGLETON;
 
-    private List<String> worlds;
+    private final List<String> worlds;
 
     private WorldService() {
         worlds = new ArrayList<>();

@@ -35,6 +35,7 @@ public class PlayerSnapshot {
         player.playerListName(name);
         player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
         player.setHealth(20);
+        player.setFoodLevel(20);
         player.setGameMode(GameMode.SURVIVAL);
     }
 
@@ -65,12 +66,12 @@ public class PlayerSnapshot {
 
     public record Snapshot(ItemStack[] contents, int level, float exp, Collection<PotionEffect> effects,
                            boolean invisible, boolean invulnerable, Component displayName, Component listName,
-                           Scoreboard scoreboard, double health, GameMode gamemode) {
+                           Scoreboard scoreboard, double health, int foodLevel, GameMode gamemode) {
 
         public Snapshot(Player player) {
             this(player.getInventory().getContents(), player.getLevel(), player.getExp(), player.getActivePotionEffects(),
                     player.isInvisible(), player.isInvulnerable(), player.displayName(), player.playerListName(),
-                    player.getScoreboard(), player.getHealth(), player.getGameMode());
+                    player.getScoreboard(), player.getHealth(), player.getFoodLevel(), player.getGameMode());
         }
 
         public void apply(Player player) {
@@ -85,6 +86,7 @@ public class PlayerSnapshot {
             player.playerListName(listName);
             player.setScoreboard(scoreboard);
             player.setHealth(health);
+            player.setFoodLevel(foodLevel);
             player.setGameMode(gamemode);
         }
 

@@ -4,15 +4,16 @@ import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.stardust.base.events.WorldListener;
 import net.stardust.base.minigame.Minigame.MinigameState;
 import net.stardust.base.model.economy.transaction.*;
 import net.stardust.base.model.economy.transaction.operation.*;
 import net.stardust.base.model.economy.wallet.Currency;
 import net.stardust.base.model.economy.wallet.Money;
-import net.stardust.base.utils.inventory.CantStoreItemsException;
-import net.stardust.base.utils.inventory.InventoryUtils;
 import net.stardust.base.utils.SoundPack;
 import net.stardust.base.utils.database.crud.PlayerWalletCrud;
+import net.stardust.base.utils.inventory.CantStoreItemsException;
+import net.stardust.base.utils.inventory.InventoryUtils;
 import net.stardust.base.utils.item.ItemUtils;
 import net.stardust.base.utils.persistence.DataManager;
 import net.stardust.base.utils.ranges.Ranges;
@@ -22,7 +23,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -40,7 +40,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 @Getter
-public class MinigameShop implements Listener {
+public class MinigameShop extends WorldListener {
 
     private static final NamespacedKey SHOP_ITEM_KEY, SHOP_BOOK_KEY;
     private static final SoundPack BUY_SOUND;
@@ -53,6 +53,7 @@ public class MinigameShop implements Listener {
     private boolean preMatchOnly;
 
     private MinigameShop(Minigame parent, Inventory inventory, boolean preMatchOnly) {
+        super(parent::getWorld);
         this.parent = Objects.requireNonNull(parent, "parent");
         this.inventory = Objects.requireNonNull(inventory, "inventory");
         this.preMatchOnly = preMatchOnly;
@@ -78,10 +79,21 @@ public class MinigameShop implements Listener {
 
     public static void giveShopBook(Player player) throws CantStoreItemsException {
         PlayerInventory inventory = player.getInventory();
-        if(!InventoryUtils.canStoreAllItems(inventory, SHOP_BOOK)) {
-            throw new CantStoreItemsException(inventory, player);
+        boolean set = false;
+        for(int i = 8; i >= 0; i--) {
+            ItemStack item = inventory.getItem(i);
+            if(item == null || item.getType() == Material.AIR) {
+                inventory.setItem(i, SHOP_BOOK);
+                set = true;
+                break;
+            }
         }
-        inventory.addItem(SHOP_BOOK);
+        if(!set) {
+            if(!InventoryUtils.canStoreAllItems(inventory, SHOP_BOOK)) {
+                throw new CantStoreItemsException(inventory, player);
+            }
+            inventory.addItem(SHOP_BOOK);
+        }
     }
 
     @EventHandler

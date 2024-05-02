@@ -1,5 +1,8 @@
 package net.stardust.throwables;
 
+import br.sergio.comlib.*;
+import net.stardust.base.BasePlugin;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,15 +14,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import br.sergio.comlib.Communication;
-import br.sergio.comlib.MappingException;
-import br.sergio.comlib.Request;
-import br.sergio.comlib.RequestListener;
-import br.sergio.comlib.RequestMapper;
-import br.sergio.comlib.Response;
-import br.sergio.comlib.ResponseStatus;
-import net.stardust.base.BasePlugin;
 
 public class ThrowableManager extends BasePlugin implements RequestMapper {
 
@@ -81,9 +75,12 @@ public class ThrowableManager extends BasePlugin implements RequestMapper {
         if(!throwablesFolder.exists()) {
             throwablesFolder.mkdirs();
         }
+        if(id != null) {
+            id = id.replace('/', '_');
+        }
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH-mm-ss-SSS");
         String fileName = format.format(new Date()) + " " 
-            + t.getClass().getSimpleName() + " " + id.replace('/', '_') + ".twb";
+            + t.getClass().getSimpleName() + " " + id + ".twb";
         File file = new File(throwablesFolder, fileName);
         try(FileWriter fw = new FileWriter(file, StandardCharsets.UTF_8, true); 
             PrintWriter pw = new PrintWriter(fw)) {

@@ -1,34 +1,40 @@
 package net.stardust.base.minigame;
 
+import br.sergio.utils.Pair;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.bossbar.BossBar.Color;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.stardust.base.events.WorldListener;
 import net.stardust.base.model.economy.wallet.Currency;
 import net.stardust.base.model.economy.wallet.Money;
 import net.stardust.base.model.economy.wallet.PlayerWallet;
 import net.stardust.base.model.minigame.MinigameData;
 import net.stardust.base.model.minigame.MinigamePlayer;
-import net.stardust.base.utils.AutomaticMessages;
-import net.stardust.base.utils.BossBarUtils;
-import net.stardust.base.utils.PlayerSnapshot;
-import net.stardust.base.utils.Throwables;
+import net.stardust.base.utils.*;
 import net.stardust.base.utils.database.crud.MinigameDataCrud;
 import net.stardust.base.utils.database.crud.PlayerWalletCrud;
 import net.stardust.base.utils.plugin.PluginConfig;
+import net.stardust.base.utils.world.NotWorldListener;
+import net.stardust.base.utils.world.WorldUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.io.File;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 public abstract class Minigame implements Listener {
@@ -48,6 +54,8 @@ public abstract class Minigame implements Listener {
 
     @Getter(AccessLevel.PACKAGE)
     private BossBar preMatchBar;
+    private BossBar matchBar;
+    private BukkitRunnable matchStopwatch;
     private Listener preMatchTraffic;
     private Listener defaultListener;
 
@@ -65,7 +73,8 @@ public abstract class Minigame implements Listener {
     @Getter
     @Setter(AccessLevel.PROTECTED)
     private MinigameShop shop;
-    private WorldListener shopWorldListener;
+
+    private ExecutorService mapCopyExecutorService;
 
     public Minigame(MinigameInfo info) {
         this.info = Objects.requireNonNull(info, "info");
@@ -74,6 +83,8 @@ public abstract class Minigame implements Listener {
         tickListeners = new ArrayList<>();
         postMatchTime = DEFAULT_POST_MATCH_TIME;
         preMatchBar = BossBarUtils.newDefaultBar();
+        matchBar = BossBarUtils.newDefaultBar();
+        mapCopyExecutorService = PluginConfig.get().getPlugin().getCached();
         ticker = new BukkitRunnable() {
 
             @Override
@@ -82,28 +93,36 @@ public abstract class Minigame implements Listener {
             }
 
         };
+        ticker.runTaskTimer(PluginConfig.get().getPlugin(), 0, 20);
     }
 
     public void preMatch() {
         setState(MinigameState.PRE_MATCH);
-        ticker.runTaskTimer(PluginConfig.get().getPlugin(), 0, 20);
-        if(world != null) {
-            Bukkit.unloadWorld(world, false);
-        }
-        world = info.mapDrawer().drawMap();
-        String worldName = world.getName();
         if(stopwatch != null) {
             stopwatch.cancel();
         }
+        if(world != null) {
+            Bukkit.unloadWorld(world, false);
+            world = null;
+        }
+        mapCopyExecutorService.submit(() -> {
+            File drawnMap = FileDrawer.drawFile(info.mapsFolder());
+            String suffix = "-" + info.index();
+            WorldUtils.copyMapToServerFolder(drawnMap, suffix);
+            Bukkit.getScheduler().runTask(PluginConfig.get().getPlugin(),
+                    () -> preMatch0(drawnMap.getName() + suffix));
+        });
+    }
+
+    private void preMatch0(String worldName) {
+        world = WorldUtils.loadWorld(worldName);
+        world.getEntities().forEach(Entity::remove);
         stopwatch = newStopwatch();
         stopwatch.runTaskTimer(PluginConfig.get().getPlugin(), 0, 20);
         preMatchTraffic = new PreMatchTrafficListener(this);
-        defaultListener = new WorldListener(newPreMatchListener(), worldName);
+        defaultListener = newPreMatchListener();
         PluginConfig.get().registerEvents(preMatchTraffic, defaultListener);
-        if(shop != null) {
-            shopWorldListener = new WorldListener(shop, worldName);
-            PluginConfig.get().registerEvents(shopWorldListener);
-        }
+        registerListener(shop);
         stateListeners.forEach(listener -> listener.onLatePreMatch(this));
     }
 
@@ -120,16 +139,51 @@ public abstract class Minigame implements Listener {
         unregisterMatchListener();
         unregisterShop();
         registerListener(defaultListener);
-        MinigameDataCrud dataCrud = new MinigameDataCrud();
-        PlayerWalletCrud walletCrud = new PlayerWalletCrud();
-        MinigameData data = dataCrud.getOrNull(info.name());
-        Map<UUID, PlayerWallet> wallets = walletCrud.getAll(winners.stream()
-                .map(Player::getUniqueId)
-                .toList())
-                .stream()
-                .collect(Collectors.toMap(PlayerWallet::getId, wallet -> wallet));
-        Map<UUID, MinigamePlayer> minigamePlayers = data.getMinigamePlayers();
-        BigInteger reward = new BigInteger(String.valueOf(info.reward()));
+        stopMatchStopwatch();
+        MatchResult result = getMatchResult(winners, losers);
+        if(result != MatchResult.NO_WINNERS) {
+            MinigameDataCrud dataCrud = new MinigameDataCrud();
+            PlayerWalletCrud walletCrud = new PlayerWalletCrud();
+            MinigameData data = dataCrud.getOrNull(info.name());
+            if(data == null) {
+                data = new MinigameData(info.name());
+            }
+            Map<UUID, PlayerWallet> wallets = walletCrud.getAll(winners.stream()
+                            .map(Player::getUniqueId)
+                            .toList())
+                    .stream()
+                    .collect(Collectors.toMap(PlayerWallet::getId, wallet -> wallet));
+            Map<UUID, MinigamePlayer> minigamePlayers = data.getMinigamePlayers();
+            BigInteger reward = new BigInteger(String.valueOf(info.reward()));
+            if(result == MatchResult.NORMAL) {
+                onNormalEnding(winners, losers, wallets, minigamePlayers, reward);
+            } else {
+                onDrawEnding(wallets, minigamePlayers, reward);
+            }
+            final MinigameData finalData = data;
+            PluginConfig.get().getPlugin().getVirtual().submit(() -> {
+                dataCrud.update(finalData);
+                walletCrud.updateAll(new ArrayList<>(wallets.values()));
+            });
+        }
+        sendEndMessages(winners, losers, result);
+        Location lobby = info.lobby();
+        Bukkit.getScheduler().runTaskLater(PluginConfig.get().getPlugin(), () -> {
+            snapshot.restoreAll();
+            BossBarUtils.removeAll(preMatchBar);
+            BossBarUtils.removeAll(matchBar);
+            getWorld().getPlayers().forEach(player -> player.teleport(lobby));
+            unregisterPreMatchListeners();
+            unregisterMatchListener();
+            unregisterShop();
+            stateListeners.forEach(listener -> listener.onLateEndMatch(this));
+            Bukkit.unloadWorld(world, false);
+            world = null;
+        }, 20 * postMatchTime);
+    }
+
+    private void onNormalEnding(List<Player> winners, List<Player> losers, Map<UUID, PlayerWallet> wallets,
+                                Map<UUID, MinigamePlayer> minigamePlayers, BigInteger reward) {
         for(Player player : winners) {
             UUID uniqueId = player.getUniqueId();
             MinigamePlayer minigamePlayer = getMinigamePlayer(minigamePlayers, uniqueId);
@@ -142,28 +196,44 @@ public abstract class Minigame implements Listener {
             MinigamePlayer minigamePlayer = getMinigamePlayer(minigamePlayers, uniqueId);
             minigamePlayer.setLosses(minigamePlayer.getLosses() + 1);
         }
-        PluginConfig.get().getPlugin().getVirtual().submit(() -> {
-            dataCrud.update(data);
-            walletCrud.updateAll(new ArrayList<>(wallets.values()));
-        });
-        sendEndMessages(winners, losers);
-        Location lobby = info.lobby();
-        Bukkit.getScheduler().runTaskLater(PluginConfig.get().getPlugin(), () -> {
-            snapshot.restoreAll();
-            ticker.cancel();
-            getWorld().getPlayers().forEach(player -> player.teleport(lobby));
-            unregisterDefaultListener();
-            stateListeners.forEach(listener -> listener.onLateEndMatch(this));
-        }, 20 * postMatchTime);
     }
 
-    protected void sendEndMessages(List<Player> winners, List<Player> losers) {
-        Money reward = new Money(Currency.SILVER, new BigInteger(String.valueOf(info.reward())));
-        Component component = reward.toComponent();
-        Component winMessage = Component.translatable("minigame.win", NamedTextColor.GREEN, component);
-        Component lossMessage = Component.translatable("minigame.loss", NamedTextColor.RED);
-        winners.forEach(p -> p.sendMessage(winMessage));
-        losers.forEach(p -> p.sendMessage(lossMessage));
+    private void onDrawEnding(Map<UUID, PlayerWallet> wallets, Map<UUID, MinigamePlayer> minigamePlayers, BigInteger reward) {
+        for(Player player : getWorld().getPlayers()) {
+            UUID uniqueId = player.getUniqueId();
+            MinigamePlayer minigamePlayer = getMinigamePlayer(minigamePlayers, uniqueId);
+            minigamePlayer.setWins(minigamePlayer.getWins() + 1);
+            PlayerWallet wallet = wallets.get(uniqueId);
+            wallet.getSilver().add(reward);
+        }
+    }
+
+    protected void sendEndMessages(List<Player> winners, List<Player> losers, MatchResult result) {
+        switch(result) {
+            case NORMAL -> {
+                Money reward = new Money(Currency.SILVER, new BigInteger(String.valueOf(info.reward())));
+                Component component = reward.toComponent();
+                Component winMessage = Component.translatable("minigame.win", NamedTextColor.GREEN, component);
+                Component lossMessage = Component.translatable("minigame.loss", NamedTextColor.RED);
+                sendEndMessages0(new Pair<>(winners, winMessage), new Pair<>(losers, lossMessage));
+            }
+            case DRAW -> {
+                Component drawMessage = Component.translatable("minigame.draw", NamedTextColor.YELLOW,
+                        TextDecoration.BOLD);
+                sendEndMessages0(new Pair<>(winners, drawMessage), new Pair<>(losers, drawMessage));
+            }
+            case NO_WINNERS -> {
+                Component noWinnersMessage = Component.translatable("minigame.no-winners",
+                        NamedTextColor.GOLD, TextDecoration.BOLD);
+                sendEndMessages0(new Pair<>(winners, noWinnersMessage), new Pair<>(losers, noWinnersMessage));
+            }
+        }
+    }
+
+    protected final void sendEndMessages0(Pair<List<Player>, Component> winnersMessage,
+                                          Pair<List<Player>, Component> losersMessage) {
+        winnersMessage.getMale().forEach(player -> player.sendMessage(winnersMessage.getFemale()));
+        losersMessage.getMale().forEach(player -> player.sendMessage(losersMessage.getFemale()));
     }
 
     private static MinigamePlayer getMinigamePlayer(Map<UUID, MinigamePlayer> minigamePlayers, UUID uniqueId) {
@@ -175,26 +245,78 @@ public abstract class Minigame implements Listener {
         return minigamePlayer;
     }
 
+    private static MatchResult getMatchResult(List<Player> winners, List<Player> losers) {
+        if(winners.isEmpty()) {
+            return losers.isEmpty() ? MatchResult.DRAW : MatchResult.NO_WINNERS;
+        }
+        return MatchResult.NORMAL;
+    }
+
     void enterMatchProcess() {
         unregisterPreMatchListeners();
-        setState(MinigameState.MATCH);
         BossBarUtils.removeAll(preMatchBar);
-        registerMatchListener();
+        BossBarUtils.removeAll(matchBar);
         match();
+        registerMatchListener();
+        startMatchBar();
+        setState(MinigameState.MATCH);
     }
 
     protected abstract void match();
 
     protected abstract void onSpawnCommand(Player player);
 
+    private void startMatchBar() {
+        matchStopwatch = new BukkitRunnable() {
+
+            private int totalTime = info.matchTime();
+            private int time = totalTime;
+
+            @Override
+            public void run() {
+                if(time <= 0) {
+                    endMatch(Collections.emptyList(), Collections.emptyList());
+                } else {
+                    String minutes = toFormattedString(time / 60);
+                    String seconds = toFormattedString(time % 60);
+                    String timeString = minutes + ":" + seconds;
+                    TextColor color;
+                    Color barColor;
+                    if(time <= totalTime / 4) {
+                        color = NamedTextColor.RED;
+                        barColor = Color.RED;
+                    } else if(time <= totalTime / 2) {
+                        color = NamedTextColor.YELLOW;
+                        barColor = Color.YELLOW;
+                    } else {
+                        color = NamedTextColor.GREEN;
+                        barColor = Color.GREEN;
+                    }
+                    matchBar.name(Component.text(timeString, color));
+                    matchBar.color(barColor);
+                    matchBar.progress((float) time / totalTime);
+                    time--;
+                }
+            }
+
+            private String toFormattedString(int number) {
+                return (number < 10 ? "0" : "") + number;
+            }
+
+        };
+    }
+
     public final void spawnCommandIssued(Player player) {
         switch(state) {
             case PRE_MATCH -> {
-                preMatchBar.removeViewer(player);
+                removePlayerFromBars(player);
                 player.teleport(info.lobby());
                 snapshot.restore(player);
             }
-            case MATCH -> onSpawnCommand(player);
+            case MATCH -> {
+                removePlayerFromBars(player);
+                onSpawnCommand(player);
+            }
             case END_MATCH -> player.sendMessage(Component.translatable("minigame.spawn-in-end-match", NamedTextColor.YELLOW));
             default -> {
                 IllegalStateException e = new IllegalStateException("Player " + player.getName()
@@ -210,19 +332,32 @@ public abstract class Minigame implements Listener {
         setState(MinigameState.END_MATCH);
         unregisterPreMatchListeners();
         unregisterMatchListener();
-        Component interruptedMessage = Component.translatable("minigame.match.interrupted", NamedTextColor.RED);
-        Location lobby = info.lobby();
-        world.getPlayers().forEach(player -> {
-            player.sendMessage(interruptedMessage);
-            player.teleport(lobby);
-        });
+        stopMatchStopwatch();
+        if(world != null) {
+            Component interruptedMessage = Component.translatable("minigame.match.interrupted",
+                    NamedTextColor.RED);
+            Location lobby = info.lobby();
+            world.getPlayers().forEach(player -> {
+                removePlayerFromBars(player);
+                player.sendMessage(interruptedMessage);
+                player.teleport(lobby);
+            });
+            Bukkit.unloadWorld(world, false);
+            world = null;
+        }
         snapshot.restoreAll();
-        try {
-            ticker.cancel();
-        } catch(IllegalStateException e) {
-            PluginConfig.get().getPlugin().getLogger()
-                    .warning("Minigame ticker canceled before being scheduled. Probably because " +
-                            "method interruptMatch was called before preMatch state. " + Throwables.send(e));
+    }
+
+    private void stopMatchStopwatch() {
+        if(matchStopwatch != null) {
+            try {
+                matchStopwatch.cancel();
+            } catch(IllegalStateException e) {
+                // ignored
+            } finally {
+                BossBarUtils.removeAll(matchBar);
+                matchStopwatch = null;
+            }
         }
     }
 
@@ -233,11 +368,18 @@ public abstract class Minigame implements Listener {
         this.postMatchTime = postMatchTime;
     }
 
+    private void removePlayerFromBars(Player player) {
+        preMatchBar.removeViewer(player);
+        matchBar.removeViewer(player);
+    }
+
     private void registerMatchListener() {
         if(matchListener == null) {
-            matchListener = new WorldListener(this, world.getName());
+            matchListener = this;
         } else if(!(matchListener instanceof WorldListener)) {
-            matchListener = new WorldListener(matchListener, world.getName());
+            NotWorldListener e = new NotWorldListener("Class: " + matchListener.getClass().getName());
+            e.setListener(matchListener);
+            throw e;
         }
         PluginConfig.get().registerEvents(matchListener);
     }
@@ -256,7 +398,7 @@ public abstract class Minigame implements Listener {
     }
 
     private void unregisterShop() {
-        unregisterListener(shopWorldListener);
+        unregisterListener(shop);
     }
 
     private void unregisterListener(Listener listener) {
@@ -314,6 +456,10 @@ public abstract class Minigame implements Listener {
 
     public enum MinigameState {
         PRE_MATCH, MATCH, END_MATCH;
+    }
+
+    public enum MatchResult {
+        NORMAL, DRAW, NO_WINNERS;
     }
 
 }

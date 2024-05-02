@@ -188,13 +188,15 @@ minigame:
     others: » {0} ha comprado un objeto por {1} en la tienda
   to-start:
     plural:
-      time: {0} segundos restantes para comenzar
-      player: {0} jugadores restantes para comenzar
+      time: '{0} segundos restantes para comenzar'
+      player: '{0} jugadores restantes para comenzar'
     single:
-      time: {0} segundo restante para comenzar
-      player: {0} jugador restante para comenzar
+      time: '{0} segundo restante para comenzar'
+      player: '{0} jugador restante para comenzar'
   win: ¡Ganaste la partida y recibiste {0}!
   loss: ¡Perdiste la partida!
+  draw: Empate!
+  no-winners: No hubo ganadores!
   rank-message: '{0} es el jugador top {1} del rank de este minigame y se ha unido a esta partida!'
   no-squad: » El comando /equipo no funciona acá
   not-in-match-state: » La partida no está en desarrollo
@@ -213,11 +215,13 @@ minigame:
     you-are-being-saved: ¡Te están salvando!
     you-have-been-captured: ¡Te han capturado!
     you-have-been-saved: ¡Te han salvado!
-    failed-to-capture: {0} no pudo capturarte
-    failed-to-save: {0} no pudo salvarte
+    failed-to-capture: '{0} no pudo capturarte'
+    failed-to-save: '{0} no pudo salvarte'
     captured: '{0} fue capturado por {1}'
     saved: '{0} fue salvado por {1}'
     dumb: '{0} fue lo suficientemente tonto como para capturarse a sí mismo'
+    police-win: Los policías ganaron!
+    thief-win: Los ladrones ganaron!
 word:
   player: Jugador
   command: Comando
@@ -225,6 +229,14 @@ word:
   channels: Canales
   unknown: Desconocido
   home: Casa
+  minigame: Minigame
+mg-data-display:
+  header: '» Mostrando los datos de {0} para el minigame {1}:'
+  wins: '» Victorias: {0}'
+  losses: '» Pérdidas: {0}'
+  ratio: '» Proporción victorias/pérdidas: {0}'
+  total-matches: '» Total de partidas jugadas: {0}'
+  wins-rank: '» Posición en el rank de victorias: {0}'
 pageable:
   negative-page: » Página negativa
   greater-page: » Página más grande que la quantidade máxima existente
@@ -243,3 +255,5 @@ no-empty-slot: No tienes ningun slot vacío
 must-hold-item: » Necesitas tener un ítem en tu mano principal
 click-to-copy: Haz click para copiar
 dont-have-money: » No tienes dinero suficiente para comprar eso
+already-here: » Ya estás aquí
+no-data-yet: » Todavía no tienes datos para este minigame

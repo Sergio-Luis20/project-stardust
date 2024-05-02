@@ -4,14 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.StandardException;
-import org.bukkit.World;
+import org.bukkit.event.Listener;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @StandardException
-public class WorldInUseException extends RuntimeException {
+public class NotWorldListener extends RuntimeException {
 
-    private World world;
+    private Listener listener;
 
 }

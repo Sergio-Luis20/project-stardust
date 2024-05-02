@@ -188,13 +188,15 @@ minigame:
     others: » {0} comprou um item por {1} na loja
   to-start:
     plural:
-      time: {0} segundos restantes para começar
-      player: {0} jogadores restantes para começar
+      time: '{0} segundos restantes para começar'
+      player: '{0} jogadores restantes para começar'
     single:
-      time: {0} segundo restante para começar
-      player: {0} jogador restante para começar
+      time: '{0} segundo restante para começar'
+      player: '{0} jogador restante para começar'
   win: Você venceu a partida e ganhou {0}!
   loss: Você perdeu a partida!
+  draw: Empate!
+  no-winners: Não houve vencedores!
   rank-message: '{0} é o jogador top {1} do rank deste minigame e entrou na partida!' #originalmente terminaria com "e conectou no servidor o/"
   no-squad: » O comando /equipe não funciona aqui
   not-in-match-state: » A partida não está em andamento
@@ -214,11 +216,13 @@ minigame:
     you-are-being-saved: Você está sendo salvo!
     you-have-been-captured: Você foi capturado!
     you-have-been-saved: Você foi salvo!
-    failed-to-capture: {0} falhou ao tentar capturá-lo!
-    failed-to-save: {0} falhou ao tentar salvá-lo!
+    failed-to-capture: '{0} falhou ao tentar capturá-lo!'
+    failed-to-save: '{0} falhou ao tentar salvá-lo!'
     captured: '{0} foi capturado por {1}'
     saved: '{0} foi salvo por {1}'
     dumb: '{0} foi burro o suficiente para se autocapturar'
+    police-win: Os policiais venceram!
+    thief-win: Os ladrões venceram!
 word:
   player: Jogador
   command: Comando
@@ -227,6 +231,14 @@ word:
   unknown: Desconhecido
   home: Casa
   tracker: Rastreador
+  minigame: Minigame
+mg-data-display:
+  header: '» Exibindo dados de {0} para o minigame {1}:'
+  wins: '» Vitórias: {0}'
+  losses: '» Derrotas: {0}'
+  ratio: '» Razão vitórias/derrotas: {0}'
+  total-matches: '» Total de partidas jogadas: {0}'
+  wins-rank: '» Posição no rank de vitórias: {0}'
 pageable:
   negative-page: » Página negativa
   greater-page: » Página maior que a quantidade máxima existente
@@ -246,3 +258,5 @@ must-hold-item: » Você precisa segurar algum item na mão principal
 click-to-copy: Clique para copiar
 dont-have-money: » Você não tem dinheiro suficiente para comprar isso
 track: '<gray>Jogador: {0}, distância: {1}'
+already-here: » Você já está aqui
+no-data-yet: » Você ainda não tem dados para este minigame

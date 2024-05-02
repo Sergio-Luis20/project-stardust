@@ -191,13 +191,15 @@ minigame:
     others: » {0} has bought an item for {1} in the shop
   to-start:
     plural:
-      time: {0} seconds left to start
-      player: {0} players left to start
+      time: '{0} seconds left to start'
+      player: '{0} players left to start'
     single:
-      time: {0} second left to start
-      player: {0} player left to start
+      time: '{0} second left to start'
+      player: '{0} player left to start'
   win: You won the match and earned {0}!
   loss: You lost the match!
+  draw: Draw!
+  no-winners: There are no winners!
   rank-message: '{0} is the top {1} ranked player in this minigame and has joined this match!'
   no-squad: » The command /squad do not work here
   not-in-match-state: » The match is not running
@@ -216,11 +218,13 @@ minigame:
     you-are-being-saved: You are being saved!
     you-have-been-captured: You have been captured!
     you-have-been-saved: You have been saved!
-    failed-to-capture: {0} failed to capture you!
-    failed-to-save: {0} failed to save you!
+    failed-to-capture: '{0} failed to capture you!'
+    failed-to-save: '{0} failed to save you!'
     captured: '{0} was captured by {1}'
     saved: '{0} was saved by {1}'
     dumb: '{0} was stupid enough to capture itself'
+    police-win: Police win!
+    thief-win: Thief win!
 word:
   player: Player
   command: Command
@@ -228,6 +232,14 @@ word:
   channels: Channels
   unknown: Unknown
   Home: Home
+  minigame: Minigame
+mg-data-display:
+  header: "» Displaying {0}'s data for minigame {1}:"
+  wins: '» Wins: {0}'
+  losses: '» Losses: {0}'
+  ratio: '» Ratio wins/losses: {0}'
+  total-matches: '» Total matches: {0}'
+  wins-rank: '» Wins rank position: {0}'
 pageable:
   negative-page: » Negative page
   greater-page: Page larger than the maximum existing quantity
@@ -246,3 +258,5 @@ no-empty-slot: You don't have any empty slot
 must-hold-item: » You need to hold an item in your main hand
 click-to-copy: Click to copy
 dont-have-money: » You don't have enought money to buy that
+already-here: » You are already here
+no-data-yet: » You don't have data for this minigame yet

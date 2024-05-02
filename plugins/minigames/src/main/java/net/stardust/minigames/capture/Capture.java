@@ -3,7 +3,6 @@ package net.stardust.minigames.capture;
 import br.sergio.utils.Pair;
 import lombok.AccessLevel;
 import lombok.Getter;
-import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -13,10 +12,9 @@ import net.stardust.base.minigame.Minigame;
 import net.stardust.base.minigame.MinigameShop;
 import net.stardust.base.minigame.SquadChannel;
 import net.stardust.base.minigame.SquadMinigame;
-import net.stardust.base.utils.BossBarUtils;
-import net.stardust.base.utils.inventory.InventoryUtils;
 import net.stardust.base.utils.SoundPack;
 import net.stardust.base.utils.database.lang.Translation;
+import net.stardust.base.utils.inventory.InventoryUtils;
 import net.stardust.base.utils.item.Enchant;
 import net.stardust.base.utils.item.ItemUtils;
 import net.stardust.base.utils.plugin.PluginConfig;
@@ -61,7 +59,6 @@ public class Capture extends Minigame implements SquadMinigame {
     private List<Player> blueTeam, redTeam;
     private Location blueBase, redBase, spawn;
     private SquadChannel blueChannel, redChannel;
-    private BossBar time;
 
     private Scoreboard scoreboard;
     private Objective playerDistribution;
@@ -76,13 +73,22 @@ public class Capture extends Minigame implements SquadMinigame {
     @Getter(AccessLevel.PACKAGE)
     private List<Player> blueFree, blueCaptured, redFree, redCaptured;
 
+    @Getter(AccessLevel.PACKAGE)
+    private boolean ending;
+
     public Capture(MinigamesPlugin plugin, int index) {
         super(plugin.getMinigameInfo("capture", index));
         this.plugin = Objects.requireNonNull(plugin, "plugin");
 
+        setMatchListener(new CaptureMatchListener(this));
+        setShop(MinigameShop.newShop(this, false, Component.translatable("word.shop"),
+                InventoryUtils.DEFAULT_INVENTORY_SIZE, getShopItems()));
+    }
+
+    private void initFields() {
         blueTeam = new ArrayList<>();
         redTeam = new ArrayList<>();
-        time = BossBarUtils.newDefaultBar();
+
         stats = new HashMap<>();
         carry = new HashMap<>();
         timers = new HashMap<>();
@@ -91,14 +97,11 @@ public class Capture extends Minigame implements SquadMinigame {
         blueCaptured = new ArrayList<>();
         redFree = new ArrayList<>();
         redCaptured = new ArrayList<>();
-
-        setMatchListener(new CaptureMatchListener(this));
-        setShop(MinigameShop.newShop(this, false, Component.translatable("word.shop"),
-                InventoryUtils.DEFAULT_INVENTORY_SIZE, getShopItems()));
     }
 
     @Override
     protected void match() {
+        initFields();
         distributePlayers();
         setupBasesAndSpawn();
         setupSquadChannels();
@@ -109,9 +112,7 @@ public class Capture extends Minigame implements SquadMinigame {
 
     @Override
     protected void onSpawnCommand(Player player) {
-        time.removeViewer(player);
-        getSnapshot().restore(player);
-        player.teleport(getInfo().lobby());
+        leave(player);
     }
 
     private void distributePlayers() {
@@ -120,8 +121,11 @@ public class Capture extends Minigame implements SquadMinigame {
         Collections.shuffle(players);
         CaptureTeam team = CaptureTeam.randomTeam();
         for(Player player : players) {
-            stats.put(player, new Pair<>(0, 0));
+            Pair<Integer, Integer> statsPair = new Pair<>(0, 0);
+            stats.put(player, statsPair);
             carry.put(player, new ArrayList<>());
+            player.playerListName(buildListName(player, statsPair, team));
+            player.displayName(player.name().color(team.getTextColor()));
             team.getPlayers(this).add(player);
             team = team.other();
         }
@@ -172,10 +176,10 @@ public class Capture extends Minigame implements SquadMinigame {
         for(Player player : team) {
             PlayerInventory inventory = player.getInventory();
             ItemStack[] armor = {
-                    new ItemStack(Material.LEATHER_HELMET),
-                    new ItemStack(Material.LEATHER_CHESTPLATE),
+                    new ItemStack(Material.LEATHER_BOOTS),
                     new ItemStack(Material.LEATHER_LEGGINGS),
-                    new ItemStack(Material.LEATHER_BOOTS)
+                    new ItemStack(Material.LEATHER_CHESTPLATE),
+                    new ItemStack(Material.LEATHER_HELMET)
             };
             configureArmor(color, armor);
             inventory.setArmorContents(armor);
@@ -226,6 +230,15 @@ public class Capture extends Minigame implements SquadMinigame {
                 .append(message.color(color));
     }
 
+    private Component buildListName(Player player, Pair<Integer, Integer> stats, CaptureTeam team) {
+        Component suffix = Component.text("[" + stats.getMale() + "-" + stats.getFemale() + "]", NamedTextColor.WHITE);
+        return player.name().color(team.getTextColor()).appendSpace().append(suffix);
+    }
+
+    void leave(Player player) {
+        player.teleport(getInfo().lobby());
+    }
+
     void captured(Player capturer, Player captured) {
         Component message;
         boolean checkVictory = false;
@@ -237,21 +250,23 @@ public class Capture extends Minigame implements SquadMinigame {
             Component capturerName = capturer.name().color(CaptureTeam.getTeam(this, capturer).getTextColor());
             Component capturedName = captured.name().color(CaptureTeam.getTeam(this, captured).getTextColor());
             message = Component.translatable("minigame.capture.captured", NamedTextColor.GOLD, capturedName, capturerName);
+
             Pair<Integer, Integer> capturerStats = stats.get(capturer);
             capturerStats.setMale(capturerStats.getMale() + 1);
-            capturer.playerListName(buildListName(capturer, capturerStats));
+            capturer.playerListName(buildListName(capturer, capturerStats, CaptureTeam.getTeam(this, capturer)));
         }
+
+        CaptureTeam capturedTeam = CaptureTeam.getTeam(this, captured);
 
         Pair<Integer, Integer> capturedStats = stats.get(captured);
         capturedStats.setFemale(capturedStats.getFemale() + 1);
-        captured.playerListName(buildListName(captured, capturedStats));
+        captured.playerListName(buildListName(captured, capturedStats, capturedTeam));
 
-        CaptureTeam team = CaptureTeam.getTeam(this, captured);
-        team.getFreePlayers(this).remove(captured);
-        team.getCapturedPlayers(this).add(captured);
-        Score score = team.getScore(this);
+        capturedTeam.getFreePlayers(this).remove(captured);
+        capturedTeam.getCapturedPlayers(this).add(captured);
+        Score score = capturedTeam.getScore(this);
         score.setScore(score.getScore() - 1);
-        captured.teleport(team.other().getBase(this));
+        captured.teleport(capturedTeam.other().getBase(this));
         captured.addPotionEffects(CAPTURED_EFFECTS);
         getWorld().getPlayers().forEach(player -> player.sendMessage(message));
         captured.sendMessage(Component.translatable("minigame.capture.you-have-been-captured", NamedTextColor.RED));
@@ -276,10 +291,10 @@ public class Capture extends Minigame implements SquadMinigame {
         team.getFreePlayers(this).add(princess);
         Score score = team.getScore(this);
         score.setScore(score.getScore() + 1);
-        princess.teleport(team.getBase(this));
+        princess.teleport(hero != null ? team.getBase(this) : spawn);
         CAPTURED_EFFECTS.forEach(effect -> princess.removePotionEffect(effect.getType()));
 
-        if(message != null) {
+        if(hero != null) {
             getWorld().getPlayers().forEach(player -> player.sendMessage(message));
         }
         princess.sendMessage(Component.translatable("minigame.capture.you-have-been-saved", NamedTextColor.GREEN));
@@ -293,7 +308,9 @@ public class Capture extends Minigame implements SquadMinigame {
         CaptureTeam team = CaptureTeam.getTeam(this, player);
         List<Player> carry = this.carry.get(player);
         if(!carry.isEmpty()) {
-            for(Player carrying : carry) {
+            List<Player> copy = new ArrayList<>(carry);
+            carry.clear();
+            for(Player carrying : copy) {
                 if(team == CaptureTeam.getTeam(this, carrying)) {
                     saved(player, carrying);
                 } else {
@@ -301,7 +318,6 @@ public class Capture extends Minigame implements SquadMinigame {
                 }
             }
             BASE_DELIVERY.play(player);
-            carry.clear();
             checkVictory();
         }
     }
@@ -340,6 +356,7 @@ public class Capture extends Minigame implements SquadMinigame {
             top = carry.getLast();
         }
         top.addPassenger(bullfighter);
+        carry.add(bullfighter);
         PluginConfig.get().getPlugin().getMessager().message(bull, messages);
         bullfighter.sendMessage(Component.translatable("minigame.capture." + bullfighterKey, bullfighterColor));
         CARRYING.play(bull);
@@ -359,24 +376,31 @@ public class Capture extends Minigame implements SquadMinigame {
         if(index == -1) {
             return;
         }
+        carry.remove(index);
         bullfighter.leaveVehicle();
-        if(index != carry.size() - 1) {
+        if(index != carry.size()) {
             Player bottom = index == 0 ? bull : carry.get(index - 1);
-            Player top = carry.get(index + 1);
+            Player top = carry.get(index);
             bottom.addPassenger(top);
         }
     }
 
     void dismountAll(Player bull) {
         boolean teleportToWorldSpawn = WorldUtils.belowVoid(bull.getLocation());
-        timers.get(bull).fire();
+        Optional.ofNullable(timers.get(bull)).ifPresent(timer -> {
+            if(!timer.isCancelled()) {
+                timer.cancel();
+            }
+        });
         List<Player> carry = this.carry.get(bull);
         CaptureTeam bullTeam = CaptureTeam.getTeam(this, bull);
         Component failedToCapture = Component.translatable("minigame.capture.failed-to-capture",
                 NamedTextColor.GREEN, bull.name().color(NamedTextColor.GREEN));
         Component failedToSave = Component.translatable("minigame.capture.failed-to-save",
                 NamedTextColor.RED, bull.name().color(NamedTextColor.RED));
-        carry.forEach(player -> {
+        List<Player> copy = new ArrayList<>(carry);
+        carry.clear();
+        copy.forEach(player -> {
             player.leaveVehicle();
             if(bullTeam == CaptureTeam.getTeam(this, player)) {
                 player.sendMessage(failedToSave);
@@ -387,7 +411,6 @@ public class Capture extends Minigame implements SquadMinigame {
                 player.teleport(spawn);
             }
         });
-        carry.clear();
     }
 
     Optional<Player> getBull(Player bullfighter) {
@@ -397,6 +420,29 @@ public class Capture extends Minigame implements SquadMinigame {
             }
         }
         return Optional.empty();
+    }
+
+    private void checkVictory() {
+        for(CaptureTeam team : CaptureTeam.values()) {
+            if(team.getFreePlayers(this).isEmpty()) {
+                victory(team.other());
+                break;
+            }
+        }
+    }
+
+    private void victory(CaptureTeam team) {
+        for(Player player : new ArrayList<>(team.other().getCapturedPlayers(this))) {
+            saved(null, player);
+        }
+        String key = team == CaptureTeam.BLUE ? "police-win" : "thief-win";
+        Component winMessage = Component.translatable("minigame.capture." + key, NamedTextColor.GOLD, TextDecoration.BOLD);
+        getWorld().getPlayers().forEach(player -> player.sendMessage(winMessage));
+        ending = true;
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            endMatch(team.getPlayers(this), team.other().getPlayers(this));
+            ending = false;
+        }, 5 * 20); // 5 seconds
     }
 
     void onQuit(Player player) {
@@ -415,32 +461,8 @@ public class Capture extends Minigame implements SquadMinigame {
         score.setScore(score.getScore() - 1);
     }
 
-    void onDisconnect(Player player) {
-        onQuit(player);
-        player.teleport(getInfo().lobby());
-    }
-
-    private void checkVictory() {
-        for(CaptureTeam team : CaptureTeam.values()) {
-            if(team.getFreePlayers(this).isEmpty()) {
-                victory(team.other());
-                break;
-            }
-        }
-    }
-
-    private void victory(CaptureTeam team) {
-        endMatch(team.getPlayers(this), team.other().getPlayers(this));
-    }
-
-    private Component buildListName(Player player, Pair<Integer, Integer> stats) {
-        Component suffix = Component.text("[" + stats.getMale() + "-" + stats.getFemale() + "]", NamedTextColor.WHITE);
-        TextColor color = CaptureTeam.getTeam(this, player).getTextColor();
-        return player.name().color(color).appendSpace().append(suffix);
-    }
-
     private Location getLocation(ConfigurationSection section) {
-        return new Location(getWorld(), section.getDouble("x"), section.getDouble("y"), section.getDouble("x"));
+        return new Location(getWorld(), section.getDouble("x"), section.getDouble("y"), section.getDouble("z"));
     }
 
     @Override

@@ -1,14 +1,14 @@
 package net.stardust.base.model.minigame;
 
-import java.util.Objects;
-import java.util.UUID;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+import java.util.UUID;
+
 @Getter
 @NoArgsConstructor
-public class MinigamePlayer {
+public class MinigamePlayer implements Comparable<MinigamePlayer> {
 
     private UUID id;
     private int wins, losses;
@@ -18,7 +18,7 @@ public class MinigamePlayer {
     }
 
     public MinigamePlayer(UUID playerId, int wins, int losses) {
-        this.id = Objects.requireNonNull(id, "id");
+        id = Objects.requireNonNull(playerId, "playerId");
         setWins(wins);
         setLosses(losses);
     }
@@ -37,12 +37,17 @@ public class MinigamePlayer {
         this.losses = losses;
     }
 
+    @Override
+    public int compareTo(MinigamePlayer o) {
+        return wins - o.wins;
+    }
+
     public int getTotalMatches() {
         return wins + losses;
     }
 
-    public double getRatio() {
-        return losses == 0 ? wins : (double) wins / losses;
+    public float getRatio() {
+        return losses == 0 ? wins : (float) wins / losses;
     }
 
 }

@@ -1,14 +1,5 @@
 package net.stardust.base.utils;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.function.BiConsumer;
-
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -19,6 +10,14 @@ import net.kyori.adventure.chat.SignedMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.stardust.base.BasePlugin;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.function.BiConsumer;
 
 @Getter
 @EqualsAndHashCode

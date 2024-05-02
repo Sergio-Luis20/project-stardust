@@ -1,16 +1,15 @@
 package net.stardust.base.minigame;
 
 import net.stardust.base.utils.ranges.Ranges;
-import net.stardust.base.utils.world.MapDrawer;
-import net.stardust.base.utils.world.MapDrawerFactory;
 import net.stardust.base.utils.world.WorldUtils;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 
+import java.io.File;
 import java.util.Objects;
 
 public record MinigameInfo(String name, int minPlayers, int maxPlayers, int reward, int matchTime,
-                           MapDrawer mapDrawer, Location lobby, int index) {
+                           File mapsFolder, Location lobby, int index) {
 
     public MinigameInfo {
         if(Objects.requireNonNull(name, "name").isBlank())
@@ -22,14 +21,14 @@ public record MinigameInfo(String name, int minPlayers, int maxPlayers, int rewa
             throw new IllegalArgumentException("minPlayers must not be greater than maxPlayers");
         reward = Ranges.greater(reward, 0, "reward");
         matchTime = Ranges.greater(matchTime, 0, "matchTime");
-        Objects.requireNonNull(mapDrawer, "mapDrawer");
+        validateMapsFolder(mapsFolder);
         Objects.requireNonNull(lobby, "lobby");
     }
 
     public MinigameInfo(ConfigurationSection section, int index) {
-        this(section.getString("name"), section.getInt("minPlayers"), section.getInt("maxPlayers"),
-                section.getInt("reward"), section.getInt("matchTime"), getMapDrawer(section, index),
-                WorldUtils.getLoadedWorld(section.getString("lobby")).getSpawnLocation(), index);
+        this(section.getString("name"), section.getInt("min-players"), section.getInt("max-players"),
+                section.getInt("reward"), section.getInt("match-time"), new File(section.getString("map-path")),
+                WorldUtils.loadWorld(section.getString("lobby")).getSpawnLocation(), index);
     }
 
     @Override
@@ -37,8 +36,14 @@ public record MinigameInfo(String name, int minPlayers, int maxPlayers, int rewa
         return lobby.clone();
     }
 
-    private static MapDrawer getMapDrawer(ConfigurationSection section, int index) {
-        return MapDrawerFactory.fromDirectory(section.getString("map-path"), "-" + index);
+    private static void validateMapsFolder(File mapsFolder) {
+        Objects.requireNonNull(mapsFolder, "mapsFolder");
+        if(!mapsFolder.exists())
+            throw new IllegalArgumentException("maps folder doesn't exist");
+        if(mapsFolder.isFile())
+            throw new IllegalArgumentException("maps folder must be a folder, but is file");
+        if(mapsFolder.listFiles(File::isDirectory).length == 0)
+            throw new IllegalArgumentException("maps folder must contain at least 1 map");
     }
 
 }

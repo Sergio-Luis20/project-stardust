@@ -30,6 +30,7 @@ public class MinigamesPlugin extends BasePlugin {
     private static MinigamesPlugin instance;
 
     private final Map<String, List<MatchSign>> matches = new HashMap<>();
+    private final Map<String, Location> lobbies = new HashMap<>();
     private final File mapsFolder = new File("mgmaps");
 
     @Override
@@ -44,7 +45,6 @@ public class MinigamesPlugin extends BasePlugin {
         saveDefaultConfig();
         Location spawn = Bukkit.getWorld("world").getSpawnLocation();
         Bukkit.getOnlinePlayers().forEach(p -> p.teleport(spawn));
-
         try {
             loadSigns();
         } catch(Exception e) {
@@ -72,11 +72,12 @@ public class MinigamesPlugin extends BasePlugin {
             String className = minigameSection.getString("class");
             Class<?> clazz = Class.forName(className);
             Constructor<?> constructor = clazz.getConstructor(MinigamesPlugin.class, int.class);
-            List<Map<?, ?>> signLocations = minigameSection.getMapList("signs");
             World lobby = Bukkit.createWorld(new WorldCreator(minigameSection.getString("lobby")));
-            for (Map<?, ?> signMap : signLocations) {
-                int index = (int) signMap.get("index");
-                String location = (String) signMap.get("location");
+            List<String> signLocations = minigameSection.getStringList("signs");
+            int size = signLocations.size();
+            for(int i = 0; i < size; i++) {
+                int index = i + 1;
+                String location = signLocations.get(i);
                 String[] split = location.split(",");
                 int x = Integer.parseInt(split[0]);
                 int y = Integer.parseInt(split[1]);
@@ -87,9 +88,10 @@ public class MinigamesPlugin extends BasePlugin {
                 manager.writeObject(MINIGAME_SIGN, data);
                 Location loc = new Location(lobby, x, y, z);
                 Minigame match = (Minigame) constructor.newInstance(this, index);
-                signs.add(index - 1, new MatchSign(key, loc, index, match));
+                signs.add(new MatchSign(key, loc, index, match));
             }
             matches.put(key, signs);
+            lobbies.put(key, lobby.getSpawnLocation());
         }
         matches.values().forEach(list -> list.getFirst().getMatch().preMatch());
     }
@@ -135,7 +137,8 @@ public class MinigamesPlugin extends BasePlugin {
     }
 
     public MinigameInfo getMinigameInfo(String minigame, int index) {
-        return new MinigameInfo(getConfig().getConfigurationSection(minigame.toLowerCase()), index);
+        return new MinigameInfo(getConfig().getConfigurationSection("minigames."
+                + minigame.toLowerCase()), index);
     }
 
     public static MinigamesPlugin getPlugin() {

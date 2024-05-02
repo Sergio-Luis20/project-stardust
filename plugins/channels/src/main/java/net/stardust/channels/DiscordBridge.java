@@ -1,17 +1,8 @@
 package net.stardust.channels;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.logging.Logger;
-
-import lombok.extern.log4j.Log4j2;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-
 import br.sergio.utils.Pair;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import lombok.extern.log4j.Log4j2;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -28,7 +19,15 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.stardust.base.utils.StardustThreads;
 import net.stardust.base.utils.Throwables;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.logging.Logger;
 
 @Log4j2
 public class DiscordBridge extends ListenerAdapter implements Listener {
@@ -110,6 +109,7 @@ public class DiscordBridge extends ListenerAdapter implements Listener {
                     player.sendMessage(finalResult);
                 }
             }
+            Bukkit.getConsoleSender().sendMessage(finalResult);
         });
     }
 
@@ -117,7 +117,7 @@ public class DiscordBridge extends ListenerAdapter implements Listener {
         String nick = member.getNickname();
         Component name = Component.text((nick == null ? member.getEffectiveName() : nick) + ": ", NamedTextColor.GREEN)
             .hoverEvent(HoverEvent.showText(Component.text("Clique para adicionar menção", NamedTextColor.AQUA)))
-            .clickEvent(ClickEvent.suggestCommand(member.getAsMention()));
+            .clickEvent(ClickEvent.suggestCommand(member.getAsMention() + " "));
         Component result = Component.text("[Discord] ", NamedTextColor.GOLD).append(name)
             .append(Component.text(content, NamedTextColor.WHITE));
         result = !content.isEmpty() && urlAttachs.length != 0 ? result.appendSpace() : result;

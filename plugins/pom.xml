@@ -15,6 +15,10 @@
     <version>1.0</version>
   </parent>
 
+  <properties>
+    <output.dir>../../output/</output.dir>
+  </properties>
+
   <modules>
     <module>authentication</module>
     <module>channels</module>

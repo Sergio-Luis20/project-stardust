@@ -1,5 +1,16 @@
 package net.stardust.base.utils.database.lang;
 
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.translation.GlobalTranslator;
+import net.kyori.adventure.translation.TranslationRegistry;
+import net.stardust.base.utils.StardustThreads;
+import net.stardust.base.utils.Throwables;
+import net.stardust.base.utils.plugin.PluginConfig;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -12,18 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.translation.GlobalTranslator;
-import net.kyori.adventure.translation.TranslationRegistry;
-import net.stardust.base.utils.StardustThreads;
-import net.stardust.base.utils.Throwables;
-import net.stardust.base.utils.plugin.PluginConfig;
 
 public final class Translation {
 
@@ -67,7 +66,7 @@ public final class Translation {
     }
 
     public static Component getTextComponent(Player player, String key, Object... args) {
-        return get(StardustThreads.call(PluginConfig.get().getPlugin(), player::locale), key, args);
+        return getTextComponent(StardustThreads.call(PluginConfig.get().getPlugin(), player::locale), key, args);
     }
 
     public static Component getTextComponent(Locale locale, String key, Object... args) {
@@ -105,6 +104,14 @@ public final class Translation {
 
     public static Locale consoleLocale() {
         return Locale.forLanguageTag("pt");
+    }
+
+    public static Locale locale(CommandSender sender) {
+        if(sender instanceof Player player) {
+            return StardustThreads.call(PluginConfig.get().getPlugin(), player::locale);
+        } else {
+            return consoleLocale();
+        }
     }
 
     private static ResourceBundle getBundle(String lang) {
