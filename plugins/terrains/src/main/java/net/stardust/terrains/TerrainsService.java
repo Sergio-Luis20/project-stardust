@@ -1,37 +1,31 @@
 package net.stardust.terrains;
 
-import java.util.Collections;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
+import net.stardust.base.utils.plugin.PluginConfig;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import net.stardust.base.utils.BatchList;
-import net.stardust.base.utils.plugin.PluginConfig;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class TerrainsService {
 
 	public static final TerrainsService INSTANCE = new TerrainsService();
 	
 	private TerrainsPlugin plugin;
-	private BatchList<String> terrains;
-	private int batchSize;
-	
+	private List<String> terrains;
+
 	private TerrainsService() {
 		plugin = (TerrainsPlugin) PluginConfig.get().getPlugin();
-		batchSize = plugin.getConfig().getInt("terrains-batch-size");
-		terrains = BatchList.withBatchSize(batchSize);
+		terrains = new ArrayList<>();
 	}
 	
-	public BatchList<World> getTerrains() {
-		return terrains.stream().map(Bukkit::getWorld).collect(BatchList.collector(batchSize));
+	public List<World> getTerrains() {
+		return terrains.stream().map(Bukkit::getWorld).toList();
 	}
 
-	public BatchList<String> getNamesList() {
-		return new BatchList<>(batchSize, terrains);
+	public List<String> getNamesList() {
+		return Collections.unmodifiableList(terrains);
 	}
 	
 	public boolean containsTerrain(String worldName) {
@@ -67,7 +61,10 @@ public class TerrainsService {
 	private void loadTerrain0(String worldName) {
 		WorldCreator creator = new WorldCreator(worldName);
 		creator.type(WorldType.FLAT);
-		terrains.add(Bukkit.createWorld(creator).getName());
+		creator.generateStructures(false);
+		World world = Bukkit.createWorld(creator);
+		world.setDifficulty(Difficulty.PEACEFUL);
+		terrains.add(world.getName());
 	}
 	
 	public void unloadTerrains() {

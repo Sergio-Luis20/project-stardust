@@ -125,7 +125,6 @@ public class Capture extends Minigame implements SquadMinigame {
             stats.put(player, statsPair);
             carry.put(player, new ArrayList<>());
             player.playerListName(buildListName(player, statsPair, team));
-            player.displayName(player.name().color(team.getTextColor()));
             team.getPlayers(this).add(player);
             team = team.other();
         }
@@ -150,6 +149,9 @@ public class Capture extends Minigame implements SquadMinigame {
 
     private void setupScoreboard() {
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+
+        blueTeam.forEach(player -> player.setScoreboard(scoreboard));
+        redTeam.forEach(player -> player.setScoreboard(scoreboard));
 
         playerDistribution = scoreboard.registerNewObjective("Players", Criteria.DUMMY,
                 Component.text("Players", NamedTextColor.GOLD, TextDecoration.BOLD));
@@ -317,6 +319,7 @@ public class Capture extends Minigame implements SquadMinigame {
                     captured(player, carrying);
                 }
             }
+            fireTimer(player);
             BASE_DELIVERY.play(player);
             checkVictory();
         }
@@ -387,11 +390,7 @@ public class Capture extends Minigame implements SquadMinigame {
 
     void dismountAll(Player bull) {
         boolean teleportToWorldSpawn = WorldUtils.belowVoid(bull.getLocation());
-        Optional.ofNullable(timers.get(bull)).ifPresent(timer -> {
-            if(!timer.isCancelled()) {
-                timer.cancel();
-            }
-        });
+        fireTimer(bull);
         List<Player> carry = this.carry.get(bull);
         CaptureTeam bullTeam = CaptureTeam.getTeam(this, bull);
         Component failedToCapture = Component.translatable("minigame.capture.failed-to-capture",
@@ -515,20 +514,20 @@ public class Capture extends Minigame implements SquadMinigame {
         ), 2));
         items.put(27, MinigameShop.createShopItem(ItemUtils.withEnchants(
                 new ItemStack(Material.WOODEN_SWORD),
-                new Enchant(Enchantment.KNOCKBACK, 1)
-        ), 1));
-        items.put(28, MinigameShop.createShopItem(ItemUtils.withEnchants(
-                new ItemStack(Material.WOODEN_SWORD),
-                new Enchant(Enchantment.KNOCKBACK, 2)
-        ), 2));
-        items.put(36, MinigameShop.createShopItem(ItemUtils.withEnchants(
-                new ItemStack(Material.WOODEN_SWORD),
                 new Enchant(Enchantment.DAMAGE_ALL, 1)
         ), 2));
-        items.put(37, MinigameShop.createShopItem(ItemUtils.withEnchants(
+        items.put(28, MinigameShop.createShopItem(ItemUtils.withEnchants(
                 new ItemStack(Material.WOODEN_SWORD),
                 new Enchant(Enchantment.DAMAGE_ALL, 2)
         ), 3));
+        items.put(36, MinigameShop.createShopItem(ItemUtils.withEnchants(
+                new ItemStack(Material.WOODEN_SWORD),
+                new Enchant(Enchantment.KNOCKBACK, 1)
+        ), 1));
+        items.put(37, MinigameShop.createShopItem(ItemUtils.withEnchants(
+                new ItemStack(Material.WOODEN_SWORD),
+                new Enchant(Enchantment.KNOCKBACK, 2)
+        ), 2));
         items.put(45, MinigameShop.createShopItem(ItemUtils.withEnchants(
                 new ItemStack(Material.WOODEN_SWORD),
                 new Enchant(Enchantment.FIRE_ASPECT, 1)
@@ -548,6 +547,14 @@ public class Capture extends Minigame implements SquadMinigame {
         return spawn.clone();
     }
 
+    private void fireTimer(Player bull) {
+        Optional.ofNullable(timers.get(bull)).ifPresent(timer -> {
+            if(!timer.isCancelled()) {
+                timer.fire(false);
+            }
+        });
+    }
+
     private class CarryTimer extends BukkitRunnable {
 
         private int time = CARRY_TIME;
@@ -560,16 +567,21 @@ public class Capture extends Minigame implements SquadMinigame {
         @Override
         public void run() {
             if(time <= 0) {
-                fire();
+                fire(true);
             } else {
-                player.setLevel(time--);
+                player.setLevel(time);
+                player.setExp((float) time / CARRY_TIME);
+                time--;
             }
         }
 
-        public void fire() {
+        public void fire(boolean dismountAll) {
             cancel();
-            dismountAll(player);
+            if(dismountAll) {
+                dismountAll(player);
+            }
             player.setLevel(0);
+            player.setExp(0);
             timers.remove(player);
         }
 

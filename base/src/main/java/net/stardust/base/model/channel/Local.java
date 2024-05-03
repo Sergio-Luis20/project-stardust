@@ -10,9 +10,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -78,13 +76,9 @@ public class Local extends SimpleCooldownChannel {
                 throw new Error("Player is not op neither is in the world \"" 
                         + StardustThreads.call(plugin, () -> world.getName()) + "\" and is somehow participating of its local chat");
             }
+            return;
         }
         messager.message(participants, message);
     }
 
-    @Override
-    public List<ChannelCondition> getNonCooldownRelatedConditions() {
-        return new ArrayList<>();
-    }
-    
 }

@@ -1,12 +1,5 @@
 package net.stardust.terrains;
 
-import org.bukkit.block.TileState;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.ServerIdentifier;
@@ -14,6 +7,13 @@ import net.stardust.base.events.BaseListener;
 import net.stardust.base.model.Identifier;
 import net.stardust.base.model.user.PlayerIdentifier;
 import net.stardust.base.utils.persistence.DataManager;
+import org.bukkit.block.Block;
+import org.bukkit.block.TileState;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 
 @BaseListener
 public class BlockProtection implements Listener {
@@ -26,7 +26,13 @@ public class BlockProtection implements Listener {
 
     @EventHandler
     public void onPlace(BlockPlaceEvent event) {
-        if(event.getBlock().getState() instanceof TileState state) {
+        Block block = event.getBlock();
+        String worldName = block.getWorld().getName();
+        if(worldName.startsWith("world") || worldName.startsWith("minigame") || worldName.startsWith("dungeon")) {
+            event.setCancelled(true);
+            return;
+        }
+        if(block.getState() instanceof TileState state) {
             DataManager<TileState> manager = new DataManager<>(state);
             Player player = event.getPlayer();
             Identifier<?> identifier = plugin.getBlockServerMode().contains(player) ? 
@@ -37,8 +43,14 @@ public class BlockProtection implements Listener {
 
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
+        Block block = event.getBlock();
+        String worldName = block.getWorld().getName();
+        if(worldName.startsWith("world") || worldName.startsWith("minigame") || worldName.startsWith("dungeon")) {
+            event.setCancelled(true);
+            return;
+        }
         Player player = event.getPlayer();
-        if(event.getBlock().getState() instanceof TileState state) {
+        if(block.getState() instanceof TileState state) {
             DataManager<TileState> manager = new DataManager<>(state);
             Identifier<?> identifier = manager.readObject("stardust:block_owner", Identifier.class);
             if(identifier == null) {

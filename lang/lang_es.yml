@@ -180,6 +180,7 @@ minigame:
     interrupted: » Partida interrumpida
   team:
     usage: '» Uso: /equipo <mensaje>'
+  no-data-yet: » Todavía no tienes datos para este minigame
   shop: Tienda
   tracker: Rastreador
   track: 'Jugador: {0}, distancia: {1}'
@@ -240,7 +241,14 @@ mg-data-display:
 pageable:
   negative-page: » Página negativa
   greater-page: » Página más grande que la quantidade máxima existente
-  home-list: '» Lista de las casas que tienes {0}:'
+  list:
+    home: '» Lista de las casas que tienes {0}:'
+    terrain: '» Lista de los terrenos atualmente cargados {0}:'
+    discord-chat: '» Lista de los jugadores actualmente en el chat de discord {0}:'
+    discord-users:
+      online-only: '» Lista de usuarios online en discord {0}:'
+      offline-too: '» Lista de usuarios en discord {0}:'
+    worlds-manually-loaded: '» Lista de mundos manualmente cargados {0}:'
 custom-enchant:
   glow: Brillo
 color:
@@ -256,4 +264,3 @@ must-hold-item: » Necesitas tener un ítem en tu mano principal
 click-to-copy: Haz click para copiar
 dont-have-money: » No tienes dinero suficiente para comprar eso
 already-here: » Ya estás aquí
-no-data-yet: » Todavía no tienes datos para este minigame

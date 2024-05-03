@@ -3,12 +3,13 @@ package net.stardust.base.model.minigame;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
-public class MinigamePlayer implements Comparable<MinigamePlayer> {
+public class MinigamePlayer implements Serializable, Comparable<MinigamePlayer> {
 
     private UUID id;
     private int wins, losses;

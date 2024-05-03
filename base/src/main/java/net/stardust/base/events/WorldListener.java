@@ -10,7 +10,6 @@ import java.util.function.Supplier;
 public abstract class WorldListener implements Listener, Communicable {
 
     private Supplier<World> supplier;
-    private World world;
 
     public WorldListener(Supplier<World> supplier) {
         this.supplier = Objects.requireNonNull(supplier, "supplier");
@@ -21,10 +20,7 @@ public abstract class WorldListener implements Listener, Communicable {
     }
 
     public World getWorld() {
-        if(world == null) {
-            world = supplier.get();
-        }
-        return world;
+        return supplier.get();
     }
 
 }

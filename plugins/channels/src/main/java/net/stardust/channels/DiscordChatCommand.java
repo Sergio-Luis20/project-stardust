@@ -6,11 +6,11 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.stardust.base.Stardust;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.SenderType;
 import net.stardust.base.command.VirtualCommand;
-import net.stardust.base.utils.BatchList;
 import net.stardust.base.utils.StardustThreads;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @BaseCommand(value = "discordchat", types = SenderType.PLAYER)
 public class DiscordChatCommand extends VirtualCommand<ChannelsPlugin> {
@@ -153,33 +154,16 @@ public class DiscordChatCommand extends VirtualCommand<ChannelsPlugin> {
 
     private void list(int page) {
         Player player = sender();
-        int index = page - 1;
-        if(index < 0) {
-            messager.message(player, "§c» Página negativa");
-            return;
-        }
-        BatchList<String> batchList = StardustThreads.call(plugin, () -> plugin
-            .getDiscordParticipants().stream().map(Bukkit::getOfflinePlayer)
-            .filter(op -> op != null).map(OfflinePlayer::getName).collect(BatchList.collector(5)));
-        List<String> batch;
-        try {
-            assert batchList != null;
-            batch = batchList.getBatch(index);
-        } catch(IndexOutOfBoundsException e) {
-            player.sendMessage("§c» Página maior que a quantidade máxima existente");
-            return;
-        }
-        messager.message(player, "§6» Lista de jogadores atualmente no chat do discord (p. %s/%s):".formatted(page, batchList.getTotalBatches()));
-        messager.message(player, batch.stream().map(name -> "§a§o» " + name).toArray(String[]::new));
+        String key = "discord-chat";
+        Stream<String> names = StardustThreads.call(plugin, () -> plugin
+                .getDiscordParticipants().stream().map(Bukkit::getOfflinePlayer)
+                .filter(op -> op != null).map(OfflinePlayer::getName));
+        Stardust.listPageableString(player, page, names, key, name -> name);
     }
 
     private void users(boolean online, int page) {
         Player player = sender();
-        int index = page - 1;
-        if(index < 0) {
-            messager.message(player, "§c» Página negativa");
-            return;
-        }
+        String key = "discord-users." + (online ? "online-only" : "offline-too");
         HoverEvent<Component> hover = HoverEvent.showText(Component.text("Clique para copiar", NamedTextColor.AQUA));
         Component mention = Component.text("Menção", NamedTextColor.YELLOW).decorate(TextDecoration.ITALIC)
             .hoverEvent(HoverEvent.showText(Component.text("Clique para mencionar", NamedTextColor.AQUA)));
@@ -189,31 +173,22 @@ public class DiscordChatCommand extends VirtualCommand<ChannelsPlugin> {
         Component comma = Component.text(", ", NamedTextColor.WHITE);
         List<OnlineStatus> status = online ? Arrays.asList(OnlineStatus.ONLINE, 
             OnlineStatus.IDLE, OnlineStatus.DO_NOT_DISTURB) : Arrays.asList(OnlineStatus.values());
-        BatchList<Component> batchList = plugin.getJDAInfo().getMale().getMembers().stream()
-            .filter(member -> status.contains(member.getOnlineStatus())).map(member -> {
-            String name = member.getEffectiveName();
-            String nick = member.getNickname();
-            String id = member.getId();
-            Component namePiece = nameComp.append(Component.text(name, NamedTextColor.AQUA))
-                .hoverEvent(hover).clickEvent(ClickEvent.copyToClipboard(name));
-            Component nickPiece = nickComp.append(Component.text(String.valueOf(nick == null ? null : "\"" + nick + "\"")))
-                .hoverEvent(hover).clickEvent(ClickEvent.copyToClipboard(nick == null ? "null" : nick));
-            Component idPiece = idComp.append(Component.text(id, NamedTextColor.AQUA)).hoverEvent(hover)
-                .clickEvent(ClickEvent.copyToClipboard(id));
-            Component mentionPiece = mention.clickEvent(ClickEvent.suggestCommand(member.getAsMention() + " "));
-            return namePiece.append(comma).append(nickPiece).append(comma).append(idPiece)
-                .append(comma).append(mentionPiece);
-        }).collect(BatchList.collector(5));
-        List<Component> batch;
-        try {
-            batch = batchList.getBatch(index);
-        } catch(IndexOutOfBoundsException e) {
-            player.sendMessage("§c» Página maior que a quantidade máxima existente");
-            return;
-        }
-        messager.message(player, "§6» Lista de usuários " + (online ? "online " : "") 
-            + "do discord (p. %s/%s):".formatted(page, batchList.getTotalBatches()));
-        messager.message(player, batch.toArray(Component[]::new));
+        Stream<Component> elements = plugin.getJDAInfo().getMale().getMembers().stream()
+                .filter(member -> status.contains(member.getOnlineStatus())).map(member -> {
+                    String name = member.getEffectiveName();
+                    String nick = member.getNickname();
+                    String id = member.getId();
+                    Component namePiece = nameComp.append(Component.text(name, NamedTextColor.AQUA))
+                            .hoverEvent(hover).clickEvent(ClickEvent.copyToClipboard(name));
+                    Component nickPiece = nickComp.append(Component.text(String.valueOf(nick == null ? null : "\"" + nick + "\"")))
+                            .hoverEvent(hover).clickEvent(ClickEvent.copyToClipboard(nick == null ? "null" : nick));
+                    Component idPiece = idComp.append(Component.text(id, NamedTextColor.AQUA)).hoverEvent(hover)
+                            .clickEvent(ClickEvent.copyToClipboard(id));
+                    Component mentionPiece = mention.clickEvent(ClickEvent.suggestCommand(member.getAsMention() + " "));
+                    return namePiece.append(comma).append(nickPiece).append(comma).append(idPiece)
+                            .append(comma).append(mentionPiece);
+                });
+        Stardust.listPageable(player, page, elements, key, e -> e);
     }
 
 }

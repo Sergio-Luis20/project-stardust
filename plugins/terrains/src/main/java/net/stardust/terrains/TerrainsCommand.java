@@ -1,13 +1,10 @@
 package net.stardust.terrains;
 
-import java.util.List;
-
-import org.bukkit.entity.Player;
-
+import net.stardust.base.Stardust;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.DirectCommand;
-import net.stardust.base.utils.BatchList;
+import org.bukkit.entity.Player;
 
 @BaseCommand("terrains")
 public class TerrainsCommand extends DirectCommand<TerrainsPlugin> {
@@ -73,24 +70,7 @@ public class TerrainsCommand extends DirectCommand<TerrainsPlugin> {
     }
     
     private void listTerrains(int page) {
-        int index = page - 1;
-        Player player = sender();
-        if(index < 0) {
-            player.sendMessage("§c» Página negativa");
-            return;
-        }
-        BatchList<String> batchList = service.getNamesList();
-        List<String> batch;
-        try {
-            batch = batchList.getBatch(index);
-        } catch(IndexOutOfBoundsException e) {
-            player.sendMessage("§c» Página maior que a quantidade máxima existente");
-            return;
-        }
-        player.sendMessage("§6» Lista de terrenos atualmente carregados (p. %s/%s):".formatted(page, batchList.getTotalBatches()));
-        for(String terrain : batch) {
-            player.sendMessage("§a§o» " + terrain);
-        }
+        Stardust.listPageableString(sender(), page, service.getNamesList(), "terrain", terrain -> terrain);
     }
     
 }

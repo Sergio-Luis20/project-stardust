@@ -1,26 +1,24 @@
 package net.stardust.terrains;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
-
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.stardust.base.Stardust;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.DirectCommand;
 import net.stardust.base.command.SenderType;
 import net.stardust.base.model.terrain.Home;
 import net.stardust.base.utils.AutomaticMessages;
-import net.stardust.base.utils.BatchList;
 import net.stardust.base.utils.persistence.DataManager;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.HashSet;
+import java.util.Set;
 
 @BaseCommand(value = "home", types = SenderType.PLAYER)
 public class HomeCommand extends DirectCommand<TerrainsPlugin> {
@@ -144,34 +142,19 @@ public class HomeCommand extends DirectCommand<TerrainsPlugin> {
     @SuppressWarnings("unchecked")
     public void listHomes(int page) {
         Player player = sender();
-        int index = page - 1;
-        if(index < 0) {
-            player.sendMessage(AutomaticMessages.negativePage());
-            return;
-        }
         DataManager<Player> dataManager = new DataManager<>(player);
         Set<Home> homes = dataManager.readObject(key, Set.class);
         if(homes == null) {
-            player.sendRichMessage("<red><lang:world.home.dont-have-any>");
+            player.sendMessage(Component.translatable("world.home.dont-have-any", NamedTextColor.RED));
             return;
         }
-        final int batchSize = 5;
-        BatchList<Home> batchList = new BatchList<>(batchSize, homes);
-        List<Home> batch;
-        try {
-            batch = batchList.getBatch(index);
-        } catch(IndexOutOfBoundsException e) {
-            player.sendMessage(AutomaticMessages.greaterPage());
-            return;
-        }
-        Component p = Component.text("(p. " + page + "/" + batchList.getTotalBatches() + ")", NamedTextColor.GOLD);
-        player.sendMessage(AutomaticMessages.pageable("home-list", p));
-        for(Home home : batch) {
-            Component prefix = miniMessage.deserialize("<light_purple>» ");
-            Component name = miniMessage.deserialize("<gold>" + home.getName() + " ");
-            Component homeString = miniMessage.deserialize("<light_purple>[<aqua>" + getHomeString(player, home.getLocation()) + "<light_purple>]");
-            player.sendMessage(prefix.append(name).append(homeString));
-        }
+        Stardust.listPageable(player, page, homes, "home", home -> {
+            Component prefix = Component.text("» ", NamedTextColor.LIGHT_PURPLE);
+            Component name = Component.text(home.getName() + " ", NamedTextColor.GOLD);
+            Component homeString = miniMessage.deserialize("<light_purple>[<aqua>"
+                    + getHomeString(player, home.getLocation()) + "<light_purple>]");
+            return prefix.append(name).append(homeString);
+        });
     }
 
     private String getHomeString(Player player) {

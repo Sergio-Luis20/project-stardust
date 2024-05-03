@@ -10,6 +10,7 @@ import net.stardust.base.model.minigame.MinigameData;
 import net.stardust.base.model.minigame.MinigamePlayer;
 import net.stardust.base.model.user.User;
 import net.stardust.base.utils.AutomaticMessages;
+import net.stardust.base.utils.StardustThreads;
 import net.stardust.base.utils.database.crud.MinigameDataCrud;
 import net.stardust.base.utils.database.crud.UserCrud;
 import net.stardust.base.utils.database.lang.Translation;
@@ -51,10 +52,10 @@ public class MgDataCommand extends VirtualCommand<MinigamesPlugin> {
                 Map<UUID, MinigamePlayer> minigamePlayers = data.getMinigamePlayers();
                 MinigamePlayer minigamePlayer = minigamePlayers.get(player.getUniqueId());
                 if(minigamePlayer == null) {
-                    if(sender.equals(player)) {
-                        sender.sendMessage(Component.translatable("no-data-yet", NamedTextColor.RED));
+                    if(StardustThreads.call(plugin, () -> sender.equals(player))) {
+                        messager.message(sender, Component.translatable("minigame.no-data-yet", NamedTextColor.RED));
                     } else {
-                        sender.sendMessage(AutomaticMessages.notFound("word.player"));
+                        messager.message(sender, AutomaticMessages.notFound("word.player"));
                     }
                     return;
                 }
@@ -92,7 +93,7 @@ public class MgDataCommand extends VirtualCommand<MinigamesPlugin> {
         Component winsRank = Component.translatable("mg-data-display.wins-rank", NamedTextColor.GOLD,
                 Component.text(position, NamedTextColor.YELLOW));
 
-        messager.messageAndWait(sender, header, wins, losses, ratio, totalMatches, winsRank);
+        messager.message(sender, header, wins, losses, ratio, totalMatches, winsRank);
     }
 
 }

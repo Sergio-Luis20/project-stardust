@@ -1,19 +1,5 @@
 package net.stardust.base.model.channel;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -22,6 +8,13 @@ import net.stardust.base.Communicable;
 import net.stardust.base.utils.MessageFormatter;
 import net.stardust.base.utils.Messager;
 import net.stardust.base.utils.Throwables;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
 
 public abstract class Channel implements MessageFormatter<CommandSender>, Communicable {
 
@@ -86,13 +79,13 @@ public abstract class Channel implements MessageFormatter<CommandSender>, Commun
     
     public void sendMessage(CommandSender sender, String message) {
         LegacyComponentSerializer serializer = LegacyComponentSerializer.legacySection();
-        sendMessage(sender, formatMessage(sender, serializer.deserialize(message)));
+        sendMessage(sender, serializer.deserialize(message));
     }
 
     public void sendMessage(CommandSender sender, Component component) {
         if(!containsParticipant(sender)) return;
         if(!canSendMessages(sender)) return;
-        messager.message(participants, component);
+        messager.message(participants, formatMessage(sender, component));
     }
 
     public static Set<String> getChannels(Communicable communicable) {

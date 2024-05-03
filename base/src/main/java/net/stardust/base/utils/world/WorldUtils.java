@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 public final class WorldUtils {
 
@@ -18,8 +19,36 @@ public final class WorldUtils {
     private WorldUtils() {}
 
     public static World loadWorld(String name) {
-        WorldCreator creator = new WorldCreator(name);
-        return creator.createWorld();
+        return loadWorld(new WorldCreator(name));
+    }
+
+    public static World loadWorld(WorldCreator creator) {
+        try {
+            return Bukkit.getScheduler().callSyncMethod(PluginConfig.get().getPlugin(), creator::createWorld).get();
+        } catch(InterruptedException | ExecutionException e) {
+            Throwables.sendAndThrow(e);
+            return null;
+        }
+    }
+
+    public static boolean unloadWorld(World world, boolean save) {
+        try {
+            return Bukkit.getScheduler().callSyncMethod(PluginConfig.get().getPlugin(), () ->
+                    Bukkit.unloadWorld(world, save)).get();
+        } catch (InterruptedException | ExecutionException e) {
+            Throwables.sendAndThrow(e);
+            return false;
+        }
+    }
+
+    public static boolean unloadWorld(String name, boolean save) {
+        try {
+            return Bukkit.getScheduler().callSyncMethod(PluginConfig.get().getPlugin(), () ->
+                    Bukkit.unloadWorld(name, save)).get();
+        } catch (InterruptedException | ExecutionException e) {
+            Throwables.sendAndThrow(e);
+            return false;
+        }
     }
 
     public static boolean isLoaded(String name) {
@@ -35,14 +64,11 @@ public final class WorldUtils {
             throw new IllegalArgumentException("\"" + folder.getPath() + "\" is file");
         }
         File uidDat = new File(folder, "uid.dat");
-        if(!uidDat.exists()) {
-            throw new IllegalArgumentException("Folder \"" + folder.getPath() + "\" is not a Minecraft " +
-                    "map folder. It doesn't have the file uid.dat");
-        }
         try(DataInputStream inputStream = new DataInputStream(new FileInputStream(uidDat))) {
             return new UUID(inputStream.readLong(), inputStream.readLong());
         } catch (FileNotFoundException e) {
-            throw new Error(e);
+            throw new IllegalArgumentException("Folder \"" + folder.getPath() + "\" is not a Minecraft " +
+                    "map folder. It doesn't have the file uid.dat");
         } catch (IOException e) {
             Throwables.sendAndThrow(e);
             return null;

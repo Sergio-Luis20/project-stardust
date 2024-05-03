@@ -145,7 +145,7 @@ public class MatchSign {
             case AVAILABLE -> updateActiveSign(info, title, players, player -> Translation
                         .getTextComponent(player, "minigame.sign.available").color(NamedTextColor.GREEN));
             case RUNNING -> updateActiveSign(info, title, players, player -> Translation
-                        .getTextComponent(player, "minigame.sign.running").color(NamedTextColor.GREEN));
+                        .getTextComponent(player, "minigame.sign.running").color(NamedTextColor.RED));
             case WAITING -> {
                 Component emptyLine = Component.empty();
                 Component noPlayers = Component.text("-/-", NamedTextColor.WHITE, TextDecoration.BOLD);

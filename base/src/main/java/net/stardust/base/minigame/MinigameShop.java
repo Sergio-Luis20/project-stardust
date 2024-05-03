@@ -98,16 +98,19 @@ public class MinigameShop extends WorldListener {
 
     @EventHandler
     public void onIteract(PlayerInteractEvent event) {
-        Action action = event.getAction();
-        if(action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) {
-            return;
-        }
-        ItemStack item = event.getItem();
-        if(item == null || !isShopBook(item)) {
-            return;
-        }
-        if(!preMatchOnly || parent.getState() == MinigameState.PRE_MATCH) {
-            event.getPlayer().openInventory(inventory);
+        Player player = event.getPlayer();
+        if(player.getWorld().equals(parent.getWorld())) {
+            Action action = event.getAction();
+            if(action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) {
+                return;
+            }
+            ItemStack item = event.getItem();
+            if(item == null || !isShopBook(item)) {
+                return;
+            }
+            if(!preMatchOnly || parent.getState() == MinigameState.PRE_MATCH) {
+                event.getPlayer().openInventory(inventory);
+            }
         }
     }
 
@@ -116,7 +119,8 @@ public class MinigameShop extends WorldListener {
         Inventory inventory = event.getInventory();
         if(inventory.getHolder() instanceof MinigameShopInventoryHolder) {
             event.setCancelled(true);
-            if(event.getWhoClicked() instanceof Player player && (!preMatchOnly || parent.getState() == MinigameState.PRE_MATCH)) {
+            if(event.getWhoClicked() instanceof Player player && player.getWorld().equals(parent.getWorld())
+                    && (!preMatchOnly || parent.getState() == MinigameState.PRE_MATCH)) {
                 ItemStack clickedItem = event.getCurrentItem();
                 ItemMeta meta = clickedItem.getItemMeta();
                 DataManager<ItemMeta> manager = new DataManager<>(meta);
@@ -148,9 +152,7 @@ public class MinigameShop extends WorldListener {
 
     public static ItemStack createShopItem(ItemStack item, int price) {
         ItemStack shopItem = ItemUtils.item(Objects.requireNonNull(item, "item"));
-        if(price < 0) {
-            throw new IllegalArgumentException("price must be positive");
-        }
+        Ranges.greater(price, 0, "price");
         Money money = new Money(Currency.SILVER, new BigInteger(String.valueOf(price)));
         ItemMeta meta = shopItem.getItemMeta();
         DataManager<ItemMeta> manager = new DataManager<>(meta);

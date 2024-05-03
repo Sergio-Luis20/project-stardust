@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.stardust.base.events.DefaultListener;
 import net.stardust.base.events.WorldListener;
 import net.stardust.base.model.economy.wallet.Currency;
 import net.stardust.base.model.economy.wallet.Money;
@@ -127,7 +128,7 @@ public abstract class Minigame implements Listener {
     }
 
     protected Listener newPreMatchListener() {
-        return new DefaultListener(this);
+        return new DefaultListener(this::getWorld);
     }
 
     protected PreMatchStopwatch newStopwatch() {

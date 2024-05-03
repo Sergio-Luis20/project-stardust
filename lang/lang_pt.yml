@@ -182,6 +182,7 @@ minigame:
     interrupted: » Partida interrompida
   team:
     usage: '» Uso: /equipe <mensagem>'
+  no-data-yet: » Você ainda não tem dados para este minigame
   shop: Loja
   bought:
     self: » Você pagou {0} nesse item
@@ -242,7 +243,14 @@ mg-data-display:
 pageable:
   negative-page: » Página negativa
   greater-page: » Página maior que a quantidade máxima existente
-  home-list: '» Lista das casas que você possui {0}:'
+  list:
+    home: '» Lista das casas que você possui {0}:'
+    terrain: '» Lista de terrenos atualmente carregados {0}:'
+    discord-chat: '» Lista de jogadores atualmente no chat do discord {0}:'
+    discord-users:
+      online-only: '» Lista de usuários online do discord {0}:'
+      offline-too: '» Lista de usuários do discord {0}:'
+    worlds-manually-loaded: '» Lista de mundos manualmente carregados {0}:'
 custom-enchant:
   glow: Brilho
 color:
@@ -259,4 +267,3 @@ click-to-copy: Clique para copiar
 dont-have-money: » Você não tem dinheiro suficiente para comprar isso
 track: '<gray>Jogador: {0}, distância: {1}'
 already-here: » Você já está aqui
-no-data-yet: » Você ainda não tem dados para este minigame

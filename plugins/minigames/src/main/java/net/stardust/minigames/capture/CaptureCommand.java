@@ -1,10 +1,11 @@
 package net.stardust.minigames.capture;
 
+import br.sergio.utils.Pair;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.DirectCommand;
 import net.stardust.base.command.SenderType;
-import net.stardust.base.utils.MultiWriterYamlConfiguration;
+import net.stardust.base.utils.AutomaticMessages;
 import net.stardust.base.utils.Throwables;
 import net.stardust.base.utils.world.DifferentWorldException;
 import net.stardust.base.utils.world.WorldUtils;
@@ -13,6 +14,8 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -80,16 +83,22 @@ public class CaptureCommand extends DirectCommand<MinigamesPlugin> {
         Location loc = player.getLocation().toCenterLocation().subtract(0, 0.5, 0);
         loc.setYaw(0);
         loc.setPitch(0);
-        MultiWriterYamlConfiguration captureYaml = getCaptureYaml(loc.getWorld());
+        Pair<FileConfiguration, File> captureYaml = getCaptureYaml(loc.getWorld());
         if(captureYaml == null) {
             player.sendMessage("§c» Você não está num mapa de capture");
             return;
         }
+        FileConfiguration config = captureYaml.getMale();
         String yamlKey = location.yamlKeyName;
-        captureYaml.set(yamlKey + ".x", loc.getX());
-        captureYaml.set(yamlKey + ".y", loc.getY());
-        captureYaml.set(yamlKey + ".z", loc.getZ());
-        captureYaml.save();
+        config.set(yamlKey + ".x", loc.getX());
+        config.set(yamlKey + ".y", loc.getY());
+        config.set(yamlKey + ".z", loc.getZ());
+        try {
+            config.save(captureYaml.getFemale());
+        } catch(IOException e) {
+            player.sendMessage(AutomaticMessages.internalServerError());
+            Throwables.sendAndThrow(e);
+        }
         player.sendMessage("§a» Atributo " + location.toString().toLowerCase() + " definido para §e" + loc);
     }
 
@@ -101,12 +110,12 @@ public class CaptureCommand extends DirectCommand<MinigamesPlugin> {
     @CommandEntry("get")
     public void get(String worldName, CaptureLocation location) {
         CommandSender sender = sender();
-        MultiWriterYamlConfiguration captureYaml = getCaptureYaml(worldName);
+        Pair<FileConfiguration, File> captureYaml = getCaptureYaml(worldName);
         if(captureYaml == null) {
             sender.sendMessage("§c» Mundo \"" + worldName + "\" não é um mapa de capture");
             return;
         }
-        ConfigurationSection section = captureYaml.getConfigurationSection(location.yamlKeyName);
+        ConfigurationSection section = captureYaml.getMale().getConfigurationSection(location.yamlKeyName);
         if(section == null) {
             sender.sendMessage("§c» Atributo §6" + location.toString().toLowerCase() + " §cainda não definido" +
                     "no arquivo capture.yml");
@@ -163,21 +172,16 @@ public class CaptureCommand extends DirectCommand<MinigamesPlugin> {
         return new File(plugin.getMapsFolder(), "capture/" + worldName);
     }
 
-    private MultiWriterYamlConfiguration getCaptureYaml(World world) {
+    private Pair<FileConfiguration, File> getCaptureYaml(World world) {
         return getCaptureYaml(world.getName());
     }
 
-    private MultiWriterYamlConfiguration getCaptureYaml(String worldName) {
+    private Pair<FileConfiguration, File> getCaptureYaml(String worldName) {
         File inMapsFolder = new File(getWorldMapFolder(worldName), "capture.yml");
         if(!inMapsFolder.exists()) {
             return null;
         }
-        File inServerFolder = new File(worldName);
-        MultiWriterYamlConfiguration config = new MultiWriterYamlConfiguration(inServerFolder);
-        if(inServerFolder.exists()) {
-            config.getFiles().add(inServerFolder);
-        }
-        return config;
+        return new Pair<>(YamlConfiguration.loadConfiguration(inMapsFolder), inMapsFolder);
     }
 
 }

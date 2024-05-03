@@ -28,10 +28,6 @@ public final class AutomaticMessages {
         return Component.translatable("pageable.greater-page", NamedTextColor.RED);
     }
 
-    public static Component pageable(String subkey, Component page) {
-        return Component.translatable("pageable." + subkey, NamedTextColor.GOLD, page);
-    }
-
     public static Component internalServerError() {
         return Component.translatable("error.internal", NamedTextColor.RED);
     }

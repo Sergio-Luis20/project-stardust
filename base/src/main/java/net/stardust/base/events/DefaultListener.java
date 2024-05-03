@@ -1,9 +1,9 @@
-package net.stardust.base.minigame;
+package net.stardust.base.events;
 
 import com.destroystokyo.paper.event.player.PlayerPickupExperienceEvent;
 import io.papermc.paper.event.player.PlayerPickItemEvent;
 import lombok.Getter;
-import net.stardust.base.events.WorldListener;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -15,16 +15,13 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 
-import java.util.Objects;
+import java.util.function.Supplier;
 
 @Getter
 public class DefaultListener extends WorldListener {
 
-    private Minigame parent;
-
-    public DefaultListener(Minigame parent) {
-        super(parent::getWorld);
-        this.parent = Objects.requireNonNull(parent, "parent");
+    public DefaultListener(Supplier<World> worldSupplier) {
+        super(worldSupplier);
     }
 
     @EventHandler
@@ -55,7 +52,7 @@ public class DefaultListener extends WorldListener {
         if(event.getEntity() instanceof Player player && checkWorld(player.getWorld())) {
             event.setCancelled(true);
             if(event.getCause() == DamageCause.VOID) {
-                event.getEntity().teleport(parent.getWorld().getSpawnLocation());
+                event.getEntity().teleport(getWorld().getSpawnLocation());
             }
         }
     }

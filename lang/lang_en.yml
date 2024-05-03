@@ -183,6 +183,7 @@ minigame:
     interrupted: » Match interrupted
   team:
     usage: '» Usage: /team <message>'
+  no-data-yet: » You don't have data for this minigame yet
   shop: Shop
   tracker: Tracker
   track: 'Player: {0}, distance: {1}'
@@ -242,8 +243,15 @@ mg-data-display:
   wins-rank: '» Wins rank position: {0}'
 pageable:
   negative-page: » Negative page
-  greater-page: Page larger than the maximum existing quantity
-  home-list: '» Your homes list {0}:'
+  greater-page: » Page larger than the maximum existing quantity
+  list:
+    home: '» List of homes you own {0}:'
+    terrain: '» List of currently loaded terrains {0}:'
+    discord-chat: '» List of players currently in discord chat {0}:'
+    discord-users:
+      online-only: '» Discord online user list {0}:'
+      offline-too: '» Discord user list {0}:'
+    worlds-manually-loaded: '» List of manually loaded worlds {0}:'
 custom-enchant:
   glow: Glow
 color:
@@ -259,4 +267,3 @@ must-hold-item: » You need to hold an item in your main hand
 click-to-copy: Click to copy
 dont-have-money: » You don't have enought money to buy that
 already-here: » You are already here
-no-data-yet: » You don't have data for this minigame yet
