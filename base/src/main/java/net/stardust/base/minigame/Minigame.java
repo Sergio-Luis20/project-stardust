@@ -11,6 +11,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.stardust.base.events.DefaultListener;
+import net.stardust.base.events.TrackerListener;
 import net.stardust.base.events.WorldListener;
 import net.stardust.base.model.economy.wallet.Currency;
 import net.stardust.base.model.economy.wallet.Money;
@@ -61,6 +62,9 @@ public abstract class Minigame implements Listener {
     private Listener defaultListener;
 
     private Listener matchListener;
+
+    @Setter(AccessLevel.PROTECTED)
+    private TrackerListener trackerListener;
 
     @Getter(AccessLevel.PROTECTED)
     private PlayerSnapshot snapshot;
@@ -124,6 +128,7 @@ public abstract class Minigame implements Listener {
         defaultListener = newPreMatchListener();
         PluginConfig.get().registerEvents(preMatchTraffic, defaultListener);
         registerListener(shop);
+        registerListener(trackerListener);
         stateListeners.forEach(listener -> listener.onLatePreMatch(this));
     }
 
@@ -139,6 +144,7 @@ public abstract class Minigame implements Listener {
         setState(MinigameState.END_MATCH);
         unregisterMatchListener();
         unregisterShop();
+        unregisterListener(trackerListener);
         registerListener(defaultListener);
         stopMatchStopwatch();
         MatchResult result = getMatchResult(winners, losers);
@@ -267,6 +273,8 @@ public abstract class Minigame implements Listener {
 
     protected abstract void onSpawnCommand(Player player);
 
+    protected abstract void onMatchInterrupted();
+
     private void startMatchBar() {
         matchStopwatch = new BukkitRunnable() {
 
@@ -329,8 +337,12 @@ public abstract class Minigame implements Listener {
         }
     }
 
-    public void interruptMatch() {
+    public final void interruptMatch() {
+        if(state == MinigameState.MATCH) {
+            onMatchInterrupted();
+        }
         setState(MinigameState.END_MATCH);
+        unregisterListener(trackerListener);
         unregisterPreMatchListeners();
         unregisterMatchListener();
         stopMatchStopwatch();
@@ -453,6 +465,10 @@ public abstract class Minigame implements Listener {
 
     protected final void setMatchListener(Listener matchListener) {
         this.matchListener = matchListener;
+    }
+
+    public boolean useTracker() {
+        return trackerListener != null;
     }
 
     public enum MinigameState {

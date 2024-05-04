@@ -233,6 +233,7 @@ word:
   home: Casa
   tracker: Rastreador
   minigame: Minigame
+  infinity: Infinito
 mg-data-display:
   header: '» Exibindo dados de {0} para o minigame {1}:'
   wins: '» Vitórias: {0}'
@@ -265,5 +266,5 @@ no-empty-slot: » Você não tem nenhum slot vazio
 must-hold-item: » Você precisa segurar algum item na mão principal
 click-to-copy: Clique para copiar
 dont-have-money: » Você não tem dinheiro suficiente para comprar isso
-track: '<gray>Jogador: {0}, distância: {1}'
+track: 'Jogador: {0}, distância: {1}'
 already-here: » Você já está aqui

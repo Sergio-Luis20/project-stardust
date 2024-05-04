@@ -26,7 +26,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -43,8 +44,8 @@ import java.util.Map.Entry;
 public class Capture extends Minigame implements SquadMinigame {
 
     private static final List<PotionEffect> CAPTURED_EFFECTS = List.of(
-            new PotionEffect(PotionEffectType.BLINDNESS, 100000, 3, false, false, true),
-            new PotionEffect(PotionEffectType.SLOW, 100000, 2, false, false, true)
+            new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 2, false, false, true),
+            new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 1, false, false, true)
     );
 
     private static final SoundPack BEING_CARRIED = new SoundPack(Sound.ENTITY_IRON_GOLEM_HURT, 2f);
@@ -73,6 +74,8 @@ public class Capture extends Minigame implements SquadMinigame {
     @Getter(AccessLevel.PACKAGE)
     private List<Player> blueFree, blueCaptured, redFree, redCaptured;
 
+    private Map<Player, ArmorStand> invisibleEntities;
+
     @Getter(AccessLevel.PACKAGE)
     private boolean ending;
 
@@ -80,6 +83,7 @@ public class Capture extends Minigame implements SquadMinigame {
         super(plugin.getMinigameInfo("capture", index));
         this.plugin = Objects.requireNonNull(plugin, "plugin");
 
+        setTrackerListener(new CaptureTrackerListener(this));
         setMatchListener(new CaptureMatchListener(this));
         setShop(MinigameShop.newShop(this, false, Component.translatable("word.shop"),
                 InventoryUtils.DEFAULT_INVENTORY_SIZE, getShopItems()));
@@ -97,6 +101,8 @@ public class Capture extends Minigame implements SquadMinigame {
         blueCaptured = new ArrayList<>();
         redFree = new ArrayList<>();
         redCaptured = new ArrayList<>();
+
+        invisibleEntities = new HashMap<>();
     }
 
     @Override
@@ -115,6 +121,11 @@ public class Capture extends Minigame implements SquadMinigame {
         leave(player);
     }
 
+    @Override
+    protected void onMatchInterrupted() {
+        invisibleEntities.values().forEach(Entity::remove);
+    }
+
     private void distributePlayers() {
         World world = getWorld();
         List<Player> players = world.getPlayers();
@@ -125,6 +136,12 @@ public class Capture extends Minigame implements SquadMinigame {
             stats.put(player, statsPair);
             carry.put(player, new ArrayList<>());
             player.playerListName(buildListName(player, statsPair, team));
+            ArmorStand entity = (ArmorStand) getWorld().spawnEntity(player.getLocation(),
+                    EntityType.ARMOR_STAND, SpawnReason.CUSTOM);
+            entity.setInvisible(true);
+            entity.setInvulnerable(true);
+            player.addPassenger(entity);
+            invisibleEntities.put(player, entity);
             team.getPlayers(this).add(player);
             team = team.other();
         }
@@ -170,8 +187,8 @@ public class Capture extends Minigame implements SquadMinigame {
     }
 
     private void teleportPlayers() {
-        blueTeam.forEach(player -> player.teleport(blueBase));
-        redTeam.forEach(player -> player.teleport(redBase));
+        blueTeam.forEach(player -> teleportInWorld(player, blueBase));
+        redTeam.forEach(player -> teleportInWorld(player, redBase));
     }
 
     private void equipTeam(List<Player> team, Color color) {
@@ -237,6 +254,13 @@ public class Capture extends Minigame implements SquadMinigame {
         return player.name().color(team.getTextColor()).appendSpace().append(suffix);
     }
 
+    void teleportInWorld(Player player, Location location) {
+        ArmorStand entity = invisibleEntities.get(player);
+        entity.leaveVehicle();
+        player.teleport(location);
+        player.addPassenger(entity);
+    }
+
     void leave(Player player) {
         player.teleport(getInfo().lobby());
     }
@@ -268,7 +292,7 @@ public class Capture extends Minigame implements SquadMinigame {
         capturedTeam.getCapturedPlayers(this).add(captured);
         Score score = capturedTeam.getScore(this);
         score.setScore(score.getScore() - 1);
-        captured.teleport(capturedTeam.other().getBase(this));
+        teleportInWorld(captured, capturedTeam.other().getBase(this));
         captured.addPotionEffects(CAPTURED_EFFECTS);
         getWorld().getPlayers().forEach(player -> player.sendMessage(message));
         captured.sendMessage(Component.translatable("minigame.capture.you-have-been-captured", NamedTextColor.RED));
@@ -289,16 +313,19 @@ public class Capture extends Minigame implements SquadMinigame {
         }
 
         CaptureTeam team = CaptureTeam.getTeam(this, princess);
-        team.other().getCapturedPlayers(this).remove(princess);
+        team.getCapturedPlayers(this).remove(princess);
         team.getFreePlayers(this).add(princess);
         Score score = team.getScore(this);
         score.setScore(score.getScore() + 1);
-        princess.teleport(hero != null ? team.getBase(this) : spawn);
-        CAPTURED_EFFECTS.forEach(effect -> princess.removePotionEffect(effect.getType()));
 
         if(hero != null) {
+            princess.leaveVehicle();
             getWorld().getPlayers().forEach(player -> player.sendMessage(message));
         }
+
+        teleportInWorld(princess, hero != null ? team.getBase(this) : spawn);
+        princess.clearActivePotionEffects();
+
         princess.sendMessage(Component.translatable("minigame.capture.you-have-been-saved", NamedTextColor.GREEN));
     }
 
@@ -312,7 +339,9 @@ public class Capture extends Minigame implements SquadMinigame {
         if(!carry.isEmpty()) {
             List<Player> copy = new ArrayList<>(carry);
             carry.clear();
-            for(Player carrying : copy) {
+            int size = copy.size();
+            for(int i = size - 1; i >= 0; i--) {
+                Player carrying = copy.get(i);
                 if(team == CaptureTeam.getTeam(this, carrying)) {
                     saved(player, carrying);
                 } else {
@@ -349,14 +378,14 @@ public class Capture extends Minigame implements SquadMinigame {
         messages[0] = Component.translatable("minigame.capture." + bullKey, NamedTextColor.GREEN,
                 bullfighter.name().color(NamedTextColor.AQUA));
         boolean timer = false;
-        Player top;
+        ArmorStand top;
         if(empty) {
-            top = bull;
+            top = invisibleEntities.get(bull);
             messages[1] = Component.translatable("minigame.capture.time", NamedTextColor.GREEN,
                     Component.text(CARRY_TIME, NamedTextColor.GREEN));
             timer = true;
         } else {
-            top = carry.getLast();
+            top = invisibleEntities.get(carry.getLast());
         }
         top.addPassenger(bullfighter);
         carry.add(bullfighter);
@@ -389,9 +418,12 @@ public class Capture extends Minigame implements SquadMinigame {
     }
 
     void dismountAll(Player bull) {
+        List<Player> carry = this.carry.get(bull);
+        if(carry.isEmpty()) {
+            return;
+        }
         boolean teleportToWorldSpawn = WorldUtils.belowVoid(bull.getLocation());
         fireTimer(bull);
-        List<Player> carry = this.carry.get(bull);
         CaptureTeam bullTeam = CaptureTeam.getTeam(this, bull);
         Component failedToCapture = Component.translatable("minigame.capture.failed-to-capture",
                 NamedTextColor.GREEN, bull.name().color(NamedTextColor.GREEN));
@@ -407,7 +439,7 @@ public class Capture extends Minigame implements SquadMinigame {
                 player.sendMessage(failedToCapture);
             }
             if(teleportToWorldSpawn) {
-                player.teleport(spawn);
+                teleportInWorld(player, spawn);
             }
         });
     }
@@ -437,6 +469,10 @@ public class Capture extends Minigame implements SquadMinigame {
         String key = team == CaptureTeam.BLUE ? "police-win" : "thief-win";
         Component winMessage = Component.translatable("minigame.capture." + key, NamedTextColor.GOLD, TextDecoration.BOLD);
         getWorld().getPlayers().forEach(player -> player.sendMessage(winMessage));
+        invisibleEntities.forEach((player, entity) -> {
+            entity.leaveVehicle();
+            entity.remove();
+        });
         ending = true;
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             endMatch(team.getPlayers(this), team.other().getPlayers(this));
@@ -448,6 +484,7 @@ public class Capture extends Minigame implements SquadMinigame {
         getBull(player).ifPresent(bull -> dismount(bull, player));
         dismountAll(player);
         carry.remove(player);
+        invisibleEntities.remove(player).remove();
         CaptureTeam team = CaptureTeam.getTeam(this, player);
         team.getPlayers(this).remove(player);
         if(isCaptured(player)) {
@@ -458,6 +495,7 @@ public class Capture extends Minigame implements SquadMinigame {
         getSnapshot().restore(player);
         Score score = team.getScore(this);
         score.setScore(score.getScore() - 1);
+        checkVictory();
     }
 
     private Location getLocation(ConfigurationSection section) {

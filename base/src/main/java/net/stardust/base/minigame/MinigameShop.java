@@ -122,6 +122,9 @@ public class MinigameShop extends WorldListener {
             if(event.getWhoClicked() instanceof Player player && player.getWorld().equals(parent.getWorld())
                     && (!preMatchOnly || parent.getState() == MinigameState.PRE_MATCH)) {
                 ItemStack clickedItem = event.getCurrentItem();
+                if(clickedItem == null || clickedItem.getType() == Material.AIR) {
+                    return;
+                }
                 ItemMeta meta = clickedItem.getItemMeta();
                 DataManager<ItemMeta> manager = new DataManager<>(meta);
                 Money price = manager.readObject(SHOP_ITEM_KEY, Money.class);

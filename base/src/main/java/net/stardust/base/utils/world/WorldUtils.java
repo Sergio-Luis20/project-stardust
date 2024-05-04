@@ -1,5 +1,6 @@
 package net.stardust.base.utils.world;
 
+import net.stardust.base.utils.StardustThreads;
 import net.stardust.base.utils.Throwables;
 import net.stardust.base.utils.plugin.PluginConfig;
 import org.apache.commons.io.FileUtils;
@@ -10,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 public final class WorldUtils {
 
@@ -23,32 +23,15 @@ public final class WorldUtils {
     }
 
     public static World loadWorld(WorldCreator creator) {
-        try {
-            return Bukkit.getScheduler().callSyncMethod(PluginConfig.get().getPlugin(), creator::createWorld).get();
-        } catch(InterruptedException | ExecutionException e) {
-            Throwables.sendAndThrow(e);
-            return null;
-        }
+        return StardustThreads.call(creator::createWorld);
     }
 
     public static boolean unloadWorld(World world, boolean save) {
-        try {
-            return Bukkit.getScheduler().callSyncMethod(PluginConfig.get().getPlugin(), () ->
-                    Bukkit.unloadWorld(world, save)).get();
-        } catch (InterruptedException | ExecutionException e) {
-            Throwables.sendAndThrow(e);
-            return false;
-        }
+        return StardustThreads.call(() -> Bukkit.unloadWorld(world, save));
     }
 
     public static boolean unloadWorld(String name, boolean save) {
-        try {
-            return Bukkit.getScheduler().callSyncMethod(PluginConfig.get().getPlugin(), () ->
-                    Bukkit.unloadWorld(name, save)).get();
-        } catch (InterruptedException | ExecutionException e) {
-            Throwables.sendAndThrow(e);
-            return false;
-        }
+        return StardustThreads.call(() -> Bukkit.unloadWorld(name, save));
     }
 
     public static boolean isLoaded(String name) {

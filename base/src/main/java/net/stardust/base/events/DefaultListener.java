@@ -65,13 +65,6 @@ public class DefaultListener extends WorldListener {
     }
 
     @EventHandler
-    public void preventReceivingPotionEffects(EntityPotionEffectEvent event) {
-        if(checkWorld(event.getEntity().getWorld())) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler
     public void preventHunger(FoodLevelChangeEvent event) {
         if(checkWorld(event.getEntity().getWorld())) {
             event.setCancelled(true);

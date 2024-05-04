@@ -163,6 +163,10 @@ public class DiscordChatCommand extends VirtualCommand<ChannelsPlugin> {
 
     private void users(boolean online, int page) {
         Player player = sender();
+        if(!plugin.getDiscordParticipants().contains(uniqueId(player))) {
+            messager.message(player, Component.translatable("command.no-permission", NamedTextColor.RED));
+            return;
+        }
         String key = "discord-users." + (online ? "online-only" : "offline-too");
         HoverEvent<Component> hover = HoverEvent.showText(Component.text("Clique para copiar", NamedTextColor.AQUA));
         Component mention = Component.text("Menção", NamedTextColor.YELLOW).decorate(TextDecoration.ITALIC)

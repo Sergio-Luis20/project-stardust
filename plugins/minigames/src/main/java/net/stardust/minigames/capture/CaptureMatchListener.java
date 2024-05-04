@@ -8,6 +8,7 @@ import net.stardust.base.events.WorldListener;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -41,31 +42,20 @@ public class CaptureMatchListener extends WorldListener {
     }
 
     @EventHandler
-    public void onTryingToScape(PlayerMoveEvent event) {
-        if(checkWorld(event.getPlayer().getWorld())) {
-            Player player = event.getPlayer();
-            if(!capture.isCaptured(player)) {
-                return;
-            }
-            CaptureTeam enemy = CaptureTeam.getTeam(capture, player).other();
-            if(enemy.isOutsideBase(capture, player) && !capture.isBeingCarried(player)) {
-                player.teleport(enemy.getBase(capture));
-                player.sendMessage(Component.translatable("minigame.capture.cant-escape", NamedTextColor.RED));
-            }
-        }
-    }
-
-    @EventHandler
-    public void onEnteringOwnBase(PlayerMoveEvent event) {
-        if(checkWorld(event.getPlayer().getWorld())) {
-            Player player = event.getPlayer();
-            // Prevent bugs when being saved
-            if(capture.isCaptured(player)) {
-                return;
-            }
+    public void handleMoving(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        if(checkWorld(player.getWorld())) {
             CaptureTeam team = CaptureTeam.getTeam(capture, player);
-            if(team.isInsideBase(capture, player)) {
-                capture.deliveryCarry(player);
+            if(capture.isCaptured(player)) {
+                CaptureTeam enemy = team.other();
+                if(enemy.isOutsideBase(capture, player) && !capture.isBeingCarried(player)) {
+                    capture.teleportInWorld(player, enemy.getBase(capture));
+                    player.sendMessage(Component.translatable("minigame.capture.cant-escape", NamedTextColor.RED));
+                }
+            } else {
+                if(team.isInsideBase(capture, player)) {
+                    capture.deliveryCarry(player);
+                }
             }
         }
     }
@@ -79,7 +69,8 @@ public class CaptureMatchListener extends WorldListener {
                 capture.dismountAll(player);
                 capture.captured(null, player);
             } else if((cause != DamageCause.FIRE && cause != DamageCause.FIRE_TICK
-                    && cause != DamageCause.ENTITY_ATTACK && cause != DamageCause.PROJECTILE) || capture.isEnding()) {
+                    && cause != DamageCause.ENTITY_ATTACK && cause != DamageCause.PROJECTILE)
+                    || capture.isBeingCarried(player) || capture.isCaptured(player) || capture.isEnding()) {
                 event.setCancelled(true);
             }
         }
@@ -87,8 +78,9 @@ public class CaptureMatchListener extends WorldListener {
 
     @EventHandler
     public void preventDamageByOthers(EntityDamageByEntityEvent event) {
-        if(checkWorld(event.getEntity().getWorld())) {
-            if(!(event.getDamager() instanceof Player damager) || !(event.getEntity() instanceof Player victim)) {
+        Entity entity = event.getEntity();
+        if(checkWorld(entity.getWorld())) {
+            if(!(event.getDamager() instanceof Player damager) || !(entity instanceof Player victim)) {
                 return;
             }
             if(capture.isCaptured(damager) || capture.isCaptured(victim)
@@ -110,10 +102,12 @@ public class CaptureMatchListener extends WorldListener {
 
     @EventHandler
     public void onInteract(PlayerInteractEntityEvent event) {
-        if(event.getRightClicked() instanceof Player princess && checkWorld(princess.getWorld())) {
-            Player hero = event.getPlayer();
-            if(CaptureTeam.areSameTeam(capture, hero, princess) && capture.isCaptured(princess)
-                    && !capture.isCaptured(hero)) {
+        Player hero = event.getPlayer();
+        if(checkWorld(hero.getWorld())) {
+            event.setCancelled(true);
+            if(event.getRightClicked() instanceof Player princess
+                    && CaptureTeam.areSameTeam(capture, hero, princess) && capture.isCaptured(princess)
+                    && !capture.isCaptured(hero) && !capture.isBeingCarried(princess)) {
                 capture.mount(hero, princess);
             }
         }
@@ -121,9 +115,15 @@ public class CaptureMatchListener extends WorldListener {
 
     @EventHandler
     public void preventDismount(EntityDismountEvent event) {
-        if(event.getEntity() instanceof Player player && checkWorld(player.getWorld()) && capture.isBeingCarried(player)) {
-            event.setCancelled(true);
-            player.sendMessage(Component.translatable("minigame.capture.cant-escape", NamedTextColor.RED));
+        Entity entity = event.getEntity();
+        if(checkWorld(entity.getWorld())) {
+            if(entity.getType() == EntityType.ARMOR_STAND) {
+                return;
+            }
+            if(entity instanceof Player player && capture.isBeingCarried(player)) {
+                event.setCancelled(true);
+                player.sendMessage(Component.translatable("minigame.capture.cant-escape", NamedTextColor.RED));
+            }
         }
     }
 
@@ -143,9 +143,9 @@ public class CaptureMatchListener extends WorldListener {
 
     @EventHandler
     public void removeArrow(ProjectileHitEvent event) {
-        Entity entity = event.getEntity();
-        if(checkWorld(entity.getWorld())) {
-            entity.remove();
+        Projectile projectile = event.getEntity();
+        if(checkWorld(projectile.getWorld())) {
+            projectile.remove();
         }
     }
 
@@ -187,7 +187,18 @@ public class CaptureMatchListener extends WorldListener {
 
     @EventHandler
     public void preventSpawningEntities(EntitySpawnEvent event) {
-        if(checkWorld(event.getLocation().getWorld()) && event.getEntityType() != EntityType.ARROW) {
+        if(checkWorld(event.getLocation().getWorld())) {
+            EntityType type = event.getEntityType();
+            if(type != EntityType.ARROW && type != EntityType.ARMOR_STAND) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void preventShootingWhileBeingCarried(ProjectileLaunchEvent event) {
+        if(event.getEntity().getShooter() instanceof Player player &&
+                checkWorld(player.getWorld()) && (capture.isBeingCarried(player) || capture.isCaptured(player))) {
             event.setCancelled(true);
         }
     }

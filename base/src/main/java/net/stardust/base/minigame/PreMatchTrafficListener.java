@@ -3,6 +3,7 @@ package net.stardust.base.minigame;
 import lombok.Getter;
 import net.kyori.adventure.bossbar.BossBar;
 import net.stardust.base.utils.Throwables;
+import net.stardust.base.utils.Tracker;
 import net.stardust.base.utils.inventory.CantStoreItemsException;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -39,6 +40,9 @@ public class PreMatchTrafficListener implements Listener {
                 }
             }
             bar.addViewer(player);
+            if(parent.useTracker()) {
+                Tracker.giveTo(player);
+            }
         } else if(from.equals(world) && !to.equals(world)) {
             bar.removeViewer(player);
         }

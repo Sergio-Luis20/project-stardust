@@ -2,6 +2,7 @@ package net.stardust.minigames;
 
 import lombok.Getter;
 import net.stardust.base.BasePlugin;
+import net.stardust.base.events.DefaultListener;
 import net.stardust.base.minigame.Minigame;
 import net.stardust.base.minigame.MinigameInfo;
 import net.stardust.base.utils.Throwables;
@@ -92,6 +93,7 @@ public class MinigamesPlugin extends BasePlugin {
             }
             matches.put(key, signs);
             lobbies.put(key, lobby.getSpawnLocation());
+            getPluginConfig().registerEvents(new DefaultListener(() -> lobby));
         }
         matches.values().forEach(list -> list.getFirst().getMatch().preMatch());
     }

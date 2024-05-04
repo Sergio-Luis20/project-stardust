@@ -1,19 +1,18 @@
 package net.stardust.base.model.channel;
 
+import net.kyori.adventure.text.Component;
+import net.stardust.base.BasePlugin;
+import net.stardust.base.model.channel.conditions.CooldownCondition;
+import net.stardust.base.utils.Cooldown;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import net.kyori.adventure.text.Component;
-import net.stardust.base.BasePlugin;
-import net.stardust.base.model.channel.conditions.CooldownCondition;
-import net.stardust.base.utils.Cooldown;
 
 public abstract class CooldownChannel extends Channel {
     
@@ -48,7 +47,7 @@ public abstract class CooldownChannel extends Channel {
     public void sendMessage(CommandSender sender, Component component) {
         if(!containsParticipant(sender)) return;
         if(!canSendMessages(sender)) return;
-        messager.message(participants, component);
+        messager.message(participants, formatMessage(sender, component));
         cooldown(sender);
     }
 

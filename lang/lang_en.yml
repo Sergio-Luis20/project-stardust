@@ -234,6 +234,7 @@ word:
   unknown: Unknown
   Home: Home
   minigame: Minigame
+  infinity: Infinity
 mg-data-display:
   header: "» Displaying {0}'s data for minigame {1}:"
   wins: '» Wins: {0}'
@@ -266,4 +267,5 @@ no-empty-slot: You don't have any empty slot
 must-hold-item: » You need to hold an item in your main hand
 click-to-copy: Click to copy
 dont-have-money: » You don't have enought money to buy that
+track: 'Player: {0}, distance: {1}'
 already-here: » You are already here

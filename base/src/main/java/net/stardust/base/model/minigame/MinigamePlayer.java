@@ -48,7 +48,7 @@ public class MinigamePlayer implements Serializable, Comparable<MinigamePlayer> 
     }
 
     public float getRatio() {
-        return losses == 0 ? wins : (float) wins / losses;
+        return (float) wins / losses;
     }
 
 }

@@ -1,6 +1,7 @@
 package net.stardust.terrains;
 
 import net.stardust.base.utils.plugin.PluginConfig;
+import net.stardust.base.utils.world.WorldUtils;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -62,20 +63,20 @@ public class TerrainsService {
 		WorldCreator creator = new WorldCreator(worldName);
 		creator.type(WorldType.FLAT);
 		creator.generateStructures(false);
-		World world = Bukkit.createWorld(creator);
+		World world = WorldUtils.loadWorld(creator);
 		world.setDifficulty(Difficulty.PEACEFUL);
 		terrains.add(world.getName());
 	}
 	
 	public void unloadTerrains() {
 		for(World terrain : getTerrains()) {
-			Bukkit.unloadWorld(terrain, true);
+			WorldUtils.unloadWorld(terrain, true);
 		}
 		terrains.clear();
 	}
 	
 	public void unloadTerrain(String worldName) {
-		Bukkit.unloadWorld(worldName, true);
+		WorldUtils.unloadWorld(worldName, true);
 		int index = Collections.binarySearch(terrains, worldName);
 		if(index >= 0) {
 			terrains.remove(index);

@@ -12,9 +12,9 @@ commands:
     aliases: [leng, ling, language, lenguage, linguagem, idioma]
   tpw:
     aliases: [tpm]
-  cw:
-    aliases: [createworld, crearmundo, criarmundo, cm]
-  dw:
-    aliases: [deleteworld, deletarmundo, apagarmundo, dm]
+  world:
+    aliases: [mundo]
   uid:
     aliases: [uuid]
+  clearpotions:
+    aliases: [clspot]
