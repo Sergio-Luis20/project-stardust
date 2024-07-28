@@ -10,8 +10,6 @@ commands:
     aliases: [t]
   r:
     aliases: [re, retell]
-  team:
-    aliases: [e, equipe, squad, time, equipo]
   ad:
     aliases: [a, anuncio]
   clan:

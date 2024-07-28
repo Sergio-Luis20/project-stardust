@@ -50,6 +50,13 @@ public final class InventoryUtils {
         return copy;
     }
 
+    public static void tryAdd(Inventory inventory, ItemStack... items) throws CantStoreItemsException {
+        if(!canStoreAllItems(inventory, items)) {
+            throw new CantStoreItemsException(inventory);
+        }
+        inventory.addItem(items);
+    }
+
     public static int sizeForRows(int rows) {
         return 9 * Ranges.rangeInclusive(rows, 1, 6, "rows");
     }

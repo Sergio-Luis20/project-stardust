@@ -2,7 +2,6 @@ package net.stardust.repository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 
 import br.sergio.comlib.MethodAdapter;
@@ -13,17 +12,17 @@ import net.stardust.base.utils.Throwables;
 
 public class RepositoryController<K, V extends StardustEntity<K>> extends MethodAdapter {
 
+	private RepositoryPlugin plugin;
 	private Repository<K, V> repository;
 	private Class<K> keyClass;
 	private Class<V> valueClass;
 
-	private RepositoryPlugin plugin;
-	
-	public RepositoryController(RepositoryPlugin plugin, Class<K> keyClass, Class<V> valueClass) {
-		repository = RepositoryFactory.getRepository(plugin, keyClass, valueClass);
-		this.plugin = Objects.requireNonNull(plugin, "plugin");
-		this.keyClass = Objects.requireNonNull(keyClass, "keyClass");
-		this.valueClass = Objects.requireNonNull(valueClass, "valueClass");
+	public RepositoryController(RepositoryPlugin plugin, Repository<K, V> repository) {
+		this.plugin = plugin;
+		this.repository = repository;
+
+		keyClass = repository.getKeyClass();
+		valueClass = repository.getValueClass();
 	}
 
 	@SuppressWarnings("unchecked")

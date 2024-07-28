@@ -1,12 +1,11 @@
 package net.stardust.base.model.channel.conditions;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.bukkit.command.CommandSender;
-
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.command.CommandSender;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class UpdatableCooldownCondition extends CooldownCondition {
 
@@ -30,7 +29,7 @@ public class UpdatableCooldownCondition extends CooldownCondition {
 
     @Override
     public Component getNotAllowedMessage(CommandSender sender) {
-        var seconds = Component.text(secondsLeft.getOrDefault(sender, cooldownTime), NamedTextColor.RED);
+        var seconds = Component.text(secondsLeft.getOrDefault(sender, cooldownTime), NamedTextColor.DARK_RED);
         return Component.translatable(key, NamedTextColor.RED, seconds);
     }
     

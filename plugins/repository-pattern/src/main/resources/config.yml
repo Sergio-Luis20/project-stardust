@@ -1,0 +1,13 @@
+hibernate:
+  dialect: org.hibernate.community.dialect.SQLiteDialect
+  hbm2ddl:
+    auto: update
+  connection:
+    url: jdbc:sqlite:plugins/repository/sqlite-repository.db
+    username: stardust
+    password: VukLMp1rC9xH15SwDXeZLu4396XXaalQ98gzFPkbVO2lbIoOUTLo1trUVUrCurdN15VICcXmEmIH5vXfxPneNDv3TV14RB9kA-_FC5Qg5NcXWbQtY7dl-ayfdQgCPpRi
+repository:
+  implementations:
+    - net.stardust.repository.repositories.YamlRepository
+    - net.stardust.repository.repositories.JpaRepository
+  current: 1

@@ -4,7 +4,7 @@ import java.util.List;
 
 import net.stardust.base.model.StardustEntity;
 
-public interface Repository<K, V extends StardustEntity<K>> {
+public interface Repository<K, V extends StardustEntity<K>> extends AutoCloseable {
 
 	/**
 	 * Returns all values in this repository.
@@ -121,6 +121,22 @@ public interface Repository<K, V extends StardustEntity<K>> {
 	 * false otherwise.
 	 */
 	boolean deleteAll(List<K> list);
+
+	/**
+	 * Returns the key class of this repository. This is the class
+	 * that represents the id of the entity.
+	 * 
+	 * @return the key class.
+	 */
+	Class<K> getKeyClass();
+
+	/**
+	 * Returns the vaue class of this repository. This is the class
+	 * that represents the entity itself.
+	 * 
+	 * @return the value class.
+	 */
+	Class<V> getValueClass();
 
 	/**
 	 * The final result of a save operation.

@@ -5,6 +5,7 @@ import io.papermc.paper.event.player.PlayerPickItemEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.events.WorldListener;
+import net.stardust.base.utils.world.WorldUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -63,14 +64,30 @@ public class CaptureMatchListener extends WorldListener {
     @EventHandler
     public void handleVoidAndFireDamage(EntityDamageEvent event) {
         if(event.getEntity() instanceof Player player && checkWorld(player.getWorld())) {
+            if(capture.isCaptured(player) || capture.isBeingCarried(player) || capture.isEnding()) {
+                event.setCancelled(true);
+                return;
+            }
             DamageCause cause = event.getCause();
             if(cause == DamageCause.VOID) {
                 event.setCancelled(true);
+                /*
+                 * Prevent bugs when a packet of damage by void arrives and
+                 * the player was being carried by someone. When the capturer
+                 * jumps into void carrying other people, he must pass this
+                 * verification to teleport all the carry to the world spawn,
+                 * but when the void damage packet arrives and the players have
+                 * been already teleported to spawn, it could cause the bug of
+                 * it being captured without even tried to jump into void
+                 * voluntarily.
+                 */
+                if(!WorldUtils.belowVoid(player.getLocation())) {
+                    return;
+                }
                 capture.dismountAll(player);
                 capture.captured(null, player);
             } else if((cause != DamageCause.FIRE && cause != DamageCause.FIRE_TICK
-                    && cause != DamageCause.ENTITY_ATTACK && cause != DamageCause.PROJECTILE)
-                    || capture.isBeingCarried(player) || capture.isCaptured(player) || capture.isEnding()) {
+                    && cause != DamageCause.ENTITY_ATTACK && cause != DamageCause.PROJECTILE)) {
                 event.setCancelled(true);
             }
         }
@@ -95,8 +112,16 @@ public class CaptureMatchListener extends WorldListener {
         if(checkWorld(event.getPlayer().getWorld())) {
             event.setCancelled(true);
             Player player = event.getPlayer();
+            Player killer = player.getKiller();
+            /*
+             * This verification is done to prevent bugs
+             * when two players kill each other at the same time
+             */
+            if(player.equals(capture.getBull(killer).orElse(null))) {
+                return;
+            }
             capture.dismountAll(player);
-            capture.mount(player.getKiller(), player);
+            capture.mount(killer, player);
         }
     }
 
@@ -136,7 +161,7 @@ public class CaptureMatchListener extends WorldListener {
 
     @EventHandler
     public void onQuittingMatch(PlayerTeleportEvent event) {
-        if(checkWorld(event.getFrom().getWorld()) && !checkWorld(event.getTo().getWorld())) {
+        if(checkWorld(event.getFrom().getWorld()) && !checkWorld(event.getTo().getWorld()) && !capture.isEnding()) {
             capture.onQuit(event.getPlayer());
         }
     }

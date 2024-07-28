@@ -1,6 +1,7 @@
 package net.stardust.minigames.capture;
 
 import net.stardust.base.events.TrackerListener;
+import net.stardust.base.minigame.Minigame.MinigameState;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -18,7 +19,11 @@ public class CaptureTrackerListener extends TrackerListener {
 
     @Override
     protected List<Player> getPlayersToTrack(Player user, World world) {
-        return CaptureTeam.getTeam(capture, user).other().getFreePlayers(capture);
+        if(capture.getState() == MinigameState.PRE_MATCH) {
+            return super.getPlayersToTrack(user, world);
+        } else {
+            return CaptureTeam.getTeam(capture, user).other().getFreePlayers(capture);
+        }
     }
 
 }

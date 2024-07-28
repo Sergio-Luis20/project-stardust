@@ -69,7 +69,8 @@ public abstract sealed class StardustCommand<T extends BasePlugin> implements Co
 	}
     
     abstract void execute(Runnable task);
-    
+
+	@Override
     public final boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		SenderType type = SenderType.getSenderType(sender.getClass());
 		if(canExecute(senderTypes, type) && (!opOnly || sender.isOp())) {

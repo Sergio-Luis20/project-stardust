@@ -26,12 +26,24 @@ public class Wallet implements Serializable, Cloneable {
         return bronze;
     }
 
+    public void setBronze(BigInteger bronze) {
+        this.bronze.setValue(bronze);
+    }
+
     public Money getSilver() {
         return silver;
     }
 
+    public void setSilver(BigInteger silver) {
+        this.silver.setValue(silver);
+    }
+
     public Money getGold() {
         return gold;
+    }
+
+    public void setGold(BigInteger gold) {
+        this.gold.setValue(gold);
     }
 
     public Money getMoney(Currency currency) {

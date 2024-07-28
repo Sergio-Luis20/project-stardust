@@ -210,7 +210,8 @@ minigame:
       red: Red
       blue: Blue
       police: Police
-      Thief: Thief
+      thief: Thief
+    quit-while-being-carried: » You left the match while being carried by {0}. This will count as a capture for him/her and as a defeat for you in the minigame.
     time: You have {0} seconds to bring the players to your base!
     cant-escape: You can't escape!
     you-are-capturing: You are capturing {0}. Take him to your base!
@@ -228,6 +229,7 @@ minigame:
     thief-win: Thief win!
 word:
   player: Player
+  players: Players
   command: Command
   shop: Shop
   channels: Channels
@@ -235,6 +237,8 @@ word:
   Home: Home
   minigame: Minigame
   infinity: Infinity
+  rank: Rank
+  position: Position
 mg-data-display:
   header: "» Displaying {0}'s data for minigame {1}:"
   wins: '» Wins: {0}'

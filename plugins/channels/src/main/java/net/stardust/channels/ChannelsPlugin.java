@@ -1,33 +1,6 @@
 package net.stardust.channels;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
-
-import br.sergio.comlib.Communication;
-import br.sergio.comlib.ConnectionException;
-import br.sergio.comlib.Request;
-import br.sergio.comlib.RequestListener;
-import br.sergio.comlib.RequestMapper;
-import br.sergio.comlib.Response;
-import br.sergio.comlib.ResponseStatus;
+import br.sergio.comlib.*;
 import br.sergio.utils.Pair;
 import lombok.Getter;
 import net.dv8tion.jda.api.JDA;
@@ -46,12 +19,27 @@ import net.stardust.base.utils.StardustThreads;
 import net.stardust.base.utils.Throwables;
 import net.stardust.base.utils.database.crud.ChannelStatusCrud;
 import net.stardust.base.utils.property.Property;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.time.Duration;
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class ChannelsPlugin extends BasePlugin implements Listener, RequestMapper {
 
     private Set<UUID> loggedPlayers;
     private RequestListener listener;
     private String doctorToken;
+    @Getter
     private long discordChannelId;
     private JDA jda;
     private DiscordBridge bridge;
@@ -63,7 +51,9 @@ public class ChannelsPlugin extends BasePlugin implements Listener, RequestMappe
     @Getter
     private Global global;
 
+    @Getter
     private Set<Channel> channels;
+    @Getter
     private Set<UUID> discordParticipants;
 
     @Override
@@ -98,7 +88,7 @@ public class ChannelsPlugin extends BasePlugin implements Listener, RequestMappe
             log.severe("""
                 O token do Doutor na config não foi especificado. \
                 Criando plugin sem conexão com o discord
-                    """);
+                   \s""");
         } else {
             bridge = new DiscordBridge(this);
             Thread jdaStarter = Thread.ofPlatform().daemon().name("JDADaemonThreadStarter").start(() -> {
@@ -188,10 +178,6 @@ public class ChannelsPlugin extends BasePlugin implements Listener, RequestMappe
         return status.getProperty(channelName, propertyName).isActivated();
     }
 
-    public Set<Channel> getChannels() {
-        return channels;
-    }
-
     public Channel getChannel(String name) {
         synchronized(channels) {
             for(Channel channel : channels) {
@@ -220,16 +206,8 @@ public class ChannelsPlugin extends BasePlugin implements Listener, RequestMappe
         }
     }
 
-    public Set<UUID> getDiscordParticipants() {
-        return discordParticipants;
-    }
-
     public JDA getJDA() {
         return jda;
-    }
-
-    public long getDiscordChannelId() {
-        return discordChannelId;
     }
 
     public Pair<Guild, TextChannel> getJDAInfo() {

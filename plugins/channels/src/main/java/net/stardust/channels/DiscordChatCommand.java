@@ -132,22 +132,22 @@ public class DiscordChatCommand extends VirtualCommand<ChannelsPlugin> {
         list(page);
     }
 
-    @CommandEntry(value = "users", opOnly = true)
+    @CommandEntry(value = "users")
     public void usersPage1() {
         usersPage1Online(true);
     }
 
-    @CommandEntry(value = "users", opOnly = true)
+    @CommandEntry(value = "users")
     public void usersPage1Online(boolean online) {
         users(online, 1);
     }
 
-    @CommandEntry(value = "users", opOnly = true)
+    @CommandEntry(value = "users")
     public void usersPageN(int page) {
         usersPageNOnline(true, page);
     }
 
-    @CommandEntry(value = "users", opOnly = true)
+    @CommandEntry(value = "users")
     public void usersPageNOnline(boolean online, int page) {
         users(online, page);
     }
@@ -156,8 +156,7 @@ public class DiscordChatCommand extends VirtualCommand<ChannelsPlugin> {
         Player player = sender();
         String key = "discord-chat";
         Stream<String> names = StardustThreads.call(plugin, () -> plugin
-                .getDiscordParticipants().stream().map(Bukkit::getOfflinePlayer)
-                .filter(op -> op != null).map(OfflinePlayer::getName));
+                .getDiscordParticipants().stream().map(uid -> Bukkit.getOfflinePlayer(uid).getName()));
         Stardust.listPageableString(player, page, names, key, name -> name);
     }
 

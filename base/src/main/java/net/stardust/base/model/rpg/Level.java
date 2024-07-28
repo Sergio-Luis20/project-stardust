@@ -1,18 +1,21 @@
 package net.stardust.base.model.rpg;
 
+import br.sergio.utils.math.Point;
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.util.Objects;
-
-import br.sergio.utils.math.Point;
 
 public class Level implements Serializable, Comparable<Level> {
 
     public static final LevelFunction DEFAULT_FUNCTION = LevelFunctions.linear(100, new Point(1000, 100000));
     private static final double PROPORTION = (double) Integer.MAX_VALUE / Long.MAX_VALUE;
     
+    @Getter
     private int value;
     private long xp;
 
+    @Getter
     private LevelFunction function;
 
     public Level() {
@@ -87,10 +90,6 @@ public class Level implements Serializable, Comparable<Level> {
         this.xp = levelXP;
     }
 
-    public LevelFunction getFunction() {
-        return function;
-    }
-
     public void setFunction(LevelFunction function) {
         this.function = Objects.requireNonNull(function, "null function");
         long xp = this.xp;
@@ -98,12 +97,8 @@ public class Level implements Serializable, Comparable<Level> {
         setXP(xp);
     }
 
-    public int getValue() {
-        return value;
-    }
-
     public void setValue(int value) {
-        this.value = value < 0 ? 0 : value;
+        this.value = Math.max(value, 0);
         this.xp = 0;
     }
 

@@ -120,16 +120,7 @@ public class YamlRepository<K, V extends StardustEntity<K>> implements Repositor
 	}
 
 	private SaveResult flush() {
-		flusher.submit(() -> {
-			synchronized(mapper) {
-				try {
-					mapper.writeValue(file, elements);
-				} catch(IOException e) {
-					log.log(Level.SEVERE, "Could not save the file " + file
-						.getAbsolutePath(), Throwables.send(id, e));
-				}
-			}
-		});
+		flusher.submit(this::doFlush);
 		return SaveResult.SUCCESS;
 	}
 
@@ -149,9 +140,35 @@ public class YamlRepository<K, V extends StardustEntity<K>> implements Repositor
 		try {
 			elements.forEach(this.elements::remove);
 			return flush() == SaveResult.SUCCESS;
-		} catch(Exception e) {
+		} catch (Exception e) {
 			Throwables.send(getId(), e);
 			return false;
+		}
+	}
+
+	@Override
+	public Class<K> getKeyClass() {
+		return keyClass;
+	}
+
+	@Override
+	public Class<V> getValueClass() {
+		return valueClass;
+	}
+	
+	@Override
+	public void close() {
+		doFlush();
+	}
+
+	private void doFlush() {
+		synchronized (mapper) {
+			try {
+				mapper.writeValue(file, elements);
+			} catch (IOException e) {
+				log.log(Level.SEVERE, "Could not save the file " + file
+						.getAbsolutePath(), Throwables.send(id, e));
+			}
 		}
 	}
 

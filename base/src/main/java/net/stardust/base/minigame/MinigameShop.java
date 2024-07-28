@@ -1,22 +1,11 @@
 package net.stardust.base.minigame;
 
-import lombok.Getter;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.stardust.base.events.WorldListener;
-import net.stardust.base.minigame.Minigame.MinigameState;
-import net.stardust.base.model.economy.transaction.*;
-import net.stardust.base.model.economy.transaction.operation.*;
-import net.stardust.base.model.economy.wallet.Currency;
-import net.stardust.base.model.economy.wallet.Money;
-import net.stardust.base.utils.SoundPack;
-import net.stardust.base.utils.database.crud.PlayerWalletCrud;
-import net.stardust.base.utils.inventory.CantStoreItemsException;
-import net.stardust.base.utils.inventory.InventoryUtils;
-import net.stardust.base.utils.item.ItemUtils;
-import net.stardust.base.utils.persistence.DataManager;
-import net.stardust.base.utils.ranges.Ranges;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -33,11 +22,31 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
+import lombok.Getter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.stardust.base.events.WorldListener;
+import net.stardust.base.minigame.Minigame.MinigameState;
+import net.stardust.base.model.economy.transaction.ItemNegotiators;
+import net.stardust.base.model.economy.transaction.ItemTransaction;
+import net.stardust.base.model.economy.transaction.PlayerItemHolder;
+import net.stardust.base.model.economy.transaction.ServerItemHolder;
+import net.stardust.base.model.economy.transaction.Transaction;
+import net.stardust.base.model.economy.transaction.operation.MoneyNode;
+import net.stardust.base.model.economy.transaction.operation.Operation;
+import net.stardust.base.model.economy.transaction.operation.OperationChain;
+import net.stardust.base.model.economy.transaction.operation.OperationFailedException;
+import net.stardust.base.model.economy.transaction.operation.SpaceNode;
+import net.stardust.base.model.economy.transaction.operation.TransferNode;
+import net.stardust.base.model.economy.wallet.Currency;
+import net.stardust.base.model.economy.wallet.Money;
+import net.stardust.base.utils.SoundPack;
+import net.stardust.base.utils.inventory.CantStoreItemsException;
+import net.stardust.base.utils.inventory.InventoryUtils;
+import net.stardust.base.utils.item.ItemUtils;
+import net.stardust.base.utils.persistence.DataManager;
+import net.stardust.base.utils.ranges.Ranges;
 
 @Getter
 public class MinigameShop extends WorldListener {
@@ -45,7 +54,6 @@ public class MinigameShop extends WorldListener {
     private static final NamespacedKey SHOP_ITEM_KEY, SHOP_BOOK_KEY;
     private static final SoundPack BUY_SOUND;
     private static final ItemStack SHOP_BOOK;
-    private static PlayerWalletCrud crud = new PlayerWalletCrud();
     private static Operation buyItem;
 
     private Minigame parent;
@@ -89,10 +97,7 @@ public class MinigameShop extends WorldListener {
             }
         }
         if(!set) {
-            if(!InventoryUtils.canStoreAllItems(inventory, SHOP_BOOK)) {
-                throw new CantStoreItemsException(inventory, player);
-            }
-            inventory.addItem(SHOP_BOOK);
+            InventoryUtils.tryAdd(inventory, SHOP_BOOK);
         }
     }
 

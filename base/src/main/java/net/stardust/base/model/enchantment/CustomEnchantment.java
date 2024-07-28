@@ -1,13 +1,10 @@
 package net.stardust.base.model.enchantment;
 
-import br.sergio.utils.Pair;
-import io.papermc.paper.enchantments.EnchantmentRarity;
-import jakarta.persistence.criteria.CriteriaBuilder.In;
-import javassist.runtime.Inner;
-import lombok.NoArgsConstructor;
-import net.kyori.adventure.text.Component;
-import net.stardust.base.Stardust;
-import net.stardust.base.utils.ranges.Ranges;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
@@ -16,10 +13,12 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import br.sergio.utils.Pair;
+import io.papermc.paper.enchantments.EnchantmentRarity;
+import lombok.NoArgsConstructor;
+import net.kyori.adventure.text.Component;
+import net.stardust.base.Stardust;
+import net.stardust.base.utils.ranges.Ranges;
 
 @NoArgsConstructor
 public abstract class CustomEnchantment extends Enchantment {

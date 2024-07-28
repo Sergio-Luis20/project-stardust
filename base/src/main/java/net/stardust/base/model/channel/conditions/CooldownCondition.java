@@ -1,14 +1,13 @@
 package net.stardust.base.model.channel.conditions;
 
-import java.util.Map;
-import java.util.Objects;
-
-import org.bukkit.command.CommandSender;
-
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.model.channel.ChannelCondition;
+import org.bukkit.command.CommandSender;
+
+import java.util.Map;
+import java.util.Objects;
 
 public class CooldownCondition implements ChannelCondition {
 
@@ -38,7 +37,7 @@ public class CooldownCondition implements ChannelCondition {
 
     @Override
     public Component getNotAllowedMessage(CommandSender sender) {
-        return Component.translatable(key, NamedTextColor.RED, Component.text(cooldownTime, NamedTextColor.RED));
+        return Component.translatable(key, NamedTextColor.RED, Component.text(cooldownTime, NamedTextColor.DARK_RED));
     }
     
 }

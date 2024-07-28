@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.CompassMeta;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -38,8 +40,9 @@ public class TrackerListener extends WorldListener {
         World world = player.getWorld();
         if(checkWorld(world)) {
             Action action = event.getAction();
+            ItemStack tracker = event.getItem();
             if((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
-                    && Tracker.isTracker(event.getItem())) {
+                    && Tracker.isTracker(tracker)) {
                 Location loc = player.getLocation();
                 List<Player> players = getPlayersToTrack(player, world).stream().filter(p ->
                         p.getLocation().distance(loc) <= maxTrackDistance).toList();
@@ -52,6 +55,11 @@ public class TrackerListener extends WorldListener {
                     }
                 }
                 player.sendMessage(getMessage(tracked));
+                Player trackedPlayer = tracked.getMale();
+                CompassMeta meta = (CompassMeta) tracker.getItemMeta();
+                meta.setLodestoneTracked(false);
+                meta.setLodestone(trackedPlayer == null ? world.getSpawnLocation() : trackedPlayer.getLocation());
+                tracker.setItemMeta(meta);
             }
         }
     }

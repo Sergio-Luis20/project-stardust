@@ -12,7 +12,10 @@ import net.stardust.base.minigame.Minigame;
 import net.stardust.base.minigame.MinigameShop;
 import net.stardust.base.minigame.SquadChannel;
 import net.stardust.base.minigame.SquadMinigame;
+import net.stardust.base.model.minigame.MinigameData;
+import net.stardust.base.model.minigame.MinigamePlayer;
 import net.stardust.base.utils.SoundPack;
+import net.stardust.base.utils.database.crud.MinigameDataCrud;
 import net.stardust.base.utils.database.lang.Translation;
 import net.stardust.base.utils.inventory.InventoryUtils;
 import net.stardust.base.utils.item.Enchant;
@@ -26,7 +29,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -136,7 +142,7 @@ public class Capture extends Minigame implements SquadMinigame {
             stats.put(player, statsPair);
             carry.put(player, new ArrayList<>());
             player.playerListName(buildListName(player, statsPair, team));
-            ArmorStand entity = (ArmorStand) getWorld().spawnEntity(player.getLocation(),
+            ArmorStand entity = (ArmorStand) world.spawnEntity(player.getLocation(),
                     EntityType.ARMOR_STAND, SpawnReason.CUSTOM);
             entity.setInvisible(true);
             entity.setInvulnerable(true);
@@ -171,7 +177,7 @@ public class Capture extends Minigame implements SquadMinigame {
         redTeam.forEach(player -> player.setScoreboard(scoreboard));
 
         playerDistribution = scoreboard.registerNewObjective("Players", Criteria.DUMMY,
-                Component.text("Players", NamedTextColor.GOLD, TextDecoration.BOLD));
+                Component.translatable("word.players", NamedTextColor.GOLD, TextDecoration.BOLD));
         playerDistribution.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         configureTeam("Blue", blueTeam, NamedTextColor.BLUE);
@@ -463,32 +469,76 @@ public class Capture extends Minigame implements SquadMinigame {
     }
 
     private void victory(CaptureTeam team) {
-        for(Player player : new ArrayList<>(team.other().getCapturedPlayers(this))) {
-            saved(null, player);
-        }
-        String key = team == CaptureTeam.BLUE ? "police-win" : "thief-win";
-        Component winMessage = Component.translatable("minigame.capture." + key, NamedTextColor.GOLD, TextDecoration.BOLD);
-        getWorld().getPlayers().forEach(player -> player.sendMessage(winMessage));
+        ending = true;
+		stopMatchStopwatch();
+		timers.values().forEach(timer -> timer.fire(false));
         invisibleEntities.forEach((player, entity) -> {
             entity.leaveVehicle();
             entity.remove();
         });
-        ending = true;
+        String key = team == CaptureTeam.BLUE ? "police-win" : "thief-win";
+        Component winMessage = Component.translatable("minigame.capture." + key, NamedTextColor.GOLD, TextDecoration.BOLD);
+        getWorld().getPlayers().forEach(player -> player.sendMessage(winMessage));
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            endMatch(team.getPlayers(this), team.other().getPlayers(this));
-            ending = false;
-        }, 5 * 20); // 5 seconds
+            for(Player player : new ArrayList<>(team.other().getCapturedPlayers(this))) {
+                saved(null, player);
+            }
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                endMatch(team.getPlayers(this), team.other().getPlayers(this));
+                ending = false;
+            }, 5 * 20);
+        }, 5 * 20);
     }
 
     void onQuit(Player player) {
-        getBull(player).ifPresent(bull -> dismount(bull, player));
+        getBull(player).ifPresent(bull -> {
+            dismount(bull, player);
+
+            CaptureTeam bullTeam = CaptureTeam.getTeam(this, bull);
+            CaptureTeam quitterTeam = CaptureTeam.getTeam(this, player);
+            if(bullTeam == quitterTeam) {
+                return;
+            }
+
+            Component capturerName = bull.name().color(bullTeam.getTextColor());
+            Component capturedName = player.name().color(quitterTeam.getTextColor());
+            Component message = Component.translatable("minigame.capture.captured", NamedTextColor.GOLD, capturedName, capturerName);
+
+            getWorld().getPlayers().forEach(p -> p.sendMessage(message));
+
+            Pair<Integer, Integer> capturerStats = stats.get(bull);
+            capturerStats.setMale(capturerStats.getMale() + 1);
+            bull.playerListName(buildListName(bull, capturerStats, bullTeam));
+
+            plugin.getVirtual().submit(() -> {
+                String name = getInfo().name();
+                MinigameDataCrud dataCrud = new MinigameDataCrud();
+                MinigameData data = dataCrud.getOrNull(name);
+                if(data == null) {
+                    data = new MinigameData(name);
+                }
+                Map<UUID, MinigamePlayer> minigamePlayers = data.getMinigamePlayers();
+                UUID playerId = player.getUniqueId();
+                MinigamePlayer minigamePlayer = minigamePlayers.get(playerId);
+                if(minigamePlayer == null) {
+                    minigamePlayer = new MinigamePlayer(playerId);
+                    minigamePlayers.put(playerId, minigamePlayer);
+                }
+                minigamePlayer.setLosses(minigamePlayer.getLosses() + 1);
+                dataCrud.update(data);
+            });
+
+            player.sendMessage(Component.translatable("minigame.capture.quit-while-being-carried",
+                    NamedTextColor.YELLOW, bull.name().color(bullTeam.getTextColor())));
+        });
         dismountAll(player);
         carry.remove(player);
         invisibleEntities.remove(player).remove();
         CaptureTeam team = CaptureTeam.getTeam(this, player);
         team.getPlayers(this).remove(player);
+        getSquadChannel(player).removeParticipant(player);
         if(isCaptured(player)) {
-            team.other().getCapturedPlayers(this).remove(player);
+            team.getCapturedPlayers(this).remove(player);
         } else {
             team.getFreePlayers(this).remove(player);
         }

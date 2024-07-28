@@ -3,21 +3,18 @@ package net.stardust.base.model.channel;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.stardust.base.Stardust;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.BasePlugin;
+import net.stardust.base.Stardust;
 import net.stardust.base.model.channel.conditions.MoneyCondition;
 import net.stardust.base.model.channel.conditions.RankCondition;
 import net.stardust.base.model.economy.wallet.Money;
 import net.stardust.base.model.gameplay.Rank;
-import net.stardust.base.utils.ChatUtils;
-import net.stardust.base.utils.StardustThreads;
 
 @Getter
 @ChannelProperties({"status", "minigame", "dungeon"})

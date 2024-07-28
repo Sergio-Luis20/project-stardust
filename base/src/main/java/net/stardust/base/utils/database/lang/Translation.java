@@ -44,10 +44,6 @@ public final class Translation {
         }
     }
 
-    public static boolean isLoaded() {
-        return loaded;
-    }
-
     public static Component get(CommandSender sender, String key, Object... args) {
         return sender instanceof Player player ? get(player, key, args) : console(key, args);
     }

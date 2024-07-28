@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 @BaseCommand("mgdata")
 public class MgDataCommand extends VirtualCommand<MinigamesPlugin> {
@@ -43,25 +44,46 @@ public class MgDataCommand extends VirtualCommand<MinigamesPlugin> {
         data(minigameName, Bukkit.getOfflinePlayer(playerName));
     }
 
+    @CommandEntry
+    public void data(String minigameName, int rankPosition) {
+        CommandSender sender = sender();
+        foundMinigame(sender, minigameName, data -> {
+            List<MinigamePlayer> players = data.getMinigamePlayers().values().stream()
+                    .sorted(Comparator.reverseOrder()).toList();
+            int index = rankPosition - 1;
+            if(index >= players.size()) {
+                sender.sendMessage(AutomaticMessages.notFound("word.position"));
+                return;
+            }
+            displayData(sender, data, players.get(index), players);
+        });
+    }
+
     private void data(String minigameName, OfflinePlayer player) {
         CommandSender sender = sender();
+        foundMinigame(sender, minigameName, data -> {
+            Map<UUID, MinigamePlayer> minigamePlayers = data.getMinigamePlayers();
+            MinigamePlayer minigamePlayer = minigamePlayers.get(player.getUniqueId());
+            if(minigamePlayer == null) {
+                if(StardustThreads.call(plugin, () -> sender.equals(player))) {
+                    messager.message(sender, Component.translatable("minigame.no-data-yet", NamedTextColor.RED));
+                } else {
+                    messager.message(sender, AutomaticMessages.notFound("word.player"));
+                }
+                return;
+            }
+            List<MinigamePlayer> orderedList = minigamePlayers.values().stream()
+                    .sorted(Comparator.reverseOrder()).toList();
+            displayData(sender, data, minigamePlayer, orderedList);
+        });
+    }
+
+    private void foundMinigame(CommandSender sender, String minigameName, Consumer<MinigameData> consumer) {
         MinigameDataCrud crud = new MinigameDataCrud();
         List<MinigameData> dataList = crud.getAll();
         for(MinigameData data : dataList) {
             if(data.getMinigameName().equalsIgnoreCase(minigameName)) {
-                Map<UUID, MinigamePlayer> minigamePlayers = data.getMinigamePlayers();
-                MinigamePlayer minigamePlayer = minigamePlayers.get(player.getUniqueId());
-                if(minigamePlayer == null) {
-                    if(StardustThreads.call(plugin, () -> sender.equals(player))) {
-                        messager.message(sender, Component.translatable("minigame.no-data-yet", NamedTextColor.RED));
-                    } else {
-                        messager.message(sender, AutomaticMessages.notFound("word.player"));
-                    }
-                    return;
-                }
-                List<MinigamePlayer> orderedList = minigamePlayers.values().stream().sorted(Comparator
-                        .comparing(MinigamePlayer::getWins).reversed()).toList();
-                displayData(sender, data, minigamePlayer, orderedList);
+                consumer.accept(data);
                 return;
             }
         }
@@ -69,12 +91,12 @@ public class MgDataCommand extends VirtualCommand<MinigamesPlugin> {
     }
 
     private void displayData(CommandSender sender, MinigameData data, MinigamePlayer player,
-                             List<MinigamePlayer> orderedList) {
+                             List<MinigamePlayer> sortedList) {
         UserCrud userCrud = new UserCrud();
         User user = userCrud.getOrThrow(player.getId());
         String name = user.getName();
 
-        int position = orderedList.indexOf(player) + 1;
+        int position = sortedList.indexOf(player) + 1;
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(Translation.locale(sender));
         char separator = symbols.getDecimalSeparator();
         String ratioString = String.valueOf(player.getRatio()).replace('.', separator);

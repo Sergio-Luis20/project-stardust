@@ -40,7 +40,11 @@ public class MinigamePlayer implements Serializable, Comparable<MinigamePlayer> 
 
     @Override
     public int compareTo(MinigamePlayer o) {
-        return wins - o.wins;
+        int ofWins = wins - o.wins;
+        if(ofWins == 0) {
+            return o.losses - losses;
+        }
+        return ofWins;
     }
 
     public int getTotalMatches() {

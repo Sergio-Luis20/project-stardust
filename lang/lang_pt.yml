@@ -146,7 +146,7 @@ rank:
     m4: <green>» /rank <light_purple>set <gold><jogador> <rank> <yellow>-> <aqua>Define o rank do jogador fornecido
 channel:
   low-rank: » Você precisa ter rank mínimo {0} para usar este canal
-  cooldown: » Espere <dark_red>{0} segundos antes de enviar outra mensagem neste canal
+  cooldown: » Espere {0} segundos antes de enviar outra mensagem neste canal
   cooldown-time: » Este canal tem um cooldown de {0} segundos
   muted: » Você está mutado neste canal
   no-money: » Dinheiro insuficiente, você deve pagar {0} para usar este canal
@@ -209,6 +209,7 @@ minigame:
       blue: Azul
       police: Polícia
       thief: Ladrão
+    quit-while-being-carried: » Você saiu da partida enquanto estava sendo carregado por {0}. Isso contará como uma captura para ele(a) e como uma derrota para você no minigame.
     time: Você tem {0} segundos para levar os jogadores para sua base!
     cant-escape: Você não pode fugir!
     you-are-capturing: Você está capturando {0}. Leve-o para sua base!
@@ -226,6 +227,7 @@ minigame:
     thief-win: Os ladrões venceram!
 word:
   player: Jogador
+  players: Jogadores
   command: Comando
   shop: Loja
   channels: Canais
@@ -234,6 +236,8 @@ word:
   tracker: Rastreador
   minigame: Minigame
   infinity: Infinito
+  rank: Rank
+  position: Posição
 mg-data-display:
   header: '» Exibindo dados de {0} para o minigame {1}:'
   wins: '» Vitórias: {0}'

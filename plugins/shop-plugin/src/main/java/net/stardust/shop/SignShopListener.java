@@ -15,7 +15,6 @@ import org.bukkit.inventory.EquipmentSlot;
 
 import io.papermc.paper.event.player.PlayerOpenSignEvent;
 import io.papermc.paper.event.player.PlayerOpenSignEvent.Cause;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.ServerIdentifier;
 import net.stardust.base.events.BaseListener;

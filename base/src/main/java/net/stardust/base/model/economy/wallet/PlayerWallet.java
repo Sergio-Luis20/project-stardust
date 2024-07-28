@@ -7,6 +7,9 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,10 +20,13 @@ import net.stardust.base.utils.database.BaseEntity;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @BaseEntity(UUID.class)
+@Entity
+@Table(name = "player_wallet")
 public class PlayerWallet extends Wallet implements StardustEntity<UUID> {
     
+    @Id
     private UUID id;
-    
+
     public PlayerWallet(Player player) {
         super();
         id = player.getUniqueId();

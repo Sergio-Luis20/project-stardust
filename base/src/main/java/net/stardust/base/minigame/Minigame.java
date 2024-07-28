@@ -265,6 +265,7 @@ public abstract class Minigame implements Listener {
         BossBarUtils.removeAll(matchBar);
         match();
         registerMatchListener();
+        getWorld().getPlayers().forEach(matchBar::addViewer);
         startMatchBar();
         setState(MinigameState.MATCH);
     }
@@ -284,6 +285,7 @@ public abstract class Minigame implements Listener {
             @Override
             public void run() {
                 if(time <= 0) {
+                    cancel();
                     endMatch(Collections.emptyList(), Collections.emptyList());
                 } else {
                     String minutes = toFormattedString(time / 60);
@@ -313,6 +315,7 @@ public abstract class Minigame implements Listener {
             }
 
         };
+        matchStopwatch.runTaskTimer(PluginConfig.get().getPlugin(), 0, 20);
     }
 
     public final void spawnCommandIssued(Player player) {
@@ -361,7 +364,7 @@ public abstract class Minigame implements Listener {
         snapshot.restoreAll();
     }
 
-    private void stopMatchStopwatch() {
+    protected void stopMatchStopwatch() {
         if(matchStopwatch != null) {
             try {
                 matchStopwatch.cancel();

@@ -208,6 +208,7 @@ minigame:
       blue: Azul
       police: Policía
       thief: Ladrón
+    quit-while-being-carried: » Saliste del juego mientras eras llevado por {0}. Esto se contará como una captura para él/ella y como una derrota para ti en el minigame.
     time: Tienes {0} segundos para llevar a los jugadores a tu base!
     cant-escape: ¡No puedes escapar!
     you-are-capturing: Estás capturando a {0}. ¡Llévalo a tu base!
@@ -225,6 +226,7 @@ minigame:
     thief-win: Los ladrones ganaron!
 word:
   player: Jugador
+  players: Jugadores
   command: Comando
   shop: Tienda
   channels: Canales
@@ -232,6 +234,8 @@ word:
   home: Casa
   minigame: Minigame
   infinity: Infinito
+  rank: Rank
+  position: Posición
 mg-data-display:
   header: '» Mostrando los datos de {0} para el minigame {1}:'
   wins: '» Victorias: {0}'

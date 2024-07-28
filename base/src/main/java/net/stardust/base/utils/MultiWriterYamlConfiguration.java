@@ -1,13 +1,13 @@
 package net.stardust.base.utils;
 
-import lombok.Getter;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.YamlConfiguration;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.bukkit.configuration.file.YamlConfiguration;
+
+import lombok.Getter;
 
 @Getter
 public class MultiWriterYamlConfiguration extends YamlConfiguration {
