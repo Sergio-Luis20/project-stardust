@@ -31,4 +31,20 @@ public final class JPA {
         return configuration.buildSessionFactory();
     }
 
+    public static EntityManagerFactory inMemory(Reflections reflections) {
+        var props = new Properties();
+        props.put("hibernate.connection.url", "jdbc:h2:mem:testdb");
+        props.put("hibernate.connection.username", "sa");
+        props.put("hibernate.connection.password", "");
+        props.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        props.put("hibernate.hbm2ddl.auto", "update");
+
+        var configuration = new Configuration();
+        configuration.setProperties(props);
+
+        reflections.getTypesAnnotatedWith(Entity.class).forEach(configuration::addAnnotatedClass);
+
+        return configuration.buildSessionFactory();
+    }
+
 }

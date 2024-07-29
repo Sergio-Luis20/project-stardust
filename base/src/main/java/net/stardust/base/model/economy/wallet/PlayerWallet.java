@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import jakarta.persistence.Entity;
@@ -59,6 +60,10 @@ public class PlayerWallet extends Wallet implements StardustEntity<UUID> {
 
     public Player getPlayer() {
         return Bukkit.getPlayer(id);
+    }
+
+    public OfflinePlayer getOfflinePlayer() {
+        return Bukkit.getOfflinePlayer(id);
     }
 
     @Override

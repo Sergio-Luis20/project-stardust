@@ -1,26 +1,37 @@
 package net.stardust.base.model.terrain;
 
+import java.util.Objects;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+
 import br.sergio.utils.Pair;
 import br.sergio.utils.math.Point;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import net.stardust.base.model.StardustEntity;
 import net.stardust.base.utils.database.BaseEntity;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-
-import java.util.Objects;
-import java.util.UUID;
 
 @Getter
-@BaseEntity(UUID.class)
 @EqualsAndHashCode
+@BaseEntity(UUID.class)
+@Entity
 public class Terrain implements StardustEntity<UUID> {
 
+    @Id
     private UUID id;
     private String terrainWorldName;
     private Pair<Point, Point> terrainDelimiter;
+
+    @Enumerated
     private TerrainSize size;
+
+    @Transient
     private transient World terrainWorld;
 
     public Terrain(UUID id, String terrainWorldName, Pair<Point, Point> terrainDelimiter, TerrainSize size) {

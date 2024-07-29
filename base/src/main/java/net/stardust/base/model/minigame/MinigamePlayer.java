@@ -1,16 +1,22 @@
 package net.stardust.base.model.minigame;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 @Getter
 @NoArgsConstructor
+@Entity
+@Table(name = "minigame_player")
 public class MinigamePlayer implements Serializable, Comparable<MinigamePlayer> {
 
+    @Id
     private UUID id;
     private int wins, losses;
 

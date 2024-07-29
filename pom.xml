@@ -24,7 +24,7 @@
     <output.dir>${project.basedir}/output/</output.dir>
     <jackson.version>2.16.0</jackson.version>
     <junit.version>5.10.1</junit.version>
-    <mockito.version>5.8.0</mockito.version>
+    <mockito.version>5.12.0</mockito.version>
     <jda.version>5.0.0-beta.21</jda.version>
     <lombok.version>1.18.30</lombok.version>
     <hibernate.version>6.5.2.Final</hibernate.version>
@@ -232,6 +232,12 @@
       <groupId>org.xerial</groupId>
       <artifactId>sqlite-jdbc</artifactId>
       <version>3.46.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>2.3.230</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.google.auto.service</groupId>

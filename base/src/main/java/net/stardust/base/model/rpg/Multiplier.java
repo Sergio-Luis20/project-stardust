@@ -2,7 +2,6 @@ package net.stardust.base.model.rpg;
 
 import java.io.Serializable;
 
-
 public class Multiplier implements Cloneable, Serializable, Comparable<Multiplier> {
     
     protected float value;
@@ -81,7 +80,7 @@ public class Multiplier implements Cloneable, Serializable, Comparable<Multiplie
 
     @Override
     public int hashCode() {
-        return Float.valueOf(value).hashCode();
+        return Float.hashCode(value);
     }
 
     @Override

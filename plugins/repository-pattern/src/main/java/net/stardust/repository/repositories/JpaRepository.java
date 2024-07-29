@@ -5,8 +5,8 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceException;
 import net.stardust.base.Communicable;
 import net.stardust.base.model.StardustEntity;
 import net.stardust.base.utils.Throwables;
@@ -68,11 +68,11 @@ public class JpaRepository<K, V extends StardustEntity<K>> implements Repository
             }
             transaction.commit();
             return SaveResult.SUCCESS;
-        } catch (EntityExistsException e) {
+        } catch (PersistenceException e) {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            return update ? SaveResult.DUPLICATE : SaveResult.FAIL;
+            return update ? SaveResult.FAIL : SaveResult.DUPLICATE;
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error while trying to save an entity into the database",
                     Throwables.send(getId(), e));
@@ -85,20 +85,31 @@ public class JpaRepository<K, V extends StardustEntity<K>> implements Repository
         var transaction = entityManager.getTransaction();
         try {
             transaction.begin();
-            for (V data : list) {
-                if (update) {
+            if (update) {
+                for (V data : list) {
                     entityManager.merge(data);
-                } else {
+                }
+            } else {
+                List<K> ids = list.stream().map(V::getEntityId).toList();
+                var query = entityManager.createQuery(
+                        "SELECT e.id FROM " + valueClass.getSimpleName() + " e WHERE e.id IN :ids", keyClass);
+                query.setParameter("ids", ids);
+                List<K> existingIds = query.getResultList();
+                if (!existingIds.isEmpty()) {
+                    transaction.rollback();
+                    return SaveResult.DUPLICATE;
+                }
+                for (V data : list) {
                     entityManager.persist(data);
                 }
             }
             transaction.commit();
             return SaveResult.SUCCESS;
-        } catch (EntityExistsException e) {
+        } catch (PersistenceException e) {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            return update ? SaveResult.DUPLICATE : SaveResult.FAIL;
+            return update ? SaveResult.FAIL : SaveResult.DUPLICATE;
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error while trying to save a list of entities into the database",
                     Throwables.send(getId(), e));
@@ -168,6 +179,10 @@ public class JpaRepository<K, V extends StardustEntity<K>> implements Repository
     @Override
     public String getId() {
         return id;
+    }
+
+    public EntityManager getEntityManager() {
+        return entityManager;
     }
     
 }

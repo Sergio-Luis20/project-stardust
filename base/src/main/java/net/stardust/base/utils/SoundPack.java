@@ -1,5 +1,6 @@
 package net.stardust.base.utils;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import org.bukkit.Location;
@@ -7,7 +8,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-public record SoundPack(Sound sound, float volume, float pitch) {
+public record SoundPack(Sound sound, float volume, float pitch) implements Serializable {
 
     public SoundPack {
         Objects.requireNonNull(sound, "sound");

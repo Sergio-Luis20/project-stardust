@@ -35,9 +35,7 @@ public class RepositoryPlugin extends BasePlugin {
 	@Override
 	public void onLoad() {
 		super.onLoad();
-		reflections = new Reflections(new ConfigurationBuilder()
-				.forPackages(ENTITIES_PACKAGE)
-				.addScanners(Scanners.TypesAnnotated));
+		reflections = buildReflections();
 	}
 
 	@Override
@@ -142,17 +140,24 @@ public class RepositoryPlugin extends BasePlugin {
 
 	private <K, V extends StardustEntity<K>> void createRequestListeners() {
 		requestListeners = new ArrayList<>(repositories.size());
-		for(var repository : repositories) {
+		for (var repository : repositories) {
 			var controller = new RepositoryController<>(this, repository);
 			var id = Crud.idFor(repository.getValueClass());
 			try {
 				var mapper = new MethodMapper(controller, true);
 				var listener = Communication.newRequestListener(id, mapper);
 				requestListeners.add(listener);
-			} catch(ConnectionException e) {
-				getLogger().log(Level.SEVERE, "Falha ao ligar o request listener para \"" + id + "\"", Throwables.send(getId(), e));
+			} catch (ConnectionException e) {
+				getLogger().log(Level.SEVERE, "Falha ao ligar o request listener para \"" + id + "\"",
+						Throwables.send(getId(), e));
 			}
 		}
+	}
+	
+	public static Reflections buildReflections() {
+		return new Reflections(new ConfigurationBuilder()
+				.forPackages(ENTITIES_PACKAGE)
+				.addScanners(Scanners.TypesAnnotated));
 	}
 
 }

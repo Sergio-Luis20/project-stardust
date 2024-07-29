@@ -1,4 +1,4 @@
-package net.stardust.authentication;
+package net.stardust.base.utils;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;

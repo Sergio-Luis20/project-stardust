@@ -7,7 +7,16 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.MapKey;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -21,13 +30,33 @@ import net.stardust.base.utils.database.BaseEntity;
 @EqualsAndHashCode
 @NoArgsConstructor
 @BaseEntity(UUID.class)
+@Entity
+@Table(name = "rpg_player")
 public class RPGPlayer implements StardustEntity<UUID> {
 
     @Id
     private UUID id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 1)
     private Rank rank;
     
+    @OneToMany
+    @JoinTable(
+            name = "rpg_player_attributes", 
+            joinColumns = @JoinColumn(name = "attribute_name", referencedColumnName = "id"), 
+            inverseJoinColumns = @JoinColumn(name = "rpg_player_id", referencedColumnName = "id")
+    )
+    @MapKey(name = "name")
     private Map<String, PlayerAttribute> attributes;
+
+    @OneToMany
+    @JoinTable(
+            name = "rpg_player_skills", 
+            joinColumns = @JoinColumn(name = "skill_name", referencedColumnName = "id"), 
+            inverseJoinColumns = @JoinColumn(name = "rpg_player_id", referencedColumnName = "id")
+    )
+    @MapKey(name = "name")
     private Map<String, Skill> skills;
 
     public RPGPlayer(Player player) {
@@ -43,7 +72,7 @@ public class RPGPlayer implements StardustEntity<UUID> {
     }
 
     public RPGPlayer(UUID id, Rank rank, Map<String, PlayerAttribute> attributes, Map<String, Skill> skills) {
-        this.id = Objects.requireNonNull(id);
+        this.id = Objects.requireNonNull(id, "id");
         setRank(rank);
         setAttributes(attributes);
         setSkills(skills);
