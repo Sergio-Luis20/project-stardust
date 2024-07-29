@@ -5,9 +5,10 @@ hibernate:
   connection:
     url: jdbc:sqlite:plugins/repository/sqlite-repository.db
     username: stardust
-    password: VukLMp1rC9xH15SwDXeZLu4396XXaalQ98gzFPkbVO2lbIoOUTLo1trUVUrCurdN15VICcXmEmIH5vXfxPneNDv3TV14RB9kA-_FC5Qg5NcXWbQtY7dl-ayfdQgCPpRi
+    password: 9q5snUbhdbpM-d10323e0wB-RJmpMs2CKVWWDwdWK5xlwqGMh1lJISeq92if_V8HCNDrTb-YM5InVNhWZb0oIC76sXWuc5X0hDoYrmEDyEmPms1cJfK5GYcsXhslWAVY
 repository:
   implementations:
-    - net.stardust.repository.repositories.YamlRepository
+    - net.stardust.repository.repositories.FileRepository
     - net.stardust.repository.repositories.JpaRepository
+    - net.stardust.repository.repositories.YamlRepository
   current: 1
