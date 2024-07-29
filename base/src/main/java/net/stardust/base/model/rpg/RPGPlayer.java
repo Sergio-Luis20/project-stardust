@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -41,7 +42,7 @@ public class RPGPlayer implements StardustEntity<UUID> {
     @Column(length = 1)
     private Rank rank;
     
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "rpg_player_attributes", 
             joinColumns = @JoinColumn(name = "attribute_name", referencedColumnName = "id"), 
@@ -50,7 +51,7 @@ public class RPGPlayer implements StardustEntity<UUID> {
     @MapKey(name = "name")
     private Map<String, PlayerAttribute> attributes;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "rpg_player_skills", 
             joinColumns = @JoinColumn(name = "skill_name", referencedColumnName = "id"), 

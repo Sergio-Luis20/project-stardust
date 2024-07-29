@@ -29,15 +29,17 @@ public final class RepositoryFactory {
 			}
 			String className = implementations.get(current);
 			Class<?> repositoryClass = Class.forName(className);
+			if (!Repository.class.isAssignableFrom(repositoryClass)) {
+				throw new RepositoryException("Current selected class doesn't implement " + Repository.class.getName());
+			}
 			Constructor<?> constructor = repositoryClass.getConstructor(RepositoryPlugin.class, Class.class,
 					Class.class);
-			Object repository = constructor.newInstance(plugin, keyClass, valueClass);
-			return (Repository<K, V>) repository;
+			return (Repository<K, V>) constructor.newInstance(plugin, keyClass, valueClass);
 		} catch (ClassNotFoundException e) {
 			throw new RepositoryException("Repository class not found", e);
 		} catch (NoSuchMethodException e) {
 			throw new RepositoryException(
-					"Repository class without default public repository constructor with parameters [%s, %s, %s]"
+					"Repository class without default public constructor with parameters [%s, %s, %s]"
 							.formatted(RepositoryPlugin.class.getName(), Class.class.getName(), Class.class.getName()),
 					e);
 		} catch (Exception e) {

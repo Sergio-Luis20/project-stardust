@@ -3,6 +3,7 @@ package net.stardust.repository;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
@@ -10,6 +11,7 @@ import static org.mockito.Mockito.when;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
@@ -25,7 +27,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import br.sergio.utils.math.Point;
 import jakarta.persistence.EntityManagerFactory;
+import net.stardust.base.model.gameplay.Rank;
+import net.stardust.base.model.rpg.Level;
+import net.stardust.base.model.rpg.LevelFunctions;
+import net.stardust.base.model.rpg.Multiplier;
+import net.stardust.base.model.rpg.NumberComposition;
+import net.stardust.base.model.rpg.PlayerAttribute;
+import net.stardust.base.model.rpg.RPGPlayer;
+import net.stardust.base.model.rpg.Skill;
 import net.stardust.base.model.user.User;
 import net.stardust.base.utils.PasswordEncryption;
 import net.stardust.repository.Repository.SaveResult;
@@ -42,6 +53,8 @@ public class JpaRepositoryTest {
     private EntityManagerFactory entityManagerFactory;
     private JpaRepository<UUID, User> userRepository;
     private List<User> randomUsers;
+
+    private JpaRepository<UUID, RPGPlayer> rpgPlayerRepository;
 
     private int userAmount = 20;
 
@@ -68,6 +81,8 @@ public class JpaRepositoryTest {
             }
         }
         userRepository.getEntityManager().clear();
+
+        rpgPlayerRepository = new JpaRepository<>(plugin, UUID.class, RPGPlayer.class);
     }
 
     @AfterEach
@@ -197,6 +212,53 @@ public class JpaRepositoryTest {
 
         assertEquals(SaveResult.DUPLICATE, userRepository.saveAll(users, false));
         assertEquals(SaveResult.SUCCESS, userRepository.saveAll(users, true));
+    }
+
+    @Test
+    @DisplayName("Should successfully save and retrieve a RPGPlayer from the database")
+    void test10() {
+        UUID id = UUID.randomUUID();
+        RPGPlayer player = new RPGPlayer(id);
+        player.setRank(Rank.C);
+        Level level = new Level(LevelFunctions.exponential(1, new Point(5, 3)), 2);
+        NumberComposition composition = new NumberComposition();
+        composition.layers = new Multiplier[1][];
+        composition.layers[0] = new Multiplier[] {new Multiplier(0.4f),new Multiplier(0.03f)};
+        PlayerAttribute attribute = new PlayerAttribute(randomBase64String(10), level, 2.5f, composition);
+        player.getAttributes().put(attribute.getName(), attribute);
+        Skill skill = new Skill(randomBase64String(8));
+        player.getSkills().put(skill.getName(), skill);
+
+        assertEquals(SaveResult.SUCCESS, rpgPlayerRepository.save(player));
+
+        rpgPlayerRepository.getEntityManager().clear();
+        RPGPlayer retrieved = rpgPlayerRepository.findById(id);
+
+        assertNotNull(retrieved);
+
+        assertEquals(player.getEntityId(), retrieved.getEntityId());
+        assertEquals(player.getRank(), retrieved.getRank());
+        
+        PlayerAttribute retrievedAttribute = retrieved.getAttributes().get(attribute.getName());
+
+        assertNotNull(retrievedAttribute);
+        assertEquals(attribute.getBaseFactor(), retrievedAttribute.getBaseFactor());
+        
+        Level retrievedLevel = retrievedAttribute.getLevel();
+
+        assertNotNull(retrievedLevel);
+        assertEquals(level.getValue(), retrievedLevel.getValue());
+        assertNotNull(retrievedLevel.getFunction());
+
+        NumberComposition retrievedComposition = retrievedAttribute.getMultipliers();
+        
+        assertNotNull(retrievedComposition);
+        assertNotNull(retrievedComposition.layers);
+        assertTrue(Arrays.deepEquals(composition.layers, retrievedComposition.layers));
+
+        Skill retrievedSkill = retrieved.getSkills().get(skill.getName());
+
+        assertNotNull(retrievedSkill);
     }
 
     private List<User> getRandomUserList() {
