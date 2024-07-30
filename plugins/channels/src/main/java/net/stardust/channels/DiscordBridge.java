@@ -1,8 +1,17 @@
 package net.stardust.channels;
 
+import java.util.List;
+import java.util.UUID;
+import java.util.logging.Logger;
+
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
+
 import br.sergio.utils.Pair;
 import io.papermc.paper.event.player.AsyncChatEvent;
-import lombok.extern.log4j.Log4j2;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -19,17 +28,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.stardust.base.utils.StardustThreads;
 import net.stardust.base.utils.Throwables;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.logging.Logger;
-
-@Log4j2
 public class DiscordBridge extends ListenerAdapter implements Listener {
 
     private ChannelsPlugin plugin;
@@ -59,7 +58,7 @@ public class DiscordBridge extends ListenerAdapter implements Listener {
         long channelId = plugin.getDiscordChannelId();
         TextChannel channel = guild.getChannelById(TextChannel.class, channelId);
         if(channel == null) {
-            throw new ChannelNotFoundException("Guild has no channel with id = " + channelId);
+            throw new GuildChannelNotFoundException("Guild has no channel with id = " + channelId);
         }
         this.channelId = channelId;
         this.channel = channel;

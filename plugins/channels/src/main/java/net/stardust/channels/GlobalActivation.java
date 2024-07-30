@@ -12,7 +12,6 @@ import net.stardust.base.model.channel.ChannelStatus;
 import net.stardust.base.model.channel.Global;
 import net.stardust.base.utils.StardustThreads;
 import net.stardust.base.utils.database.crud.ChannelStatusCrud;
-import net.stardust.base.utils.property.Property;
 
 public class GlobalActivation implements ChannelInventoryActivationClickHandler, Communicable {
 
@@ -36,9 +35,10 @@ public class GlobalActivation implements ChannelInventoryActivationClickHandler,
             this.activated.put(playerId, activated);
             ChannelStatusCrud crud = new ChannelStatusCrud();
             ChannelStatus status = crud.getOrThrow(playerId);
-            Property prop = status.getProperty(Global.class.getName(), "status");
-            if(activated != prop.isActivated()) {
-                prop.setActivated(activated);
+            String className = Global.class.getName();
+            final String prop = "status";
+            if (activated != status.isChannelActivated(className, prop)) {
+                status.getProperties().get(className).put(prop, activated);
                 crud.update(status);
             }
         });
@@ -47,11 +47,6 @@ public class GlobalActivation implements ChannelInventoryActivationClickHandler,
     @Override
     public String getId() {
         return plugin.getId() + "/" + getClass().getSimpleName();
-    }
-
-    @Override
-    public String getChannelName() {
-        return plugin.getGlobal().getName();
     }
     
 }

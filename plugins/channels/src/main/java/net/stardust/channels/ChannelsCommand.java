@@ -11,7 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -41,7 +40,6 @@ import net.stardust.base.utils.StardustThreads;
 import net.stardust.base.utils.Throwables;
 import net.stardust.base.utils.database.crud.ChannelStatusCrud;
 import net.stardust.base.utils.plugin.PluginConfig;
-import net.stardust.base.utils.property.Property;
 
 @BaseCommand("channels")
 public class ChannelsCommand extends VirtualCommand<ChannelsPlugin> implements Listener {
@@ -78,16 +76,14 @@ public class ChannelsCommand extends VirtualCommand<ChannelsPlugin> implements L
             pseudoInventory.getSize(), Component.translatable("word.channels")));
 
         pseudoInventory.getReadOnlyItems().forEach((index, pseudoItem) -> {
-            if(pseudoItem == null) {
+            if (pseudoItem == null) {
                 return;
             }
 
-            String channel = pseudoItem.getLabels().get("channel").toLowerCase();
-            Component displayName = Component.translatable("channel." + channel + ".name", NamedTextColor.DARK_AQUA);
-
+            Map<String, String> labels = pseudoItem.getLabels();
+            Component displayName = Component.translatable("channel." + labels.get("channelName") + ".name", NamedTextColor.DARK_AQUA);
             ChannelStatus channelStatus = channelCrud.getOrThrow(id);
-            Property statusProperty = channelStatus.getProperty(StringUtils.capitalize(channel), "status");
-            boolean status = statusProperty.isActivated();
+            boolean status = channelStatus.isChannelActivated(labels.get("channelClassName"), "status");
 
             List<Component> lore = lore(status);
             
@@ -138,16 +134,14 @@ public class ChannelsCommand extends VirtualCommand<ChannelsPlugin> implements L
                     return;
                 }
 
-                String channel = pseudoInventory.getReadOnlyItems().get(inventory
-                    .first(item)).getLabels().get("channel");
+                String channelClassName = pseudoInventory.getReadOnlyItems().get(inventory
+                    .first(item)).getLabels().get("channelClassName");
 
                 plugin.getVirtual().submit(() -> {
-                    String capChannelName = StringUtils.capitalize(channel);
                     ChannelStatus channelStatus = channelCrud.getOrThrow(id);
-                    Property statusProperty = channelStatus.getProperty(capChannelName, "status");
-                    boolean status = statusProperty.isActivated();
+                    boolean status = channelStatus.isChannelActivated(channelClassName, "status");
     
-                    var activation = activations.get(capChannelName);
+                    var activation = activations.get(channelClassName);
                     synchronized(activation) {
                         activation.setActivated(player, !status);
                         status = activation.isActivated(player);

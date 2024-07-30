@@ -31,7 +31,7 @@ public abstract class ChannelMessageCommand extends AsyncCommand<ChannelsPlugin>
         CommandSender sender = sender();
         if(sender instanceof Player player) {
             UUID playerId = uniqueId(player);
-            if(!plugin.isPropertyActivated(playerId, channel.getName(), "status")) {
+            if(!plugin.isPropertyActivated(playerId, channel.getClass().getName(), "status")) {
                 messager.message(player, Component.translatable("channel.disabled-channel", NamedTextColor.RED));
                 return;
             }

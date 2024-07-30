@@ -19,7 +19,7 @@ public final class ChannelPropertiesProvider {
         reflections.getTypesAnnotatedWith(ChannelProperties.class).forEach(clazz -> {
             ChannelProperties ann = clazz.getAnnotation(ChannelProperties.class);
             Set<String> props = new HashSet<>(Arrays.asList(ann.value()));
-            properties.put(clazz.getSimpleName(), props);
+            properties.put(clazz.getName(), props);
         });
         return properties;
     }

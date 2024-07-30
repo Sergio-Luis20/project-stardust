@@ -1,17 +1,17 @@
 package net.stardust.minigames.capture;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import net.stardust.base.minigame.SquadChannel;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Function;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Score;
 
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Function;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 
 @Getter
 @AllArgsConstructor

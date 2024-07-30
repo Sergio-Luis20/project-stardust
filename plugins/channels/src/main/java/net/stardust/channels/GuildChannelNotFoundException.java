@@ -3,6 +3,6 @@ package net.stardust.channels;
 import lombok.experimental.StandardException;
 
 @StandardException
-public class ChannelNotFoundException extends RuntimeException {
+public class GuildChannelNotFoundException extends RuntimeException {
     
 }

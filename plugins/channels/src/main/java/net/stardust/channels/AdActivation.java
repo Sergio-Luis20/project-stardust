@@ -96,13 +96,8 @@ public class AdActivation implements ChannelInventoryActivationClickHandler, Com
     private void updateInDB(UUID playerId, boolean activated) {
         ChannelStatusCrud crud = new ChannelStatusCrud();
         ChannelStatus status = crud.getOrThrow(playerId);
-        status.getProperty(ad.getName(), "status").setActivated(activated);
+        status.getProperties().get(ad.getClass().getName()).put("status", activated);
         crud.update(status);
-    }
-
-    @Override
-    public String getChannelName() {
-        return ad.getName();
     }
 
     @RequiredArgsConstructor

@@ -1,6 +1,33 @@
 package net.stardust.channels;
 
-import br.sergio.comlib.*;
+import java.io.IOException;
+import java.io.Serializable;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
+
+import br.sergio.comlib.Communication;
+import br.sergio.comlib.ConnectionException;
+import br.sergio.comlib.Request;
+import br.sergio.comlib.RequestListener;
+import br.sergio.comlib.RequestMapper;
+import br.sergio.comlib.Response;
+import br.sergio.comlib.ResponseStatus;
 import br.sergio.utils.Pair;
 import lombok.Getter;
 import net.dv8tion.jda.api.JDA;
@@ -18,21 +45,6 @@ import net.stardust.base.model.channel.Global;
 import net.stardust.base.utils.StardustThreads;
 import net.stardust.base.utils.Throwables;
 import net.stardust.base.utils.database.crud.ChannelStatusCrud;
-import net.stardust.base.utils.property.Property;
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.time.Duration;
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class ChannelsPlugin extends BasePlugin implements Listener, RequestMapper {
 
@@ -165,17 +177,17 @@ public class ChannelsPlugin extends BasePlugin implements Listener, RequestMappe
     public Response<? extends Serializable> handle(Request<? extends Serializable> request) {
         ChannelStatus status = (ChannelStatus) request.getContent().get();
         channels.forEach(channel -> {
-            if(status.getProperty(channel.getName(), "status").isActivated()) {
+            if(status.isChannelActivated(channel.getClass().getName(), "status")) {
                 channel.addParticipant(StardustThreads.call(this, () -> Bukkit.getPlayer(status.getId())));
             }
         });
         return Response.emptyResponse(ResponseStatus.OK);
     }
 
-    public boolean isPropertyActivated(UUID playerId, String channelName, String propertyName) {
+    public boolean isPropertyActivated(UUID playerId, String channelClassName, String propertyName) {
         ChannelStatusCrud crud = new ChannelStatusCrud();
         ChannelStatus status = crud.getOrThrow(playerId);
-        return status.getProperty(channelName, propertyName).isActivated();
+        return status.isChannelActivated(channelClassName, propertyName);
     }
 
     public Channel getChannel(String name) {
@@ -197,8 +209,7 @@ public class ChannelsPlugin extends BasePlugin implements Listener, RequestMappe
             for(ChannelStatus status : statusList) {
                 Player player = Bukkit.getPlayer(status.getId());
                 for(Channel channel : channels) {
-                    Property statusProp = status.getProperty(channel.getName(), "status");
-                    if(statusProp.isActivated()) {
+                    if(status.isChannelActivated(channel.getClass().getName(), "status")) {
                         channel.addParticipant(player);
                     }
                 }

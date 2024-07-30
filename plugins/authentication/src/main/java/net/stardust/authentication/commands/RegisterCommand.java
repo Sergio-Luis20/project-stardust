@@ -3,11 +3,12 @@ package net.stardust.authentication.commands;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import org.bukkit.entity.Player;
 
@@ -33,7 +34,6 @@ import net.stardust.base.utils.database.crud.ChannelStatusCrud;
 import net.stardust.base.utils.database.crud.PlayerWalletCrud;
 import net.stardust.base.utils.database.crud.RPGPlayerCrud;
 import net.stardust.base.utils.database.crud.UserCrud;
-import net.stardust.base.utils.property.Property;
 
 @BaseCommand(value = "register", types = SenderType.PLAYER)
 public class RegisterCommand extends AsyncCommand<StardustAuthentication> {
@@ -127,10 +127,13 @@ public class RegisterCommand extends AsyncCommand<StardustAuthentication> {
     }
 
     private ChannelStatus buildChannelStatus(UUID uid) {
-        ChannelStatus channel = new ChannelStatus(uid);
-        ChannelPropertiesProvider.getProperties().forEach((channelName, props) -> channel.getProperties()
-                .put(channelName, props.stream().map(propName -> new Property(propName, true)).collect(Collectors.toSet())));
-        return channel;
+        Map<String, Map<String, Boolean>> properties = new HashMap<>();
+        ChannelPropertiesProvider.getProperties().forEach((channelClassName, props) -> {
+            Map<String, Boolean> effectiveProperties = new HashMap<>();
+            props.forEach(prop -> effectiveProperties.put(prop, true));
+            properties.put(channelClassName, effectiveProperties);
+        });
+        return new ChannelStatus(uid, properties);
     }
 
 }

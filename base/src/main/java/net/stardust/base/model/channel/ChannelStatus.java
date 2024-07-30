@@ -1,62 +1,56 @@
 package net.stardust.base.model.channel;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
 import java.util.UUID;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import net.stardust.base.model.StardustEntity;
 import net.stardust.base.utils.database.BaseEntity;
-import net.stardust.base.utils.property.Property;
 
 @Getter
 @EqualsAndHashCode
-@RequiredArgsConstructor
-@NoArgsConstructor
 @BaseEntity(UUID.class)
+@Entity
 public class ChannelStatus implements StardustEntity<UUID>, Cloneable {
     
     @Id
-    @NonNull
     private UUID id;
 
+    // Key: channel class name. Value: places where it is activated.
     @Getter
-    @NonNull
-    private Map<String, Set<Property>> properties;
+    private Map<String, Map<String, Boolean>> properties;
 
     public ChannelStatus(UUID id) {
         this(id, new HashMap<>());
     }
 
-    public Property getProperty(String channelName, String propertyName) {
-        Set<Property> props = properties.get(channelName);
-        if(props == null) {
-            return null;
+    public ChannelStatus(UUID id, Map<String, Map<String, Boolean>> properties) {
+        this.id = Objects.requireNonNull(id, "id");
+        this.properties = Objects.requireNonNull(properties, "properties");
+    }
+
+    public boolean isChannelActivated(String channelClassName, String place) {
+        Map<String, Boolean> props = properties.get(channelClassName);
+        if (props == null) {
+            ChannelNotFoundException ex = new ChannelNotFoundException();
+            ex.setChannelClassName(channelClassName);
+            throw ex;
         }
-        for(Property prop : props) {
-            if(propertyName.equals(prop.getName())) {
-                return prop;
-            }
-        }
-        return null;
+        return props.getOrDefault(place, false);
     }
 
     @Override
     public ChannelStatus clone() {
-        ChannelStatus copy = new ChannelStatus(id, new HashMap<>(properties.size()));
-        properties.forEach((channelName, props) -> {
-            Set<Property> propsCopy = new HashSet<>(props.size());
-            props.forEach(prop -> propsCopy.add(prop.clone()));
-            copy.properties.put(channelName, propsCopy);
-        });
-        return copy;
+        Map<String, Map<String, Boolean>> properties = new HashMap<>(this.properties.size());
+        properties.forEach((channelClassName, effectiveProps) -> properties.put(channelClassName,
+                new HashMap<>(effectiveProps)));
+        UUID newId = new UUID(id.getMostSignificantBits(), id.getLeastSignificantBits());
+        return new ChannelStatus(newId, properties);
     }
 
     @Override
