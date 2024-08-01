@@ -3,7 +3,6 @@ package net.stardust.channels;
 import java.io.IOException;
 import java.io.Serializable;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -204,12 +203,12 @@ public class ChannelsPlugin extends BasePlugin implements Listener, RequestMappe
     private void loadOnlinePlayers() {
         List<UUID> keys = Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId).collect(Collectors.toList());
         ChannelStatusCrud crud = new ChannelStatusCrud();
-        List<ChannelStatus> statusList = crud.getAll((ArrayList<UUID>) keys);
+        List<ChannelStatus> statusList = crud.getAll(keys);
         synchronized(channels) {
             for(ChannelStatus status : statusList) {
                 Player player = Bukkit.getPlayer(status.getId());
-                for(Channel channel : channels) {
-                    if(status.isChannelActivated(channel.getClass().getName(), "status")) {
+                for (Channel channel : channels) {
+                    if (status.isChannelActivated(channel.getClass().getName(), "status")) {
                         channel.addParticipant(player);
                     }
                 }

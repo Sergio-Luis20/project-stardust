@@ -115,6 +115,7 @@ public class MethodCommandScannerTest {
         }
 
         // this method should not be scanned
+        @SuppressWarnings("unused")
         public void nonAnnotatedMethod() {
 
         }

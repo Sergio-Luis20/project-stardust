@@ -8,8 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -38,7 +36,7 @@ import net.stardust.base.model.rpg.PlayerAttribute;
 import net.stardust.base.model.rpg.RPGPlayer;
 import net.stardust.base.model.rpg.Skill;
 import net.stardust.base.model.user.User;
-import net.stardust.base.utils.PasswordEncryption;
+import net.stardust.base.utils.security.PasswordException;
 import net.stardust.repository.Repository.SaveResult;
 import net.stardust.repository.repositories.JpaRepository;
 
@@ -76,7 +74,7 @@ public class JpaRepositoryTest {
                 User user = createRandomUser();
                 randomUsers.add(user);
                 userRepository.save(user);
-            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            } catch (PasswordException e) {
                 e.printStackTrace();
             }
         }
@@ -88,6 +86,7 @@ public class JpaRepositoryTest {
     @AfterEach
     void closeRepository() {
         userRepository.close();
+        rpgPlayerRepository.close();
         entityManagerFactory.close();
     }
     
@@ -176,7 +175,7 @@ public class JpaRepositoryTest {
         for (int i = 0; i < amount; i++) {
             try {
                 users.add(createRandomUser());
-            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            } catch (PasswordException e) {
                 e.printStackTrace();
                 fail();
                 return;
@@ -276,14 +275,14 @@ public class JpaRepositoryTest {
         return randomUsers.get(index);
     }
     
-    private User createRandomUser() throws NoSuchAlgorithmException, InvalidKeySpecException {
-        String password = randomBase64String(16);
-        byte[] salt = PasswordEncryption.generateSalt();
-        byte[] encryptedPassword = PasswordEncryption.generateHash(password, salt);
-        UUID id = UUID.randomUUID();
-        User user = new User(id, ThreadLocalRandom.current().nextLong(), randomBase64String(32),
-                randomBase64String(32), salt, encryptedPassword);
-        return user;
+    private User createRandomUser() throws PasswordException {
+        return User.builder()
+                .id(UUID.randomUUID())
+                .registered(ThreadLocalRandom.current().nextLong())
+                .name(randomBase64String(32))
+                .email(randomBase64String(32))
+                .password(randomBase64String(16))
+                .build();
     }
     
     private String randomBase64String(int length) {

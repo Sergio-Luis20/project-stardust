@@ -19,10 +19,10 @@ import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.SenderType;
 import net.stardust.base.model.channel.ChannelStatus;
 import net.stardust.base.model.user.User;
-import net.stardust.base.utils.PasswordEncryption;
 import net.stardust.base.utils.Throwables;
 import net.stardust.base.utils.database.crud.ChannelStatusCrud;
 import net.stardust.base.utils.database.crud.UserCrud;
+import net.stardust.base.utils.security.PasswordEncryption;
 
 @BaseCommand(value = "login", types = SenderType.PLAYER)
 public class LoginCommand extends AsyncCommand<StardustAuthentication> {

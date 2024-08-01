@@ -1,8 +1,6 @@
 package net.stardust.authentication.commands;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -28,12 +26,12 @@ import net.stardust.base.model.channel.ChannelStatus;
 import net.stardust.base.model.economy.wallet.PlayerWallet;
 import net.stardust.base.model.rpg.RPGPlayer;
 import net.stardust.base.model.user.User;
-import net.stardust.base.utils.PasswordEncryption;
 import net.stardust.base.utils.Throwables;
 import net.stardust.base.utils.database.crud.ChannelStatusCrud;
 import net.stardust.base.utils.database.crud.PlayerWalletCrud;
 import net.stardust.base.utils.database.crud.RPGPlayerCrud;
 import net.stardust.base.utils.database.crud.UserCrud;
+import net.stardust.base.utils.security.PasswordException;
 
 @BaseCommand(value = "register", types = SenderType.PLAYER)
 public class RegisterCommand extends AsyncCommand<StardustAuthentication> {
@@ -85,29 +83,22 @@ public class RegisterCommand extends AsyncCommand<StardustAuthentication> {
 
     private void register(Player player, UUID uid, String email, String password) {
         Logger logger = plugin.getLogger();
-
-        byte[] salt = PasswordEncryption.generateSalt();
-        byte[] hash = null;
-
+        User user;
         try {
-            hash = PasswordEncryption.generateHash(password, salt);
-        } catch(NoSuchAlgorithmException | InvalidKeySpecException e) {
-            logger.log(Level.SEVERE, "Erro ao criptografar uma senha", e);
-            Throwables.send(id, e);
-        }
-        if(hash == null) {
-            plugin.unauthorize(player, uid, "error.internal");
-            return;
-        }
-        
-        User user = User.builder()
+            user = User.builder()
                 .id(uid)
+                .registered(System.currentTimeMillis())
                 .name(player.getName())
                 .email(email)
-                .salt(salt)
-                .password(hash)
-                .registered(System.currentTimeMillis())
+                .password(password)
                 .build();
+        } catch (PasswordException e) {
+            logger.log(Level.SEVERE, "Erro ao criptografar uma senha", e);
+            plugin.unauthorize(player, uid, "error.internal");
+            Throwables.send(id, e);
+            return;
+        }
+
         ChannelStatus channel = buildChannelStatus(uid);
         RPGPlayer rpgPlayer = new RPGPlayer(uid);
         PlayerWallet wallet = new PlayerWallet(uid);

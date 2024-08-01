@@ -29,13 +29,13 @@ public final class Translation {
     public static final String DEFAULT_BUNDLE_PATH = "plugins/repository/bundles";
     public static final List<String> SUPPORTED_LANGUAGES;
 
-    private static volatile boolean loaded;
+    private static boolean loaded;
 
     private Translation() {}
 
     public static synchronized void load() {
         if(!loaded) {
-            var registry = TranslationRegistry.create(Key.key("stardust", "translation"));
+            TranslationRegistry registry = TranslationRegistry.create(Key.key("stardust", "translation"));
             registry.defaultLocale(defaultLocale());
             SUPPORTED_LANGUAGES.stream().map(Translation::getBundle)
                 .forEach(bundle -> registry.registerAll(bundle.getLocale(), bundle, true));
