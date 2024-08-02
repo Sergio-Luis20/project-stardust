@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemStack;
  * a chest in case of a sign in its wall, a villager, some
  * inventory or whatever other storing type. This includes external
  * methods of storing, like files or databases. In case of API objects,
- * it's recomendable the implementation be a wrapper.
+ * it's recomendable the implementation to be a wrapper.
  * 
  * @author Sergio Luis
  */

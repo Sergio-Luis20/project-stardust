@@ -5,9 +5,10 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.stardust.base.BasePlugin;
 import net.stardust.base.Communicable;
-import net.stardust.base.utils.MessageFormatter;
-import net.stardust.base.utils.Messager;
 import net.stardust.base.utils.Throwables;
+import net.stardust.base.utils.message.MessageFormatter;
+import net.stardust.base.utils.message.Messager;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 

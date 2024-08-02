@@ -1,4 +1,4 @@
-package net.stardust.base.utils;
+package net.stardust.base.utils.message;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -10,6 +10,8 @@ import net.kyori.adventure.chat.SignedMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.stardust.base.BasePlugin;
+import net.stardust.base.utils.StardustThreads;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

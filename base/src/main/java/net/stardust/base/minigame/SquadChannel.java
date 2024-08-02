@@ -4,7 +4,8 @@ import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.stardust.base.BasePlugin;
 import net.stardust.base.model.channel.Channel;
-import net.stardust.base.utils.MessageFormatter;
+import net.stardust.base.utils.message.MessageFormatter;
+
 import org.bukkit.command.CommandSender;
 
 import java.util.Collection;

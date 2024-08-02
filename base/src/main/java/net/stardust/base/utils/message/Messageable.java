@@ -1,4 +1,4 @@
-package net.stardust.base.utils;
+package net.stardust.base.utils.message;
 
 import java.util.Arrays;
 

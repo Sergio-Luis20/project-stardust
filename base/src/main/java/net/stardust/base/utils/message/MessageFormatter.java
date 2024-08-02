@@ -1,4 +1,4 @@
-package net.stardust.base.utils;
+package net.stardust.base.utils.message;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;

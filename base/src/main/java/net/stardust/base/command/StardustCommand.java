@@ -8,9 +8,10 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.stardust.base.BasePlugin;
 import net.stardust.base.Communicable;
 import net.stardust.base.utils.AutomaticMessages;
-import net.stardust.base.utils.Messager;
 import net.stardust.base.utils.StardustThreads;
 import net.stardust.base.utils.Throwables;
+import net.stardust.base.utils.message.Messager;
+
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 

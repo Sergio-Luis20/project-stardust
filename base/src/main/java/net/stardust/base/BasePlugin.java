@@ -1,9 +1,9 @@
 package net.stardust.base;
 
 import lombok.Getter;
-import net.stardust.base.utils.Messager;
 import net.stardust.base.utils.StardustThreads;
 import net.stardust.base.utils.Throwables;
+import net.stardust.base.utils.message.Messager;
 import net.stardust.base.utils.plugin.PluginConfig;
 import org.bukkit.plugin.java.JavaPlugin;
 
