@@ -12,3 +12,7 @@ repository:
     - net.stardust.repository.repositories.JpaRepository
     - net.stardust.repository.repositories.YamlRepository
   current: 1
+
+# Keeping the password on git is not a problem since it is a SQLite,
+# but must be changed to other password and migrated to secret manager
+# or environment variables when the database change.
