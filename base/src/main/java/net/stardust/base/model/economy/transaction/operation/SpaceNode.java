@@ -13,7 +13,7 @@ public class SpaceNode implements Operation {
             Storage storage = itemTransaction.getNegotiators().getBuyer().getStorage();
             int capacity = storage.remainingCapacity();
             if(capacity != -1 && capacity < itemTransaction.getItems().size()) {
-                throw OperationFailedException.fromKey("space");
+                throw OperationFailedException.fromKey("space", getClass());
             }
         }
     }

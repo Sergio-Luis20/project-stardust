@@ -19,7 +19,7 @@ public class ItemNode implements Operation {
                 if(!hasAll) break;
             }
             if(!hasAll) {
-                throw OperationFailedException.fromKey("seller-item");
+                throw OperationFailedException.fromKey("seller-item", getClass());
             }
         }
     }

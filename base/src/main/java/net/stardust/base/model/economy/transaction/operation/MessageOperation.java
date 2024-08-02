@@ -1,29 +1,36 @@
 package net.stardust.base.model.economy.transaction.operation;
 
-import lombok.AllArgsConstructor;
+import java.util.Objects;
+
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import net.stardust.base.model.economy.transaction.Transaction;
 import net.stardust.base.utils.Messageable;
+import net.stardust.base.utils.Messager;
+import net.stardust.base.utils.plugin.PluginConfig;
 
 @Getter
 @Setter
-@AllArgsConstructor
 public class MessageOperation implements Operation {
 
-    @NonNull
+    private static final Messager messager = PluginConfig.get().getPlugin().getMessager();
+
     protected Component buyerMessage, sellerMessage;
+
+    public MessageOperation(Component buyerMessage, Component sellerMessage) {
+        this.buyerMessage = Objects.requireNonNull(buyerMessage, "buyerMessage");
+        this.sellerMessage = Objects.requireNonNull(sellerMessage, "sellerMessage");
+    }
 
     @Override
     public void execute(Transaction transaction) throws OperationFailedException {
         var pair = transaction.getNegotiators();
-        if(pair.getBuyer() instanceof Messageable msg) {
-            msg.sendMessage(buyerMessage);
+        if (pair.getBuyer() instanceof Messageable msg) {
+            messager.message(msg, buyerMessage);
         }
-        if(pair.getSeller() instanceof Messageable msg) {
-            msg.sendMessage(sellerMessage);
+        if (pair.getSeller() instanceof Messageable msg) {
+            messager.message(msg, sellerMessage);
         }
     }
     

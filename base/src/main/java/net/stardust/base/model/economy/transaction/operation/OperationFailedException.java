@@ -13,10 +13,17 @@ public class OperationFailedException extends Exception {
     
     private String failKey;
     private Component[] args;
+    private Class<? extends Operation> failedOperation;
 
     public static OperationFailedException fromKey(String failKey) {
         var exception = new OperationFailedException();
         exception.setFailKey(failKey);
+        return exception;
+    }
+
+    public static OperationFailedException fromKey(String failKey, Class<? extends Operation> failedOperation) {
+        var exception = fromKey(failKey);
+        exception.setFailedOperation(failedOperation);
         return exception;
     }
 
@@ -26,11 +33,25 @@ public class OperationFailedException extends Exception {
         return exception;
     }
 
+    public static OperationFailedException withArgs(String failKey, Class<? extends Operation> failedOperation,
+            Component... args) {
+        var exception = withArgs(failKey, args);
+        exception.setFailedOperation(failedOperation);
+        return exception;
+    }
+
+    public Component getDirectFailMessage() {
+        return getFailMessage(getFailKey());
+    }
+
     public Component getDefaultFailMessage(boolean buy) {
+        return getFailMessage("transaction." + (buy ? "buy" : "sell") + ".fail-key." + getFailKey());
+    }
+    
+    private Component getFailMessage(String key) {
         Component[] args = getArgs();
-        String key = "transaction." + (buy ? "buy" : "sell") + ".fail-key." + getFailKey();
         Component failMessage;
-        if(args != null) {
+        if (args != null) {
             failMessage = Component.translatable(key, NamedTextColor.RED, args);
         } else {
             failMessage = Component.translatable(key, NamedTextColor.RED);

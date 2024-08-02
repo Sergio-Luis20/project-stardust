@@ -5,6 +5,7 @@ import net.stardust.base.model.economy.wallet.Wallet;
 /**
  * Represents an entity that can perform transactions
  */
+@FunctionalInterface
 public interface Cash {
     
     /**

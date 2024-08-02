@@ -9,7 +9,7 @@ public class MoneyNode implements Operation {
         var price = transaction.getValue();
         var buyerMoney = transaction.getNegotiators().getBuyer().getWallet().getMoney(price.getCurrency());
         if(!buyerMoney.isSubtractionPossible(price.getValue())) {
-            throw OperationFailedException.fromKey("buyer-money");
+            throw OperationFailedException.fromKey("buyer-money", getClass());
         }
     }
     

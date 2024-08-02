@@ -118,6 +118,22 @@ public class Messager {
 	public void message(Collection<? extends CommandSender> recipients, Component... messages) {
 		message(() -> recipients.forEach(recipient -> Arrays.asList(messages).forEach(message -> recipient.sendMessage(message))));
 	}
+	
+	public void message(Messageable messageable, String message) {
+		message(() -> messageable.sendMessage(message));
+	}
+
+	public void message(Messageable messageable, String... messages) {
+		message(() -> messageable.sendMessage(messages));
+	}
+
+	public void message(Messageable messageable, Component message) {
+		message(() -> messageable.sendMessage(message));
+	}
+
+	public void message(Messageable messageable, Component... messages) {
+		message(() -> messageable.sendMessage(messages));
+	}
 
 	public void plainMessage(Collection<? extends CommandSender> recipients, String message) {
 		message(() -> recipients.forEach(recipient -> recipient.sendPlainMessage(message)));
@@ -215,6 +231,22 @@ public class Messager {
 
 	public void messageAndWait(CommandSender recipient, Component... messages) {
 		messageAndWait(() -> Arrays.asList(messages).forEach(recipient::sendMessage));
+	}
+
+	public void messageAndWait(Messageable messageable, String message) {
+		messageAndWait(() -> messageable.sendMessage(message));
+	}
+
+	public void messageAndWait(Messageable messageable, String... messages) {
+		messageAndWait(() -> messageable.sendMessage(messages));
+	}
+
+	public void messageAndWait(Messageable messageable, Component message) {
+		messageAndWait(() -> messageable.sendMessage(message));
+	}
+
+	public void messageAndWait(Messageable messageable, Component... messages) {
+		messageAndWait(() -> messageable.sendMessage(messages));
 	}
 
 	public void plainMessageAndWait(CommandSender recipient, String message) {

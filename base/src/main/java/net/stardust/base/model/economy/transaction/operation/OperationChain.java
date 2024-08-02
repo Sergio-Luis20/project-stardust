@@ -15,6 +15,11 @@ public class OperationChain implements Operation {
         nodes = new ArrayList<>();
     }
 
+    public OperationChain(Operation... operations) {
+        this();
+        addAll(operations);
+    }
+
     @Override
     public void execute(Transaction transaction) throws OperationFailedException {
         for(Operation node : nodes) {

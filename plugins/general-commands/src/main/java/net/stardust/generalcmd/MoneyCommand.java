@@ -3,8 +3,6 @@ package net.stardust.generalcmd;
 import static net.kyori.adventure.text.Component.translatable;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -24,6 +22,15 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.VirtualCommand;
+import net.stardust.base.model.economy.PlayerCash;
+import net.stardust.base.model.economy.transaction.Negotiators;
+import net.stardust.base.model.economy.transaction.Transaction;
+import net.stardust.base.model.economy.transaction.operation.MessageOperation;
+import net.stardust.base.model.economy.transaction.operation.MoneyNode;
+import net.stardust.base.model.economy.transaction.operation.Operation;
+import net.stardust.base.model.economy.transaction.operation.OperationChain;
+import net.stardust.base.model.economy.transaction.operation.OperationFailedException;
+import net.stardust.base.model.economy.transaction.operation.TransferNode;
 import net.stardust.base.model.economy.wallet.Currency;
 import net.stardust.base.model.economy.wallet.Money;
 import net.stardust.base.model.economy.wallet.PlayerWallet;
@@ -127,8 +134,8 @@ public class MoneyCommand extends VirtualCommand<GeneralCommandsPlugin> {
 	public void rank(String name) {
 		CommandSender sender = sender();
 		User target = userCrud.byNameOrNull(name);
-    	if(target == null) {
-    		messager.message(sender, translatable("not-found", NamedTextColor.RED, Component.translatable("word.player", NamedTextColor.RED)));
+		if (target == null) {
+    		messager.message(sender, AutomaticMessages.notFound("word.player"));
     		return;
     	}
 
@@ -193,39 +200,41 @@ public class MoneyCommand extends VirtualCommand<GeneralCommandsPlugin> {
 		Money money = null;
 		try {
 			money = Money.valueOf(moneyString);
-		} catch(IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			messager.message(sender, Component.translatable("money.format", NamedTextColor.RED));
 			return;
 		}
-		Currency currency = money.getCurrency();
-		BigInteger value = money.getValue();
-    	PlayerWallet senderWallet = walletCrud.getOrThrow(senderId);
-    	PlayerWallet targetWallet = walletCrud.getOrThrow(target.getId());
-    	Money senderTotal = senderWallet.getMoney(currency);
-    	if(senderTotal.isSubtractionPossible(value)) {
-    		senderTotal.subtract(value);
-    		targetWallet.getMoney(currency).add(value);
-    		walletCrud.updateAll(new ArrayList<>(Arrays.asList(senderWallet, targetWallet)));
-    		// Send messages to players
-			Component paidComp = money.toComponent();
-    		messager.message(sender, translatable("money.sent", NamedTextColor.GREEN, paidComp, 
-				Component.text(target.getName(), NamedTextColor.AQUA)));
-    		Player targetPlayer = player(target.getId());
-    		if(targetPlayer != null) {
-    			// Target is online
-    			messager.message(targetPlayer, translatable("money.received", NamedTextColor.GREEN, paidComp, 
-					Component.text(sender.getName(), NamedTextColor.AQUA)));
-    		}
-    		return;
-    	}
-		sender.sendMessage(translatable("money.dont-have-enough", NamedTextColor.RED));
+
+		Component paidComp = money.toComponent();
+		Component senderMessage = translatable("money.sent", NamedTextColor.GREEN, paidComp,
+				Component.text(target.getName(), NamedTextColor.AQUA));
+		Component targetMessage = translatable("money.received", NamedTextColor.GREEN, paidComp,
+				Component.text(sender.getName(), NamedTextColor.AQUA));
+
+		PlayerCash senderCash = new PlayerCash(sender);
+		PlayerCash targetCash = new PlayerCash(target.getId());
+
+		Negotiators negotiators = Negotiators.from(senderCash, targetCash);
+		Transaction transaction = Transaction.newTransaction(money, negotiators);
+		Operation operation = new OperationChain(new MoneyNode(), new TransferNode(),
+				new MessageOperation(senderMessage, targetMessage));
+
+		try {
+			operation.execute(transaction);
+		} catch (OperationFailedException e) {
+			if (MoneyNode.class.isAssignableFrom(e.getFailedOperation())) {
+				messager.message(sender, translatable("money.dont-have-enough", NamedTextColor.RED));
+			} else {
+				messager.message(sender, e.getDefaultFailMessage(true));
+			}
+		}
 	}
 	
 	private void getByName(String name) {
 		CommandSender sender = sender();
 		User target = userCrud.byNameOrNull(name);
 		if(target == null) {
-			messager.message(sender,AutomaticMessages.notFound("word.player"));
+			messager.message(sender, AutomaticMessages.notFound("word.player"));
 			return;
 		}
 		executeGet(sender, target.getName(), walletCrud.getOrThrow(target.getId()));

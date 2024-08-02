@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Objects;
 
-public class Wallet implements Serializable, Cloneable {
+import net.stardust.base.model.economy.Cash;
+
+public class Wallet implements Serializable, Cloneable, Cash {
     
     protected Money bronze, silver, gold;
 
@@ -66,6 +68,11 @@ public class Wallet implements Serializable, Cloneable {
     @Override
     public Wallet clone() {
         return new Wallet(bronze.getValue(), silver.getValue(), gold.getValue());
+    }
+
+    @Override
+    public Wallet getWallet() {
+        return this;
     }
 
     @Override

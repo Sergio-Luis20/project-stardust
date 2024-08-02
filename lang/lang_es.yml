@@ -40,6 +40,7 @@ transaction:
     buyer-money: » No tienes suficiente dinero para comprar
     space: » No tienes suficiente espacio para alojar los ítems
     cant-buy: » No puedes comprar, apenas vender
+    could-not-transfer: » No se pudo realizar la transferencia
   bought: » Has comprado {0} por {1} de {2}
   sell:
     name: Vender
@@ -51,6 +52,7 @@ transaction:
       buyer-money: » El comprador no tiene suficiente dinero para comprar
       space: » El comprador no tiene suficiente espacio para alojar los ítems
       cant-sell: » No puedes vender, apenas comprar
+      could-not-transfer: » No se pudo realizar la transferencia
     sold: » Has vendido {0} por {1} a {2}
   paid: » Has pagado {0} para usar esto
   need-pay: » Necesitas pagar {0} para usar esto

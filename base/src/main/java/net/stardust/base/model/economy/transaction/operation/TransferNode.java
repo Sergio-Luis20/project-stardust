@@ -1,13 +1,13 @@
 package net.stardust.base.model.economy.transaction.operation;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.stardust.base.model.economy.transaction.ItemNegotiators;
 import net.stardust.base.model.economy.transaction.ItemTransaction;
 import net.stardust.base.model.economy.transaction.Transaction;
 import net.stardust.base.model.economy.wallet.PlayerWallet;
 import net.stardust.base.utils.database.crud.PlayerWalletCrud;
-import net.stardust.base.utils.plugin.PluginConfig;
 
 public class TransferNode implements Operation {
 
@@ -27,18 +27,20 @@ public class TransferNode implements Operation {
         sellerWallet.getMoney(currency).add(value);
 
         var crud = new PlayerWalletCrud();
-        ArrayList<PlayerWallet> list = new ArrayList<>();
-        if(buyerWallet instanceof PlayerWallet playerWallet) {
+        List<PlayerWallet> list = new ArrayList<>();
+        if (buyerWallet instanceof PlayerWallet playerWallet) {
             list.add(playerWallet);
         }
-        if(sellerWallet instanceof PlayerWallet playerWallet) {
+        if (sellerWallet instanceof PlayerWallet playerWallet) {
             list.add(playerWallet);
         }
-        if(!list.isEmpty()) {
-            PluginConfig.get().getPlugin().getVirtual().submit(() -> crud.updateAll(list));
+        if (!list.isEmpty()) {
+            if (!crud.updateAll(list)) {
+                throw OperationFailedException.fromKey("could-not-transfer", getClass());
+            }
         }
 
-        if(transaction instanceof ItemTransaction itemTransaction) {
+        if (transaction instanceof ItemTransaction itemTransaction) {
             var itemPair = (ItemNegotiators) pair;
             var buyerStorage = itemPair.getBuyer().getStorage();
             var sellerStorage = itemPair.getSeller().getStorage();
