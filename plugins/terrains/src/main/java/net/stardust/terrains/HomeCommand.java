@@ -1,26 +1,26 @@
 package net.stardust.terrains;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.Stardust;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.DirectCommand;
-import net.stardust.base.command.SenderType;
 import net.stardust.base.model.terrain.Home;
 import net.stardust.base.utils.AutomaticMessages;
 import net.stardust.base.utils.persistence.DataManager;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.HashSet;
-import java.util.Set;
-
-@BaseCommand(value = "home", types = SenderType.PLAYER)
+@BaseCommand(value = "home", types = Player.class)
 public class HomeCommand extends DirectCommand<TerrainsPlugin> {
 
     private int limit;

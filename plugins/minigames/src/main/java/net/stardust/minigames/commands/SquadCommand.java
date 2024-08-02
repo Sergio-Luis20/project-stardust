@@ -1,11 +1,12 @@
 package net.stardust.minigames.commands;
 
+import org.bukkit.entity.Player;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.DirectCommand;
-import net.stardust.base.command.SenderType;
 import net.stardust.base.minigame.Minigame;
 import net.stardust.base.minigame.Minigame.MinigameState;
 import net.stardust.base.minigame.SquadChannel;
@@ -13,9 +14,8 @@ import net.stardust.base.minigame.SquadMinigame;
 import net.stardust.base.utils.AutomaticMessages;
 import net.stardust.base.utils.Throwables;
 import net.stardust.minigames.MinigamesPlugin;
-import org.bukkit.entity.Player;
 
-@BaseCommand(value = "squad", types = SenderType.PLAYER, usageKey = "minigame.team.usage")
+@BaseCommand(value = "squad", types = Player.class, usageKey = "minigame.team.usage")
 public class SquadCommand extends DirectCommand<MinigamesPlugin> {
 
     public SquadCommand(MinigamesPlugin plugin) {

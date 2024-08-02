@@ -7,7 +7,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
-import net.stardust.base.command.SenderType;
 import net.stardust.base.command.VirtualCommand;
 import net.stardust.base.model.gameplay.Rank;
 import net.stardust.base.model.rpg.RPGPlayer;
@@ -28,7 +27,7 @@ public class RankCommand extends VirtualCommand<GeneralCommandsPlugin> {
         rpgPlayerCrud = new RPGPlayerCrud();
     }
     
-    @CommandEntry(types = SenderType.PLAYER)
+    @CommandEntry(types = Player.class)
     public void getSubCommand() {
     	Player sender = sender();
     	executeGet(sender, name(sender), rpgPlayerCrud.getOrThrow(uniqueId(sender)));

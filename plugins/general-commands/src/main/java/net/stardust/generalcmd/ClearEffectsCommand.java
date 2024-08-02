@@ -1,11 +1,11 @@
 package net.stardust.generalcmd;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.DirectCommand;
-import net.stardust.base.command.SenderType;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 @BaseCommand(value = "clearpotions", opOnly = true)
 public class ClearEffectsCommand extends DirectCommand<GeneralCommandsPlugin> {
@@ -14,7 +14,7 @@ public class ClearEffectsCommand extends DirectCommand<GeneralCommandsPlugin> {
         super(plugin);
     }
 
-    @CommandEntry(types = SenderType.PLAYER)
+    @CommandEntry(types = Player.class)
     public void clear() {
         clear((Player) sender());
     }

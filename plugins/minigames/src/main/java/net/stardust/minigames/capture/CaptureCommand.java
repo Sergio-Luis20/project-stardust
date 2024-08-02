@@ -1,15 +1,10 @@
 package net.stardust.minigames.capture;
 
-import br.sergio.utils.Pair;
-import net.stardust.base.command.BaseCommand;
-import net.stardust.base.command.CommandEntry;
-import net.stardust.base.command.DirectCommand;
-import net.stardust.base.command.SenderType;
-import net.stardust.base.utils.AutomaticMessages;
-import net.stardust.base.utils.Throwables;
-import net.stardust.base.utils.world.DifferentWorldException;
-import net.stardust.base.utils.world.WorldUtils;
-import net.stardust.minigames.MinigamesPlugin;
+import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -18,10 +13,15 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
-import java.util.UUID;
+import br.sergio.utils.Pair;
+import net.stardust.base.command.BaseCommand;
+import net.stardust.base.command.CommandEntry;
+import net.stardust.base.command.DirectCommand;
+import net.stardust.base.utils.AutomaticMessages;
+import net.stardust.base.utils.Throwables;
+import net.stardust.base.utils.world.DifferentWorldException;
+import net.stardust.base.utils.world.WorldUtils;
+import net.stardust.minigames.MinigamesPlugin;
 
 @BaseCommand(value = "capture", opOnly = true)
 public class CaptureCommand extends DirectCommand<MinigamesPlugin> {
@@ -49,7 +49,7 @@ public class CaptureCommand extends DirectCommand<MinigamesPlugin> {
         player.sendMessage("§a/capture §dinterrupt §e-> §bInterrompe a partida na qual você se encontra.");
     }
 
-    @CommandEntry(value = "createmap", types = SenderType.PLAYER)
+    @CommandEntry(value = "createmap", types = Player.class)
     public void createMap() {
         Player player = sender();
         World world = player.getWorld();
@@ -77,7 +77,7 @@ public class CaptureCommand extends DirectCommand<MinigamesPlugin> {
                 "detalhes sobre como fazer isso.");
     }
 
-    @CommandEntry(value = "set", types = SenderType.PLAYER)
+    @CommandEntry(value = "set", types = Player.class)
     public void set(CaptureLocation location) {
         Player player = sender();
         Location loc = player.getLocation().toCenterLocation().subtract(0, 0.5, 0);
@@ -102,7 +102,7 @@ public class CaptureCommand extends DirectCommand<MinigamesPlugin> {
         player.sendMessage("§a» Atributo " + location.toString().toLowerCase() + " definido para §e" + loc);
     }
 
-    @CommandEntry(value = "get", types = SenderType.PLAYER)
+    @CommandEntry(value = "get", types = Player.class)
     public void get(CaptureLocation location) {
         get(((Player) sender()).getWorld().getName(), location);
     }
@@ -135,7 +135,7 @@ public class CaptureCommand extends DirectCommand<MinigamesPlugin> {
                 section.getInt("y") + ",z=" + section.getInt("z") + ",pitch=0.0,yaw=0.0}");
     }
 
-    @CommandEntry(value = "teleport", types = SenderType.PLAYER)
+    @CommandEntry(value = "teleport", types = Player.class)
     public void teleport(CaptureLocation location) {
         Player player = sender();
         getMatch(player).ifPresentOrElse(match -> {
@@ -146,7 +146,7 @@ public class CaptureCommand extends DirectCommand<MinigamesPlugin> {
         }, () -> player.sendMessage("§c» Você não está num mapa de capture"));
     }
 
-    @CommandEntry(value = "interrupt", types = SenderType.PLAYER)
+    @CommandEntry(value = "interrupt", types = Player.class)
     public void interrupt() {
         Player player = sender();
         getMatch(player).ifPresentOrElse(match -> {

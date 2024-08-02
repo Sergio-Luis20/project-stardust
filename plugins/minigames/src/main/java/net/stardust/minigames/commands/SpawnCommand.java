@@ -1,19 +1,19 @@
 package net.stardust.minigames.commands;
 
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.DirectCommand;
-import net.stardust.base.command.SenderType;
 import net.stardust.base.minigame.Minigame;
 import net.stardust.base.utils.AutomaticMessages;
 import net.stardust.minigames.MinigamesPlugin;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
 
-@BaseCommand(value = "spawn", types = SenderType.PLAYER)
+@BaseCommand(value = "spawn", types = Player.class)
 public class SpawnCommand extends DirectCommand<MinigamesPlugin> {
 
     public SpawnCommand(MinigamesPlugin plugin) {

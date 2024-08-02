@@ -7,9 +7,8 @@ import org.bukkit.entity.Player;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.DirectCommand;
-import net.stardust.base.command.SenderType;
 
-@BaseCommand(value = "blockservermode", types = SenderType.PLAYER)
+@BaseCommand(value = "blockservermode", types = Player.class)
 public class BlockServerModeCommand extends DirectCommand<TerrainsPlugin> {
 
     public BlockServerModeCommand(TerrainsPlugin plugin) {

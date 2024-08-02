@@ -1,10 +1,21 @@
 package net.stardust.minigames.commands;
 
+import java.text.DecimalFormatSymbols;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Consumer;
+
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
-import net.stardust.base.command.SenderType;
 import net.stardust.base.command.VirtualCommand;
 import net.stardust.base.model.minigame.MinigameData;
 import net.stardust.base.model.minigame.MinigamePlayer;
@@ -15,17 +26,6 @@ import net.stardust.base.utils.database.crud.MinigameDataCrud;
 import net.stardust.base.utils.database.crud.UserCrud;
 import net.stardust.base.utils.database.lang.Translation;
 import net.stardust.minigames.MinigamesPlugin;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import java.text.DecimalFormatSymbols;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Consumer;
 
 @BaseCommand("mgdata")
 public class MgDataCommand extends VirtualCommand<MinigamesPlugin> {
@@ -34,7 +34,7 @@ public class MgDataCommand extends VirtualCommand<MinigamesPlugin> {
         super(plugin);
     }
 
-    @CommandEntry(types = SenderType.PLAYER)
+    @CommandEntry(types = Player.class)
     public void data(String minigameName) {
         data(minigameName, (Player) sender());
     }

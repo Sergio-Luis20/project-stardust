@@ -13,6 +13,7 @@ import net.stardust.base.utils.StardustThreads;
 import net.stardust.base.utils.Throwables;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -33,7 +34,7 @@ public abstract sealed class StardustCommand<T extends BasePlugin> implements Co
 	protected final String name;
     protected final Messager messager;
 	protected final MiniMessage miniMessage;
-	protected final Set<SenderType> senderTypes;
+	protected final Set<Class<? extends CommandSender>> senderTypes;
 	protected final boolean opOnly;
 	protected final Component failMessage;
 	
@@ -50,7 +51,7 @@ public abstract sealed class StardustCommand<T extends BasePlugin> implements Co
 				Component.translatable(usageKey, NamedTextColor.RED);
 
 		// Types validation
-		SenderType[] types = ann.types();
+		Class<? extends CommandSender>[] types = ann.types();
 		if(types.length == 0) {
 			throw new StardustCommandException("SenderType array is empty");
 		}
@@ -71,8 +72,8 @@ public abstract sealed class StardustCommand<T extends BasePlugin> implements Co
     abstract void execute(Runnable task);
 
 	@Override
-    public final boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		SenderType type = SenderType.getSenderType(sender.getClass());
+	public final boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		Class<? extends CommandSender> type = sender.getClass();
 		if(canExecute(senderTypes, type) && (!opOnly || sender.isOp())) {
 			plugin.getVirtual().execute(() -> {
 				Pair<Method, Object[]> result = scanner.find(args);
@@ -85,10 +86,10 @@ public abstract sealed class StardustCommand<T extends BasePlugin> implements Co
 						}
 						return;
 					}
-					Set<SenderType> types = Set.of(entry.types());
+					Set<Class<? extends CommandSender>> types = Set.of(entry.types());
 					if(!canExecute(types, type)) {
 						if(entry.showMessage()) {
-							List<String> str = types.stream().map(SenderType::toString).toList();
+							List<String> str = types.stream().map(Class::getSimpleName).toList();
 							Component allowedTypes = Component.text(String.join(", ", str), NamedTextColor.DARK_RED);
 							Component message = Component.translatable("command.can-only-be-executed-by", NamedTextColor.RED, allowedTypes);
 							messager.message(sender, message);
@@ -189,8 +190,8 @@ public abstract sealed class StardustCommand<T extends BasePlugin> implements Co
     	return plugin.getId() + "/" + getClass().getSimpleName();
     }
 
-	public static boolean canExecute(Set<SenderType> types, SenderType type) {
-		return types.contains(SenderType.ALL) || types.contains(type);
+	public static boolean canExecute(Set<Class<? extends CommandSender>> types, Class<? extends CommandSender> type) {
+		return types.contains(CommandSender.class) || types.contains(type);
 	}
     
 }

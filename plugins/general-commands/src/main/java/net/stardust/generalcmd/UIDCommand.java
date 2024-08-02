@@ -12,7 +12,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.DirectCommand;
-import net.stardust.base.command.SenderType;
 
 @BaseCommand("uid")
 public class UIDCommand extends DirectCommand<GeneralCommandsPlugin> {
@@ -21,7 +20,7 @@ public class UIDCommand extends DirectCommand<GeneralCommandsPlugin> {
         super(plugin);
     }
 
-    @CommandEntry(types = SenderType.PLAYER)
+    @CommandEntry(types = Player.class)
     public void myUID() {
         Player sender = sender();
         sender.sendMessage(getUIDMessage("» UUID: ", sender));

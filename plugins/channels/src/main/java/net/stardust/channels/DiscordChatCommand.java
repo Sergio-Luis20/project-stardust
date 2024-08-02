@@ -1,5 +1,15 @@
 package net.stardust.channels;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Stream;
+
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
+
 import net.dv8tion.jda.api.OnlineStatus;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -9,20 +19,10 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.stardust.base.Stardust;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
-import net.stardust.base.command.SenderType;
 import net.stardust.base.command.VirtualCommand;
 import net.stardust.base.utils.StardustThreads;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Stream;
-
-@BaseCommand(value = "discordchat", types = SenderType.PLAYER)
+@BaseCommand(value = "discordchat", types = Player.class)
 public class DiscordChatCommand extends VirtualCommand<ChannelsPlugin> {
     
     public DiscordChatCommand(ChannelsPlugin plugin) {

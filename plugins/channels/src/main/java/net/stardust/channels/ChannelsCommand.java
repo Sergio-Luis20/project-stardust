@@ -30,7 +30,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
-import net.stardust.base.command.SenderType;
 import net.stardust.base.command.VirtualCommand;
 import net.stardust.base.model.channel.Channel;
 import net.stardust.base.model.channel.ChannelStatus;
@@ -67,7 +66,7 @@ public class ChannelsCommand extends VirtualCommand<ChannelsPlugin> implements L
         channelCrud = new ChannelStatusCrud();
     }
     
-    @CommandEntry(types = SenderType.PLAYER)
+    @CommandEntry(types = Player.class)
     public void execute() {
         Player player = sender();
         UUID id = uniqueId(player);

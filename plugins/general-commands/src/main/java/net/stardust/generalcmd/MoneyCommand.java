@@ -23,7 +23,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
-import net.stardust.base.command.SenderType;
 import net.stardust.base.command.VirtualCommand;
 import net.stardust.base.model.economy.wallet.Currency;
 import net.stardust.base.model.economy.wallet.Money;
@@ -48,7 +47,7 @@ public class MoneyCommand extends VirtualCommand<GeneralCommandsPlugin> {
 		walletCrud = new PlayerWalletCrud();
 	}
     
-	@CommandEntry(types = SenderType.PLAYER)
+	@CommandEntry(types = Player.class)
 	public void getSubCommand() {
 		Player sender = sender();
 		executeGet(sender, name(sender), walletCrud.getOrThrow(uniqueId(sender)));
@@ -75,7 +74,7 @@ public class MoneyCommand extends VirtualCommand<GeneralCommandsPlugin> {
         messager.message(sender, messages);
 	}
 
-	@CommandEntry(value = "rank", types = SenderType.PLAYER)
+	@CommandEntry(value = "rank", types = Player.class)
 	public void rank() {
 		rank(name(sender()));
 	}
@@ -178,7 +177,7 @@ public class MoneyCommand extends VirtualCommand<GeneralCommandsPlugin> {
     	messager.message(sender, "§c» Não foi possível atualizar o dinheiro de " + target.getName());
 	}
 
-	@CommandEntry(value = "pay", types = SenderType.PLAYER, oneWordFinalString = true)
+	@CommandEntry(value = "pay", types = Player.class, oneWordFinalString = true)
 	public void pay(String name, String moneyString) {
 		Player sender = sender();
 		User target = userCrud.byNameOrNull(name);

@@ -16,7 +16,6 @@ import net.stardust.authentication.StardustAuthentication;
 import net.stardust.base.command.AsyncCommand;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
-import net.stardust.base.command.SenderType;
 import net.stardust.base.model.channel.ChannelStatus;
 import net.stardust.base.model.user.User;
 import net.stardust.base.utils.Throwables;
@@ -24,7 +23,7 @@ import net.stardust.base.utils.database.crud.ChannelStatusCrud;
 import net.stardust.base.utils.database.crud.UserCrud;
 import net.stardust.base.utils.security.PasswordEncryption;
 
-@BaseCommand(value = "login", types = SenderType.PLAYER)
+@BaseCommand(value = "login", types = Player.class)
 public class LoginCommand extends AsyncCommand<StardustAuthentication> {
 
     /*
@@ -43,7 +42,7 @@ public class LoginCommand extends AsyncCommand<StardustAuthentication> {
         channelCrud = new ChannelStatusCrud();
     }
     
-    @CommandEntry(types = SenderType.PLAYER, oneWordFinalString = true)
+    @CommandEntry(oneWordFinalString = true)
     public void login(String password) {
         Player player = sender();
     	UUID uid = uniqueId(player);
@@ -67,9 +66,8 @@ public class LoginCommand extends AsyncCommand<StardustAuthentication> {
                 messager.message(player, Component.translatable("login.wrong-pw", NamedTextColor.RED));
                 return;
             }
-            String id = plugin.getId();
             ChannelStatus channel = channelCrud.getOrThrow(uid);
-            Request<ChannelStatus> channelRequest = Request.newRequest(id, "channels", RequestMethod.POST, channel);
+            Request<ChannelStatus> channelRequest = Request.newRequest(plugin.getId(), "channels", RequestMethod.POST, channel);
             if(Communication.send(channelRequest).getStatus() != ResponseStatus.OK) {
                 plugin.unauthorize(player, uid, "error.login");
                 return;

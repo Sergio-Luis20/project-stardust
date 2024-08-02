@@ -20,7 +20,6 @@ import net.stardust.authentication.StardustAuthentication;
 import net.stardust.base.command.AsyncCommand;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
-import net.stardust.base.command.SenderType;
 import net.stardust.base.model.channel.ChannelPropertiesProvider;
 import net.stardust.base.model.channel.ChannelStatus;
 import net.stardust.base.model.economy.wallet.PlayerWallet;
@@ -33,7 +32,7 @@ import net.stardust.base.utils.database.crud.RPGPlayerCrud;
 import net.stardust.base.utils.database.crud.UserCrud;
 import net.stardust.base.utils.security.PasswordException;
 
-@BaseCommand(value = "register", types = SenderType.PLAYER)
+@BaseCommand(value = "register", types = Player.class)
 public class RegisterCommand extends AsyncCommand<StardustAuthentication> {
 
     // Lembrar de enviar um email de confirmação para o jogador.
@@ -53,7 +52,7 @@ public class RegisterCommand extends AsyncCommand<StardustAuthentication> {
         walletCrud = new PlayerWalletCrud();
     }
     
-    @CommandEntry(types = SenderType.PLAYER, oneWordFinalString = true)
+    @CommandEntry(oneWordFinalString = true)
     public void register(String email, String password, String confirmPassword) {
         Player player = sender();
     	UUID playerId = uniqueId(player);

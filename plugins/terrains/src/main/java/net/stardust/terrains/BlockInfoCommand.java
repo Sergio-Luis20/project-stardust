@@ -21,13 +21,12 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.DirectCommand;
-import net.stardust.base.command.SenderType;
 import net.stardust.base.model.Identifier;
 import net.stardust.base.model.economy.sign.ShopSign;
 import net.stardust.base.utils.persistence.DataManager;
 import net.stardust.base.utils.plugin.PluginConfig;
 
-@BaseCommand(value = "blockinfo", types = SenderType.PLAYER)
+@BaseCommand(value = "blockinfo", types = Player.class)
 public class BlockInfoCommand extends DirectCommand<TerrainsPlugin> {
 
     private Set<UUID> players = new HashSet<>();

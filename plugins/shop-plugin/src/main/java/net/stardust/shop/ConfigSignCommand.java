@@ -10,13 +10,12 @@ import net.stardust.base.ServerIdentifier;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.DirectCommand;
-import net.stardust.base.command.SenderType;
 import net.stardust.base.model.Identifier;
 import net.stardust.base.model.economy.sign.SignShopData;
 import net.stardust.base.model.economy.wallet.Money;
 import net.stardust.base.model.user.PlayerIdentifier;
 
-@BaseCommand(value = "configsign", types = SenderType.PLAYER)
+@BaseCommand(value = "configsign", types = Player.class)
 public class ConfigSignCommand extends DirectCommand<ShopPlugin> {
 
     public ConfigSignCommand(ShopPlugin plugin) {
