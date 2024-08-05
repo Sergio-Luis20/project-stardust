@@ -208,14 +208,31 @@ public class PlayerWallet extends Wallet implements PlayerIdentifierProvider, St
         return identifier;
     }
 
+    /**
+     * Returns the player.
+     * 
+     * @see PlayerIdentifier#getPlayer()
+     * @return the player
+     */
     public Player getPlayer() {
         return getIdentifier().getPlayer();
     }
 
+    /**
+     * Returns the offline player.
+     * 
+     * @see PlayerIdentifier#getOfflinePlayer()
+     * @return the offline player.
+     */
     public OfflinePlayer getOfflinePlayer() {
         return getIdentifier().getOfflinePlayer();
     }
 
+    /**
+     * Returns the player id.
+     * 
+     * @return the player id
+     */
     public UUID getId() {
         return id;
     }
@@ -227,7 +244,12 @@ public class PlayerWallet extends Wallet implements PlayerIdentifierProvider, St
 
     @Override
     public PlayerWallet clone() {
-        return new PlayerWallet(id, getBronze().getValue(), getSilver().getValue(), getGold().getValue());
+        return new PlayerWallet(
+            id, 
+            getBronze().getValue(), 
+            getSilver().getValue(), 
+            getGold().getValue()
+        );
     }
 
     @Override

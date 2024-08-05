@@ -52,6 +52,31 @@ public final class Stardust {
         return sender instanceof Player player ? new PlayerIdentifier(player) : ServerIdentifier.INSTANCE;
     }
 
+    public static NamespacedKey key(String str) {
+        if (str == null)
+            return null;
+        int len = str.length();
+        if (len == 0 || len >= 256) {
+            throw new IllegalArgumentException("NamespacedKey must have length greater than 0 and smaller than 256");
+        }
+        String namespace, key;
+        if (!str.contains(":")) {
+            namespace = NamespacedKey.MINECRAFT;
+            key = str;
+        } else {
+            String[] split = str.split(":");
+            if (split.length > 2)
+                throw new IllegalArgumentException("The String must be in format 'namespace:key'. String:" + str);
+            namespace = split[0];
+            key = split[1];
+            if (!namespace.matches("[a-z0-9._-]+"))
+                throw new IllegalArgumentException("Invalid namespace. Must be [a-z0-9._-]: " + namespace);
+            if (!key.matches("[a-z0-9/._-]+"))
+                throw new IllegalArgumentException("Invalid key. Must be [a-z0-9/._-]: " + key);
+        }
+        return new NamespacedKey(namespace, key);
+    }
+
     public static <T> void listPageableString(CommandSender sender, int page, Collection<T> elements,
                                         String pageableListKey, Function<T, String> toMessage) {
         listPageableString(sender, page, elements.stream(), pageableListKey, toMessage);

@@ -1,5 +1,7 @@
 package net.stardust.base.model;
 
+import java.io.Serializable;
+
 /**
  * This interface represents an object that can
  * supply an identifier of any kind. This is util
@@ -12,7 +14,7 @@ package net.stardust.base.model;
  * @author Sergio Luis
  */
 @FunctionalInterface
-public interface IdentifierProvider {
+public interface IdentifierProvider<T extends Serializable> {
     
     /**
      * Returns the {@link Identifier} representing
@@ -21,6 +23,6 @@ public interface IdentifierProvider {
      * @see Identifier
      * @return the {@link Identifier} object
      */
-    Identifier<?> getIdentifier();
+    Identifier<T> getIdentifier();
 
 }

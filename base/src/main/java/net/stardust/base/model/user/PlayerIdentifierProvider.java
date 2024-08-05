@@ -1,5 +1,7 @@
 package net.stardust.base.model.user;
 
+import java.util.UUID;
+
 import net.stardust.base.model.IdentifierProvider;
 
 /**
@@ -12,7 +14,7 @@ import net.stardust.base.model.IdentifierProvider;
  * 
  * @author Sergio Luis
  */
-public interface PlayerIdentifierProvider extends IdentifierProvider {
+public interface PlayerIdentifierProvider extends IdentifierProvider<UUID> {
     
     /**
      * Returns the {@link PlayerIdentifier} object.

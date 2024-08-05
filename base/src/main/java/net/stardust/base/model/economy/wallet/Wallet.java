@@ -146,7 +146,7 @@ public class Wallet implements Serializable, Cloneable, Cash {
     }
 
     @Override
-    public Wallet clone() throws CloneNotSupportedException {
+    public Wallet clone() {
         return new Wallet(bronze.getValue(), silver.getValue(), gold.getValue());
     }
 

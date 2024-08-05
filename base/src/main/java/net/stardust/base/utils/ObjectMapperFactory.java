@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 
-import net.stardust.base.utils.persistence.DataManager;
+import net.stardust.base.Stardust;
 
 public final class ObjectMapperFactory {
     
@@ -70,7 +70,7 @@ public final class ObjectMapperFactory {
         @Override
         public NamespacedKey deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
             JsonNode node = p.getCodec().readTree(p);
-            return DataManager.key(node.asText());
+            return Stardust.key(node.asText());
         }
         
     }

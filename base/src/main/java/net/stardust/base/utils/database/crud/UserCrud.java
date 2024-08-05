@@ -22,10 +22,8 @@ public final class UserCrud extends Crud<UUID, User> {
     
     public User byNameOrThrow(String name) {
     	List<User> all = getAll();
-    	int hashCode = name.hashCode();
     	for(User user : all) {
-    		String username = user.getName();
-    		if(hashCode == username.hashCode() && name.equals(username)) {
+    		if(name.equals(user.getName())) {
     			return user;
     		}
     	}

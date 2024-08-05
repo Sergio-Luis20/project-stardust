@@ -34,7 +34,7 @@ public class PlayerIdentifier implements Identifier<UUID>, Comparable<PlayerIden
     private transient OfflinePlayer offlinePlayer;
 
     /**
-     * Constructs a new PlayerIdentifier based on a {@link UUID}.
+     * Constructs a new PlayerIdentifier based on an {@link UUID}.
      * If the id parameter does not represent a {@link Player} unique
      * id, such as returned by {@link Player#getUniqueId()}, then
      * this class will not work properly.
