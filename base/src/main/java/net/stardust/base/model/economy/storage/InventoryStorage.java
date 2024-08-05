@@ -1,5 +1,6 @@
 package net.stardust.base.model.economy.storage;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.bukkit.Material;
@@ -49,10 +50,10 @@ public class InventoryStorage implements Storage {
         }
         return false;
     }
-
+    
     @Override
-    public int remainingCapacity() {
-        return InventoryUtils.getEmptyStorageSlots(inventory).size();
+    public boolean canStore(List<ItemStack> items) {
+        return InventoryUtils.canStoreAllItems(inventory, items.toArray(ItemStack[]::new));
     }
     
 }

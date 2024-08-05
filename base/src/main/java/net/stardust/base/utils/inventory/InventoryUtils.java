@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class InventoryUtils {
-
+    
     public static final int DEFAULT_INVENTORY_SIZE = sizeForRows(6);
     
     private InventoryUtils() {}

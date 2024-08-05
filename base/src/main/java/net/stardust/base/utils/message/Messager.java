@@ -21,6 +21,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.BiConsumer;
 
+/**
+ * Utility class for sending messages in a thread-safe context, that is,
+ * in Bukkit Main thread. It consists in two methods: "message" and "messageAndWait"
+ * with various overloads. The first just sends the message in Bukkit Main thread,
+ * the second does that and also blocks until the messaging process is done.
+ * 
+ * @author Sergio Luis
+ */
 @Getter
 @EqualsAndHashCode
 @RequiredArgsConstructor

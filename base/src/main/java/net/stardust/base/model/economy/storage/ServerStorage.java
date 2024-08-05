@@ -3,6 +3,7 @@ package net.stardust.base.model.economy.storage;
 import java.io.ObjectStreamException;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 import org.bukkit.inventory.ItemStack;
 
@@ -10,13 +11,18 @@ import org.bukkit.inventory.ItemStack;
  * The server storage doesn't store anything. It is a phantom
  * object since the server generates items automatically.
  * 
+ * @see Storage
  * @author Sergio Luis
  */
 public class ServerStorage implements Storage, Serializable {
 
+    /**
+     * The singleton {@link ServerStorage} instance.
+     */
     public static final ServerStorage INSTANCE = new ServerStorage();
 
-    private ServerStorage() {}
+    private ServerStorage() {
+    }
 
     @Override
     public boolean addItem(ItemStack item) {
@@ -34,8 +40,8 @@ public class ServerStorage implements Storage, Serializable {
     }
 
     @Override
-    public int remainingCapacity() {
-        return -1;
+    public boolean canStore(List<ItemStack> items) {
+        return true;
     }
 
     @Serial

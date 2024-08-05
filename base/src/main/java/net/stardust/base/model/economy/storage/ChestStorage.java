@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -38,8 +39,8 @@ public class ChestStorage implements Storage, Serializable {
     }
 
     @Override
-    public int remainingCapacity() {
-        return child.remainingCapacity();
+    public boolean canStore(List<ItemStack> items) {
+        return child.canStore(items);
     }
 
     @Serial

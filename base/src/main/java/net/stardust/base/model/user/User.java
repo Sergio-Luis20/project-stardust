@@ -23,7 +23,7 @@ import net.stardust.base.utils.security.PasswordException;
 @BaseEntity(UUID.class)
 @Entity
 @Table(name = "users")
-public class User implements StardustEntity<UUID>, Cloneable {
+public class User implements StardustEntity<UUID>, Cloneable, PlayerIdentifierProvider {
     
     @Id
     private UUID id;
@@ -73,6 +73,11 @@ public class User implements StardustEntity<UUID>, Cloneable {
     @Override
     public UUID getEntityId() {
         return id;
+    }
+
+    @Override
+    public PlayerIdentifier getIdentifier() {
+        return new PlayerIdentifier(id);
     }
 
 }
