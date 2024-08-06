@@ -69,12 +69,12 @@ public class MinigameShop extends WorldListener {
 
     public static MinigameShop newShop(Minigame parent, boolean preMatchOnly, Component inventoryTitle,
                                        int inventorySize, Map<Integer, ItemStack> items) {
-        inventorySize = Ranges.rangeInclusive(inventorySize, 9, 9 * 6, "inventorySize");
+        inventorySize = Ranges.rangeBITI(inventorySize, 9, 9 * 6, "inventorySize");
         if(inventorySize % 9 != 0) {
             throw new IllegalArgumentException("inventorySize must be a multiple of 9");
         }
         for(Entry<Integer, ItemStack> entry : Objects.requireNonNull(items, "items").entrySet()) {
-            Ranges.rangeInclusive(Objects.requireNonNull(entry.getKey(),
+            Ranges.rangeBITI(Objects.requireNonNull(entry.getKey(),
                     "index in map items"), 0 , inventorySize - 1, "index in map items");
             Objects.requireNonNull(entry.getValue(), "value in map items");
         }

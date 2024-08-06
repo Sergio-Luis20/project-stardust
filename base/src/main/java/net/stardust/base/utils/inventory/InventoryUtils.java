@@ -58,7 +58,7 @@ public final class InventoryUtils {
     }
 
     public static int sizeForRows(int rows) {
-        return 9 * Ranges.rangeInclusive(rows, 1, 6, "rows");
+        return 9 * Ranges.rangeBETI(rows, 0, 6, "rows");
     }
 
 }
