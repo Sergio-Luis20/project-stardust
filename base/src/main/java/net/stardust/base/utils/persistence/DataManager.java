@@ -11,8 +11,10 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -40,8 +42,14 @@ import net.stardust.base.utils.Throwables;
  * to avoid lacks of integrity; always use this class.
  * </p>
  * 
- * This class itself implements {@link PersistentDataHolder}; use this feature
- * with care.
+ * <p>
+ * This class is not thread-safe.
+ * </p>
+ * 
+ * Also this class itself implements {@link PersistentDataHolder}; use this
+ * feature with care. The implementation of
+ * {@link #getPersistentDataContainer()} just returns the
+ * {@link PersistentDataContainer} of the wrapped holder.
  * 
  * @see PersistentDataHolder
  * @see PersistentDataContainer
@@ -154,6 +162,60 @@ public class DataManager<T extends PersistentDataHolder> implements PersistentDa
      */
     public Set<String> getKeysAsString() {
         return getKeys().stream().map(NamespacedKey::asString).collect(Collectors.toSet());
+    }
+
+    /**
+     * Reads all objects inside the container and maps them to their
+     * respective keys.
+     * 
+     * @implNote This method internally calls {@link #readObject(NamespacedKey)} for
+     *           every key returned by {@link #getKeys()}, so if you are working
+     *           with many objects
+     *           and/or the objects are big in data, this can perform really bad.
+     * 
+     * @see #readObject(NamespacedKey)
+     * @return the map of all key-object entries inside the container
+     * @throws ClassNotFoundException            if a class of some deserialized
+     *                                           object
+     *                                           was not found
+     * @throws PersistenceSerializationException if an {@link IOException} occurs
+     *                                           during the deserialization of any
+     *                                           object. The {@link IOException}
+     *                                           will be
+     *                                           the cause of the thrown
+     *                                           {@link PersistenceSerializationException}.
+     */
+    public Map<NamespacedKey, Object> getContent() {
+        Map<NamespacedKey, Object> content = new HashMap<>();
+        for (NamespacedKey key : getKeys()) {
+            content.put(key, readObject(key));
+        }
+        return content;
+    }
+
+    /**
+     * Works the same way as {@link #getContent()}, but transforming every
+     * {@link NamespacedKey} in the map to its String form returned by
+     * {@link NamespacedKey#asString()}.
+     * 
+     * @see NamespacedKey#asString()
+     * @see #getContent()
+     * @return the map of all key-object entries inside the container
+     * @throws ClassNotFoundException            if a class of some deserialized
+     *                                           object
+     *                                           was not found
+     * @throws PersistenceSerializationException if an {@link IOException} occurs
+     *                                           during the deserialization of any
+     *                                           object. The {@link IOException}
+     *                                           will be
+     *                                           the cause of the thrown
+     *                                           {@link PersistenceSerializationException}.
+     */
+    public Map<String, Object> getContentAsString() {
+        Map<NamespacedKey, Object> content = getContent();
+        Map<String, Object> stringContent = new HashMap<>();
+        content.forEach((nsk, obj) -> stringContent.put(nsk.asString(), obj));
+        return stringContent;
     }
 
     /**

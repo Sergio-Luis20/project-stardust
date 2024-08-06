@@ -17,8 +17,8 @@ import lombok.EqualsAndHashCode;
 import lombok.EqualsAndHashCode.Exclude;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import net.stardust.base.database.BaseEntity;
 import net.stardust.base.model.StardustEntity;
-import net.stardust.base.utils.database.BaseEntity;
 
 @Getter
 @EqualsAndHashCode

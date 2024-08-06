@@ -12,10 +12,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.EqualsAndHashCode;
+import net.stardust.base.database.BaseEntity;
 import net.stardust.base.model.StardustEntity;
 import net.stardust.base.model.user.PlayerIdentifier;
 import net.stardust.base.model.user.PlayerIdentifierProvider;
-import net.stardust.base.utils.database.BaseEntity;
 
 /**
  * This class represents the wallet of a player in Stardust server.

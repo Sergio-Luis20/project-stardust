@@ -8,10 +8,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.entity.Player;
 
 import net.stardust.base.Communicable;
+import net.stardust.base.database.crud.ChannelStatusCrud;
 import net.stardust.base.model.channel.ChannelStatus;
 import net.stardust.base.model.channel.Global;
 import net.stardust.base.utils.StardustThreads;
-import net.stardust.base.utils.database.crud.ChannelStatusCrud;
 
 public class GlobalActivation implements ChannelInventoryActivationClickHandler, Communicable {
 

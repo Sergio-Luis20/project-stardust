@@ -1,4 +1,4 @@
-package net.stardust.base.utils.database;
+package net.stardust.base.database;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

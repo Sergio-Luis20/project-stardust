@@ -5,13 +5,13 @@ import java.util.UUID;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import net.stardust.base.database.NotFoundException;
+import net.stardust.base.database.crud.Crud;
+import net.stardust.base.database.crud.PlayerWalletCrud;
 import net.stardust.base.model.economy.transaction.Transaction;
 import net.stardust.base.model.economy.wallet.PlayerWallet;
 import net.stardust.base.model.economy.wallet.Wallet;
 import net.stardust.base.model.user.PlayerIdentifier;
-import net.stardust.base.utils.database.NotFoundException;
-import net.stardust.base.utils.database.crud.Crud;
-import net.stardust.base.utils.database.crud.PlayerWalletCrud;
 import net.stardust.base.utils.message.PlayerMessageable;
 
 /**

@@ -6,8 +6,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 
+import net.stardust.base.database.lang.Translation;
 import net.stardust.base.events.BaseListener;
-import net.stardust.base.utils.database.lang.Translation;
 
 @BaseListener
 public class NoNicksAllowed implements Listener {

@@ -11,8 +11,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.stardust.base.database.lang.Translation;
 import net.stardust.base.model.economy.MonetaryEntity;
-import net.stardust.base.utils.database.lang.Translation;
 
 /**
  * Enum of all currencies allowed in Stardust server economy system.

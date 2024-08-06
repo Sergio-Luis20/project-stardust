@@ -11,8 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import net.stardust.base.database.BaseEntity;
 import net.stardust.base.model.StardustEntity;
-import net.stardust.base.utils.database.BaseEntity;
 import net.stardust.base.utils.security.PasswordEncryption;
 import net.stardust.base.utils.security.PasswordException;
 

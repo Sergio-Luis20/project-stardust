@@ -22,6 +22,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.VirtualCommand;
+import net.stardust.base.database.crud.PlayerWalletCrud;
+import net.stardust.base.database.crud.UserCrud;
+import net.stardust.base.database.lang.Translation;
 import net.stardust.base.model.economy.PlayerCash;
 import net.stardust.base.model.economy.transaction.Negotiators;
 import net.stardust.base.model.economy.transaction.Transaction;
@@ -38,9 +41,6 @@ import net.stardust.base.model.user.User;
 import net.stardust.base.utils.AutomaticMessages;
 import net.stardust.base.utils.StardustThreads;
 import net.stardust.base.utils.Throwables;
-import net.stardust.base.utils.database.crud.PlayerWalletCrud;
-import net.stardust.base.utils.database.crud.UserCrud;
-import net.stardust.base.utils.database.lang.Translation;
 
 @BaseCommand("money")
 public class MoneyCommand extends VirtualCommand<GeneralCommandsPlugin> {
@@ -222,7 +222,7 @@ public class MoneyCommand extends VirtualCommand<GeneralCommandsPlugin> {
 		try {
 			operation.execute(transaction);
 		} catch (OperationFailedException e) {
-			if (MoneyNode.class.isAssignableFrom(e.getFailedOperation())) {
+			if (e.getFailedOperation() instanceof MoneyNode) {
 				messager.message(sender, translatable("money.dont-have-enough", NamedTextColor.RED));
 			} else {
 				messager.message(sender, e.getDefaultFailMessage(true));

@@ -1,4 +1,4 @@
-package net.stardust.repository;
+package net.stardust.base.database;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -27,6 +27,9 @@ import org.mockito.MockitoAnnotations;
 
 import br.sergio.utils.math.Point;
 import jakarta.persistence.EntityManagerFactory;
+import net.stardust.base.BasePlugin;
+import net.stardust.base.database.Repository.SaveResult;
+import net.stardust.base.database.repositories.JpaRepository;
 import net.stardust.base.model.gameplay.Rank;
 import net.stardust.base.model.rpg.Level;
 import net.stardust.base.model.rpg.LevelFunctions;
@@ -37,13 +40,11 @@ import net.stardust.base.model.rpg.RPGPlayer;
 import net.stardust.base.model.rpg.Skill;
 import net.stardust.base.model.user.User;
 import net.stardust.base.utils.security.PasswordException;
-import net.stardust.repository.Repository.SaveResult;
-import net.stardust.repository.repositories.JpaRepository;
 
 public class JpaRepositoryTest {
 
     @Mock
-    private RepositoryPlugin plugin;
+    private BasePlugin plugin;
 
     @Mock
     private Logger logger;
@@ -60,11 +61,11 @@ public class JpaRepositoryTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        entityManagerFactory = JPA.inMemory(RepositoryPlugin.buildReflections());
+        entityManagerFactory = JPA.inMemory();
 
         when(plugin.getEntityManagerFactory()).thenReturn(entityManagerFactory);
         when(plugin.getLogger()).thenReturn(logger);
-        when(plugin.getId()).thenReturn(RepositoryPlugin.class.getSimpleName());
+        when(plugin.getId()).thenReturn(BasePlugin.class.getSimpleName());
 
         userRepository = new JpaRepository<>(plugin, UUID.class, User.class);
 

@@ -22,9 +22,9 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import net.stardust.base.database.BaseEntity;
 import net.stardust.base.model.StardustEntity;
 import net.stardust.base.model.gameplay.Rank;
-import net.stardust.base.utils.database.BaseEntity;
 
 @Getter
 @Builder

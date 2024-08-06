@@ -1,10 +1,16 @@
 package net.stardust.base.utils;
 
-import net.stardust.base.BasePlugin;
-import net.stardust.base.utils.plugin.PluginConfig;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+
 import org.bukkit.Bukkit;
 
-import java.util.concurrent.*;
+import net.stardust.base.BasePlugin;
+import net.stardust.base.utils.plugin.PluginConfig;
 
 public final class StardustThreads {
     
@@ -53,18 +59,17 @@ public final class StardustThreads {
 	}
     
     public static <T> T call(BasePlugin plugin, Callable<T> callable) {
-    	String id = plugin.getId();
     	if(Bukkit.isPrimaryThread()) {
     		try {
 				return callable.call();
 			} catch(Exception e) {
-				Throwables.sendAndThrow(id, e);
+				Throwables.sendAndThrow(plugin.getId(), e);
 			}
     	} else {
     		try {
 				return Bukkit.getScheduler().callSyncMethod(plugin, callable).get();
 			} catch(InterruptedException | ExecutionException e) {
-				Throwables.sendAndThrow(id, e);
+				Throwables.sendAndThrow(plugin.getId(), e);
 			}
     	}
     	return null;

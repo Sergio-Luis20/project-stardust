@@ -37,13 +37,13 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.stardust.base.BasePlugin;
+import net.stardust.base.database.crud.ChannelStatusCrud;
 import net.stardust.base.model.channel.Ad;
 import net.stardust.base.model.channel.Channel;
 import net.stardust.base.model.channel.ChannelStatus;
 import net.stardust.base.model.channel.Global;
 import net.stardust.base.utils.StardustThreads;
 import net.stardust.base.utils.Throwables;
-import net.stardust.base.utils.database.crud.ChannelStatusCrud;
 
 public class ChannelsPlugin extends BasePlugin implements Listener, RequestMapper {
 

@@ -1,4 +1,4 @@
-package net.stardust.repository;
+package net.stardust.base.database;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,17 +7,18 @@ import java.util.logging.Level;
 import br.sergio.comlib.MethodAdapter;
 import br.sergio.comlib.ResponseData;
 import br.sergio.comlib.ResponseStatus;
+import net.stardust.base.BasePlugin;
 import net.stardust.base.model.StardustEntity;
 import net.stardust.base.utils.Throwables;
 
 public class RepositoryController<K, V extends StardustEntity<K>> extends MethodAdapter {
 
-	private RepositoryPlugin plugin;
+	private BasePlugin plugin;
 	private Repository<K, V> repository;
 	private Class<K> keyClass;
 	private Class<V> valueClass;
 
-	public RepositoryController(RepositoryPlugin plugin, Repository<K, V> repository) {
+	public RepositoryController(BasePlugin plugin, Repository<K, V> repository) {
 		this.plugin = plugin;
 		this.repository = repository;
 

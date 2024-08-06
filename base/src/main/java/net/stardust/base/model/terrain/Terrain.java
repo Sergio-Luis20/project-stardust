@@ -14,8 +14,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import net.stardust.base.database.BaseEntity;
 import net.stardust.base.model.StardustEntity;
-import net.stardust.base.utils.database.BaseEntity;
 
 @Getter
 @EqualsAndHashCode

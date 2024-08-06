@@ -1,4 +1,4 @@
-package net.stardust.base.utils.database.lang;
+package net.stardust.base.database.lang;
 
 import lombok.experimental.StandardException;
 

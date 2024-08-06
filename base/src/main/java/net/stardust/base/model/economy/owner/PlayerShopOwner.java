@@ -10,10 +10,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import net.stardust.base.database.BaseEntity;
 import net.stardust.base.model.StardustEntity;
 import net.stardust.base.model.economy.shop.PlayerShop;
 import net.stardust.base.model.economy.shop.Shop;
-import net.stardust.base.utils.database.BaseEntity;
 
 @BaseEntity(UUID.class)
 public class PlayerShopOwner implements ShopOwner, StardustEntity<UUID> {

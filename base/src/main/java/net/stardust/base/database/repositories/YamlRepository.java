@@ -1,4 +1,4 @@
-package net.stardust.repository.repositories;
+package net.stardust.base.database.repositories;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,16 +9,16 @@ import java.util.logging.Level;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
+import net.stardust.base.BasePlugin;
 import net.stardust.base.model.StardustEntity;
 import net.stardust.base.utils.ObjectMapperFactory;
 import net.stardust.base.utils.Throwables;
-import net.stardust.repository.RepositoryPlugin;
 
 public class YamlRepository<K, V extends StardustEntity<K>> extends FileRepository<K, V> {
 
 	private ObjectMapper mapper;
 
-	public YamlRepository(RepositoryPlugin plugin, Class<K> keyClass, Class<V> valueClass) {
+	public YamlRepository(BasePlugin plugin, Class<K> keyClass, Class<V> valueClass) {
 		super(plugin, keyClass, valueClass);
 		mapper = ObjectMapperFactory.yaml();
 	}

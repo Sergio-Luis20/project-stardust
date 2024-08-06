@@ -26,11 +26,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.BasePlugin;
+import net.stardust.base.database.crud.UserCrud;
+import net.stardust.base.database.lang.Translation;
 import net.stardust.base.events.BaseListener;
 import net.stardust.base.model.user.User;
 import net.stardust.base.utils.StardustThreads;
-import net.stardust.base.utils.database.crud.UserCrud;
-import net.stardust.base.utils.database.lang.Translation;
 
 @BaseListener
 public class StardustAuthentication extends BasePlugin implements Listener {

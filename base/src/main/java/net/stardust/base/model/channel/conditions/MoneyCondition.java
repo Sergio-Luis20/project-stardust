@@ -7,10 +7,10 @@ import org.bukkit.entity.Player;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.stardust.base.database.crud.PlayerWalletCrud;
 import net.stardust.base.model.channel.ChannelCondition;
 import net.stardust.base.model.economy.wallet.Money;
 import net.stardust.base.model.economy.wallet.PlayerWallet;
-import net.stardust.base.utils.database.crud.PlayerWalletCrud;
 
 public class MoneyCondition implements ChannelCondition {
 

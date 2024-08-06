@@ -1,4 +1,4 @@
-package net.stardust.repository.repositories;
+package net.stardust.base.database.repositories;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,24 +7,24 @@ import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.stardust.base.BasePlugin;
 import net.stardust.base.Communicable;
+import net.stardust.base.database.Repository;
 import net.stardust.base.model.StardustEntity;
 import net.stardust.base.utils.Throwables;
-import net.stardust.repository.Repository;
-import net.stardust.repository.RepositoryPlugin;
 
 public abstract class MapRepository<K, V extends StardustEntity<K>> implements Repository<K, V>, Communicable {
 
     protected Logger log;
     protected ExecutorService flusher;
-    protected RepositoryPlugin plugin;
+    protected BasePlugin plugin;
 
     private Class<K> keyClass;
     private Class<V> valueClass;
     private String id;
-    private Map<K, V> elements;
+    private Map<K, V> cache;
 
-    public MapRepository(RepositoryPlugin plugin, Class<K> keyClass, Class<V> valueClass) {
+    public MapRepository(BasePlugin plugin, Class<K> keyClass, Class<V> valueClass) {
         this.plugin = plugin;
         this.keyClass = keyClass;
         this.valueClass = valueClass;
@@ -33,7 +33,7 @@ public abstract class MapRepository<K, V extends StardustEntity<K>> implements R
         flusher = plugin.getVirtual();
         id = plugin.getId() + "/" + valueClass.getSimpleName();
 
-        elements = initializeElements();
+        cache = initializeElements();
     }
     
     protected abstract void doFlush(Map<K, V> elements);
@@ -42,31 +42,31 @@ public abstract class MapRepository<K, V extends StardustEntity<K>> implements R
 
     @Override
     public List<V> findAll() {
-        synchronized (elements) {
-            return new ArrayList<>(elements.values());
+        synchronized (cache) {
+            return new ArrayList<>(cache.values());
         }
     }
 
     @Override
     public List<V> findAll(List<K> list) {
-        synchronized (elements) {
+        synchronized (cache) {
             List<V> resultList = new ArrayList<>(list.size());
-            list.forEach(key -> resultList.add(elements.get(key)));
+            list.forEach(key -> resultList.add(cache.get(key)));
             return resultList;
         }
     }
 
     @Override
     public V findById(K id) {
-        synchronized (elements) {
-            return elements.get(id);
+        synchronized (cache) {
+            return cache.get(id);
         }
     }
 
     @Override
     public boolean existsById(K id) {
-        synchronized (elements) {
-            return elements.containsKey(id);
+        synchronized (cache) {
+            return cache.containsKey(id);
         }
     }
 
@@ -75,8 +75,8 @@ public abstract class MapRepository<K, V extends StardustEntity<K>> implements R
         K key = data.getEntityId();
         if (update || !existsById(key)) {
             try {
-                synchronized (elements) {
-                    elements.put(key, data);
+                synchronized (cache) {
+                    cache.put(key, data);
                 }
             } catch (Exception e) {
                 log.log(Level.SEVERE,
@@ -101,8 +101,8 @@ public abstract class MapRepository<K, V extends StardustEntity<K>> implements R
             K key = keys.get(i);
             if (update || !existsById(key)) {
                 try {
-                    synchronized (elements) {
-                        elements.put(key, list.get(i));
+                    synchronized (cache) {
+                        cache.put(key, list.get(i));
                     }
                 } catch (Exception e) {
                     log.log(Level.SEVERE,
@@ -123,8 +123,8 @@ public abstract class MapRepository<K, V extends StardustEntity<K>> implements R
     @Override
     public boolean delete(K id) {
         try {
-            synchronized (elements) {
-                elements.remove(id);
+            synchronized (cache) {
+                cache.remove(id);
             }
             flush();
             return true;
@@ -141,8 +141,8 @@ public abstract class MapRepository<K, V extends StardustEntity<K>> implements R
     @Override
     public boolean deleteAll(List<K> list) {
         try {
-            synchronized (elements) {
-                list.forEach(this.elements::remove);
+            synchronized (cache) {
+                list.forEach(this.cache::remove);
             }
             flush();
             return true;
@@ -173,10 +173,10 @@ public abstract class MapRepository<K, V extends StardustEntity<K>> implements R
     }
 
     public void flush() {
-        flusher.submit(() -> doFlush(elements));
+        flusher.submit(() -> doFlush(cache));
     }
 
-    public RepositoryPlugin getPlugin() {
+    public BasePlugin getPlugin() {
         return plugin;
     }
 

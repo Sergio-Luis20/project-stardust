@@ -1,10 +1,10 @@
-package net.stardust.base.utils.database.crud;
+package net.stardust.base.database.crud;
 
 import java.util.List;
 import java.util.UUID;
 
+import net.stardust.base.database.NotFoundException;
 import net.stardust.base.model.user.User;
-import net.stardust.base.utils.database.NotFoundException;
 
 public final class UserCrud extends Crud<UUID, User> {
 

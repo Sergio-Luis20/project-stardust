@@ -16,11 +16,11 @@ import net.stardust.authentication.StardustAuthentication;
 import net.stardust.base.command.AsyncCommand;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
+import net.stardust.base.database.crud.ChannelStatusCrud;
+import net.stardust.base.database.crud.UserCrud;
 import net.stardust.base.model.channel.ChannelStatus;
 import net.stardust.base.model.user.User;
 import net.stardust.base.utils.Throwables;
-import net.stardust.base.utils.database.crud.ChannelStatusCrud;
-import net.stardust.base.utils.database.crud.UserCrud;
 import net.stardust.base.utils.security.PasswordEncryption;
 
 @BaseCommand(value = "login", types = Player.class)

@@ -11,9 +11,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import lombok.NoArgsConstructor;
+import net.stardust.base.database.BinaryConverter;
+import net.stardust.base.database.lang.Translation;
 import net.stardust.base.model.Nameable;
-import net.stardust.base.utils.database.BinaryConverter;
-import net.stardust.base.utils.database.lang.Translation;
 
 @NoArgsConstructor
 @Entity

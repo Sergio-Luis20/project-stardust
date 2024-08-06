@@ -1,4 +1,4 @@
-package net.stardust.base.utils.database.crud;
+package net.stardust.base.database.crud;
 
 import java.math.BigInteger;
 import java.util.UUID;

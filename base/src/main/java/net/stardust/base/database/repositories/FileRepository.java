@@ -1,4 +1,4 @@
-package net.stardust.repository.repositories;
+package net.stardust.base.database.repositories;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,16 +8,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import net.stardust.base.BasePlugin;
 import net.stardust.base.model.StardustEntity;
 import net.stardust.base.utils.Serializer;
 import net.stardust.base.utils.Throwables;
-import net.stardust.repository.RepositoryPlugin;
 
 public class FileRepository<K, V extends StardustEntity<K>> extends MapRepository<K, V> {
 
     private File file;
 
-    public FileRepository(RepositoryPlugin plugin, Class<K> keyClass, Class<V> valueClass) {
+    public FileRepository(BasePlugin plugin, Class<K> keyClass, Class<V> valueClass) {
         super(plugin, keyClass, valueClass);
     }
 

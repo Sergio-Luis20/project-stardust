@@ -1,4 +1,4 @@
-package net.stardust.base.utils.database.lang;
+package net.stardust.base.database.lang;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;

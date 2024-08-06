@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import net.stardust.base.utils.database.BaseEntity;
+import net.stardust.base.database.BaseEntity;
 
 /**
  * Represents a database entity of Stardust server.

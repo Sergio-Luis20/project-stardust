@@ -1,4 +1,4 @@
-package net.stardust.base.utils.database;
+package net.stardust.base.database;
 
 public class NotFoundException extends RuntimeException {
 	

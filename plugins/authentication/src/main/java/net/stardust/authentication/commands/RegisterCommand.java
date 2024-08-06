@@ -20,16 +20,16 @@ import net.stardust.authentication.StardustAuthentication;
 import net.stardust.base.command.AsyncCommand;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
+import net.stardust.base.database.crud.ChannelStatusCrud;
+import net.stardust.base.database.crud.PlayerWalletCrud;
+import net.stardust.base.database.crud.RPGPlayerCrud;
+import net.stardust.base.database.crud.UserCrud;
 import net.stardust.base.model.channel.ChannelPropertiesProvider;
 import net.stardust.base.model.channel.ChannelStatus;
 import net.stardust.base.model.economy.wallet.PlayerWallet;
 import net.stardust.base.model.rpg.RPGPlayer;
 import net.stardust.base.model.user.User;
 import net.stardust.base.utils.Throwables;
-import net.stardust.base.utils.database.crud.ChannelStatusCrud;
-import net.stardust.base.utils.database.crud.PlayerWalletCrud;
-import net.stardust.base.utils.database.crud.RPGPlayerCrud;
-import net.stardust.base.utils.database.crud.UserCrud;
 import net.stardust.base.utils.security.PasswordException;
 
 @BaseCommand(value = "register", types = Player.class)

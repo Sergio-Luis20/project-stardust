@@ -14,14 +14,14 @@ import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.Communicable;
+import net.stardust.base.database.crud.ChannelStatusCrud;
+import net.stardust.base.database.crud.PlayerWalletCrud;
 import net.stardust.base.model.channel.Ad;
 import net.stardust.base.model.channel.ChannelStatus;
 import net.stardust.base.model.economy.wallet.Currency;
 import net.stardust.base.model.economy.wallet.Money;
 import net.stardust.base.model.economy.wallet.PlayerWallet;
 import net.stardust.base.utils.StardustThreads;
-import net.stardust.base.utils.database.crud.ChannelStatusCrud;
-import net.stardust.base.utils.database.crud.PlayerWalletCrud;
 import net.stardust.base.utils.message.Messager;
 
 public class AdActivation implements ChannelInventoryActivationClickHandler, Communicable {

@@ -1,4 +1,4 @@
-package net.stardust.repository.repositories;
+package net.stardust.base.database.repositories;
 
 import java.util.List;
 import java.util.Objects;
@@ -7,11 +7,11 @@ import java.util.logging.Logger;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceException;
+import net.stardust.base.BasePlugin;
 import net.stardust.base.Communicable;
+import net.stardust.base.database.Repository;
 import net.stardust.base.model.StardustEntity;
 import net.stardust.base.utils.Throwables;
-import net.stardust.repository.Repository;
-import net.stardust.repository.RepositoryPlugin;
 
 public class JpaRepository<K, V extends StardustEntity<K>> implements Repository<K, V>, Communicable {
     
@@ -21,7 +21,7 @@ public class JpaRepository<K, V extends StardustEntity<K>> implements Repository
     private EntityManager entityManager;
     private Logger log;
 
-    public JpaRepository(RepositoryPlugin plugin, Class<K> keyClass, Class<V> valueClass) {
+    public JpaRepository(BasePlugin plugin, Class<K> keyClass, Class<V> valueClass) {
         this.keyClass = Objects.requireNonNull(keyClass, "keyClass");
         this.valueClass = Objects.requireNonNull(valueClass, "valueClass");
         id = plugin.getId() + "/" + valueClass.getSimpleName();

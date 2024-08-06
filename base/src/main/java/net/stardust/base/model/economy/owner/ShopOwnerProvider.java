@@ -1,10 +1,10 @@
 package net.stardust.base.model.economy.owner;
 
 import net.stardust.base.ServerIdentifier;
+import net.stardust.base.database.crud.PlayerShopOwnerCrud;
 import net.stardust.base.model.Identifier;
 import net.stardust.base.model.IllegalIdentifierException;
 import net.stardust.base.model.user.PlayerIdentifier;
-import net.stardust.base.utils.database.crud.PlayerShopOwnerCrud;
 
 public final class ShopOwnerProvider {
     

@@ -3,6 +3,7 @@ package net.stardust.base.model.economy.transaction.operation;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.stardust.base.database.crud.PlayerWalletCrud;
 import net.stardust.base.model.economy.Cash;
 import net.stardust.base.model.economy.storage.Storage;
 import net.stardust.base.model.economy.transaction.ItemNegotiators;
@@ -10,7 +11,6 @@ import net.stardust.base.model.economy.transaction.ItemTransaction;
 import net.stardust.base.model.economy.transaction.Transaction;
 import net.stardust.base.model.economy.wallet.PlayerWallet;
 import net.stardust.base.model.economy.wallet.Wallet;
-import net.stardust.base.utils.database.crud.PlayerWalletCrud;
 
 /**
  * <p>This operation transfers the money being negotiated

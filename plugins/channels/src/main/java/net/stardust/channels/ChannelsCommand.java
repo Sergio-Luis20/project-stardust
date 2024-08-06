@@ -31,13 +31,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.VirtualCommand;
+import net.stardust.base.database.crud.ChannelStatusCrud;
 import net.stardust.base.model.channel.Channel;
 import net.stardust.base.model.channel.ChannelStatus;
 import net.stardust.base.model.inventory.PseudoInventory;
 import net.stardust.base.utils.ObjectMapperFactory;
 import net.stardust.base.utils.StardustThreads;
 import net.stardust.base.utils.Throwables;
-import net.stardust.base.utils.database.crud.ChannelStatusCrud;
 import net.stardust.base.utils.plugin.PluginConfig;
 
 @BaseCommand("channels")

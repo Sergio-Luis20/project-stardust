@@ -3,7 +3,7 @@ package net.stardust.base.model;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import net.stardust.base.utils.database.lang.Translation;
+import net.stardust.base.database.lang.Translation;
 
 /**
  * This interface defines everything that can have a "name" and

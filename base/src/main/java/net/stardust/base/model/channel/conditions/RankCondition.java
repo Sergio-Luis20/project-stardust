@@ -5,10 +5,10 @@ import org.bukkit.entity.Player;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.stardust.base.database.crud.RPGPlayerCrud;
 import net.stardust.base.model.channel.ChannelCondition;
 import net.stardust.base.model.gameplay.Rank;
 import net.stardust.base.model.rpg.RPGPlayer;
-import net.stardust.base.utils.database.crud.RPGPlayerCrud;
 
 public class RankCondition implements ChannelCondition {
 

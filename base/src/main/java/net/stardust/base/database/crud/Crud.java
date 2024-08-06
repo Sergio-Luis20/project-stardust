@@ -1,4 +1,4 @@
-package net.stardust.base.utils.database.crud;
+package net.stardust.base.database.crud;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -12,7 +12,7 @@ import br.sergio.comlib.RequestMethod;
 import br.sergio.comlib.Response;
 import br.sergio.comlib.ResponseStatus;
 import net.stardust.base.Communicable;
-import net.stardust.base.utils.database.NotFoundException;
+import net.stardust.base.database.NotFoundException;
 
 public class Crud<T extends Serializable, U extends Serializable> implements Communicable {
 

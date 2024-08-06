@@ -17,14 +17,14 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.VirtualCommand;
+import net.stardust.base.database.crud.MinigameDataCrud;
+import net.stardust.base.database.crud.UserCrud;
+import net.stardust.base.database.lang.Translation;
 import net.stardust.base.model.minigame.MinigameData;
 import net.stardust.base.model.minigame.MinigamePlayer;
 import net.stardust.base.model.user.User;
 import net.stardust.base.utils.AutomaticMessages;
 import net.stardust.base.utils.StardustThreads;
-import net.stardust.base.utils.database.crud.MinigameDataCrud;
-import net.stardust.base.utils.database.crud.UserCrud;
-import net.stardust.base.utils.database.lang.Translation;
 import net.stardust.minigames.MinigamesPlugin;
 
 @BaseCommand("mgdata")

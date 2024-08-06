@@ -6,36 +6,32 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.reflections.Reflections;
-import org.reflections.scanners.Scanners;
-import org.reflections.util.ConfigurationBuilder;
-
 import br.sergio.comlib.Communication;
 import br.sergio.comlib.ConnectionException;
 import br.sergio.comlib.MethodMapper;
 import br.sergio.comlib.RequestListener;
 import jakarta.persistence.EntityManagerFactory;
-import lombok.Getter;
 import net.stardust.base.BasePlugin;
+import net.stardust.base.database.BaseEntity;
+import net.stardust.base.database.JPA;
+import net.stardust.base.database.Repository;
+import net.stardust.base.database.RepositoryController;
+import net.stardust.base.database.RepositoryException;
+import net.stardust.base.database.RepositoryFactory;
+import net.stardust.base.database.crud.Crud;
 import net.stardust.base.model.StardustEntity;
 import net.stardust.base.utils.Throwables;
-import net.stardust.base.utils.database.BaseEntity;
-import net.stardust.base.utils.database.crud.Crud;
 
 public class RepositoryPlugin extends BasePlugin {
 
 	public static final String ENTITIES_PACKAGE = "net.stardust.base.model";
 	
-	@Getter
-	private EntityManagerFactory entityManagerFactory;
 	private List<RequestListener> requestListeners;
 	private List<Repository<?, ?>> repositories;
-	private Reflections reflections;
 
 	@Override
 	public void onLoad() {
 		super.onLoad();
-		reflections = buildReflections();
 	}
 
 	@Override
@@ -43,10 +39,6 @@ public class RepositoryPlugin extends BasePlugin {
 		super.onEnable();
 		Logger log = getLogger();
 		saveDefaultConfig();
-
-		log.info("Criando EntityManagerFactory");
-
-		entityManagerFactory = JPA.entityManagerFactory(getConfig(), reflections);
 
 		log.info("Criando repositórios");
 
@@ -116,7 +108,7 @@ public class RepositoryPlugin extends BasePlugin {
 		log.info("Fechando EntityManagerFactory");
 
 		try {
-			entityManagerFactory.close();
+			getEntityManagerFactory().close();
 			log.info("EntityManagerFactory fechado com sucesso");
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Falha ao fechar EntityManagerFactory durante o onDisable",
@@ -125,10 +117,15 @@ public class RepositoryPlugin extends BasePlugin {
 
 		log.info("Repositório offline");
 	}
+
+	@Override
+	public EntityManagerFactory createEntityManagerFactory() {
+		return JPA.entityManagerFactory(getConfig());
+	}
 	
 	@SuppressWarnings("unchecked")
 	private <K, V extends StardustEntity<K>> void createRepositories() throws RepositoryException {
-		var entities = reflections.getTypesAnnotatedWith(BaseEntity.class);
+		var entities = getStardustEntitiesReflections().getTypesAnnotatedWith(BaseEntity.class);
 		repositories = new ArrayList<>(entities.size());
 		for (var entity : entities) {
 			var valueClass = (Class<V>) entity;
@@ -152,12 +149,6 @@ public class RepositoryPlugin extends BasePlugin {
 						Throwables.send(getId(), e));
 			}
 		}
-	}
-	
-	public static Reflections buildReflections() {
-		return new Reflections(new ConfigurationBuilder()
-				.forPackages(ENTITIES_PACKAGE)
-				.addScanners(Scanners.TypesAnnotated));
 	}
 
 }
