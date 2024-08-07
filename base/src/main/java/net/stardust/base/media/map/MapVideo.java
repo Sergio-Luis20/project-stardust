@@ -41,20 +41,27 @@ public class MapVideo extends VideoFramer<MapImage> {
 
     /**
      * Creates a new {@link MapVideo} instance with the passed
-     * stream.
+     * stream. This initializes with align strategy {@link StrategyEnum#CENTER}.
      * 
+     * @see ImageAlignStrategy
+     * @see StrategyEnum
+     * @see StrategyEnum#CENTER
      * @see VideoFramer#VideoFramer(InputStream)
      * @param stream the stream to read video data
      * @throws NullPointerException if stream is null
      */
     public MapVideo(InputStream stream) {
         super(stream);
+        setAlignStrategy(StrategyEnum.CENTER);
     }
 
     /**
      * Creates a new {@link MapVideo} instance with the passed
-     * file.
+     * file. This initializes with align strategy {@link StrategyEnum#CENTER}.
      * 
+     * @see ImageAlignStrategy
+     * @see StrategyEnum
+     * @see StrategyEnum#CENTER
      * @see VideoFramer#VideoFramer(File)
      * @param file the file from where read the video data
      * @throws NullPointerException  if file is null
@@ -64,6 +71,7 @@ public class MapVideo extends VideoFramer<MapImage> {
      */
     public MapVideo(File file) throws FileNotFoundException {
         super(file);
+        setAlignStrategy(StrategyEnum.CENTER);
     }
 
     /**

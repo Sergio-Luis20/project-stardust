@@ -1,5 +1,7 @@
 package net.stardust.base.media.map;
 
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -11,8 +13,8 @@ import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
 
 import net.stardust.base.media.ImageAlignStrategy;
-import net.stardust.base.media.VideoFramer;
 import net.stardust.base.media.ImageAlignStrategy.StrategyEnum;
+import net.stardust.base.media.VideoFramer;
 import net.stardust.base.utils.ranges.Ranges;
 
 /**
@@ -28,7 +30,7 @@ import net.stardust.base.utils.ranges.Ranges;
  * @author Sergio Luis
  */
 public class WallMapVideo extends VideoFramer<MapImage[][]> {
-    
+
     private volatile ImageAlignStrategy strategy;
 
     private int wallWidth, wallHeight; // Dimensions of the wall in map unities
@@ -36,15 +38,20 @@ public class WallMapVideo extends VideoFramer<MapImage[][]> {
 
     /**
      * Constructs a {@link WallMapVideo} with the passed {@link InputStream}.
+     * This initializes with align strategy {@link StrategyEnum#CENTER}.
      * The wallWidth is the amount of maps per row in the screen.
      * The wallHeight is the amount of maps per column in the screen.
      * 
+     * @see ImageAlignStrategy
+     * @see StrategyEnum
+     * @see StrategyEnum#CENTER
      * @see VideoFramer#VideoFramer(InputStream)
-     * @param stream the stream to read the video data.
-     * @param wallWidth the width of the screen in maps.
+     * @param stream     the stream to read the video data.
+     * @param wallWidth  the width of the screen in maps.
      * @param wallHeight the height of the screen in maps.
-     * @throws NullPointerException if stream is null.
-     * @throws IllegalArgumentException if wallWidth or wallHeight are 0 or negative.
+     * @throws NullPointerException     if stream is null.
+     * @throws IllegalArgumentException if wallWidth or wallHeight are 0 or
+     *                                  negative.
      */
     public WallMapVideo(InputStream stream, int wallWidth, int wallHeight) {
         super(stream);
@@ -53,9 +60,13 @@ public class WallMapVideo extends VideoFramer<MapImage[][]> {
 
     /**
      * Constructs a {@link WallMapVideo} with the passed {@link File}.
+     * This initializes with align strategy {@link StrategyEnum#CENTER}.
      * The wallWidth is the amount of maps per row in the screen.
      * The wallHeight is the amount of maps per column in the screen.
      * 
+     * @see ImageAlignStrategy
+     * @see StrategyEnum
+     * @see StrategyEnum#CENTER
      * @see VideoFramer#VideoFramer(File)
      * @param file       the file from where read video data.
      * @param wallWidth  the width of the screen in maps.
@@ -89,10 +100,41 @@ public class WallMapVideo extends VideoFramer<MapImage[][]> {
     protected MapImage[][] convertFrame(Java2DFrameConverter converter, Frame frame) {
         BufferedImage image = converter.convert(frame);
 
-        int mapSize = MapImage.MINECRAFT_DEFAULT_MAP_SIZE;
-
         int width = image.getWidth();
         int height = image.getHeight();
+
+        if (width > screenWidth || height > screenHeight) {
+            double ratio = (double) width / height;
+
+            if (width > height) {
+                width = screenWidth;
+                height = (int) (width / ratio);
+            } else if (height > width) {
+                height = screenHeight;
+                width = (int) (height * ratio);
+            } else {
+                int squareSize;
+
+                if (screenWidth > screenHeight) {
+                    squareSize = screenWidth;
+                } else {
+                    squareSize = screenHeight;
+                }
+
+                width = height = squareSize;
+            }
+
+            Image scaled = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+            BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+            Graphics2D graphics = resized.createGraphics();
+            graphics.drawImage(scaled, 0, 0, null);
+            graphics.dispose();
+
+            image = resized;
+        }
+
+        int mapSize = MapImage.MINECRAFT_DEFAULT_MAP_SIZE;
 
         Point corner = strategy.getCorner(width, height, screenWidth, screenHeight);
         MapImage[][] convertedFrame = new MapImage[wallWidth][wallHeight];
