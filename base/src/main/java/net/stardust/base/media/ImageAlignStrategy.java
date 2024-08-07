@@ -17,7 +17,8 @@ public interface ImageAlignStrategy extends Serializable {
 
     /**
      * Gets the coordinates of the top-left corner of the image. Should never
-     * return null.
+     * return null or neither a point that is out of the bounds of the screen
+     * (width and height less than 0 or higher than screen width and height).
      * 
      * @param width        the width of the image to calculate the top-left corner
      *                     coordinates.
@@ -40,7 +41,7 @@ public interface ImageAlignStrategy extends Serializable {
      * @see StrategyEnum
      */
     public class ConstantStrategy implements ImageAlignStrategy {
-        
+
         private final int x, y;
 
         /**
@@ -97,7 +98,7 @@ public interface ImageAlignStrategy extends Serializable {
         public int hashCode() {
             return Objects.hash(x, y);
         }
-        
+
     }
 
     /**
@@ -109,13 +110,13 @@ public interface ImageAlignStrategy extends Serializable {
      * 
      * @author Sergio Luis
      */
-    public enum StrategyEnum {
+    public enum ImageAlignStrategyEnum {
 
         /**
          * Aligns the image to the top left position of the screen.
          */
         TOP_LEFT((width, height, screenWidth, screenHeight) -> new Point(0, 0)),
-                        
+
         /**
          * Aligns the image to the top center position of the screen.
          */
@@ -123,7 +124,7 @@ public interface ImageAlignStrategy extends Serializable {
             int x = Math.max(0, (screenWidth - width) / 2);
             return new Point(x, 0);
         }),
-                        
+
         /**
          * Aligns the image to the top right position of the screen.
          */
@@ -131,7 +132,7 @@ public interface ImageAlignStrategy extends Serializable {
             int x = Math.max(0, screenWidth - width);
             return new Point(x, 0);
         }),
-                        
+
         /**
          * Aligns the image to the center left position of the screen.
          */
@@ -139,7 +140,7 @@ public interface ImageAlignStrategy extends Serializable {
             int y = Math.max(0, (screenHeight - height) / 2);
             return new Point(0, y);
         }),
-                        
+
         /**
          * Aligns the image to the center position of the screen.
          */
@@ -148,7 +149,7 @@ public interface ImageAlignStrategy extends Serializable {
             int y = Math.max(0, (screenHeight - height) / 2);
             return new Point(x, y);
         }),
-                        
+
         /**
          * Aligns the image to the center right position of the screen.
          */
@@ -157,7 +158,7 @@ public interface ImageAlignStrategy extends Serializable {
             int y = Math.max(0, (screenHeight - height) / 2);
             return new Point(x, y);
         }),
-                        
+
         /**
          * Aligns the image to the bottom left position of the screen.
          */
@@ -165,7 +166,7 @@ public interface ImageAlignStrategy extends Serializable {
             int y = Math.max(0, screenHeight - height);
             return new Point(0, y);
         }),
-                        
+
         /**
          * Aligns the image to the bottom center position of the screen.
          */
@@ -174,7 +175,7 @@ public interface ImageAlignStrategy extends Serializable {
             int y = Math.max(0, screenHeight - height);
             return new Point(x, y);
         }),
-                        
+
         /**
          * Aligns the image to the bottom right position of the screen.
          */
@@ -186,7 +187,7 @@ public interface ImageAlignStrategy extends Serializable {
 
         private ImageAlignStrategy strategy;
 
-        StrategyEnum(ImageAlignStrategy strategy) {
+        ImageAlignStrategyEnum(ImageAlignStrategy strategy) {
             this.strategy = strategy;
         }
 

@@ -13,7 +13,7 @@ import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
 
 import net.stardust.base.media.ImageAlignStrategy;
-import net.stardust.base.media.ImageAlignStrategy.StrategyEnum;
+import net.stardust.base.media.ImageAlignStrategy.ImageAlignStrategyEnum;
 import net.stardust.base.media.VideoFramer;
 import net.stardust.base.utils.ranges.Ranges;
 
@@ -38,13 +38,13 @@ public class WallMapVideo extends VideoFramer<MapImage[][]> {
 
     /**
      * Constructs a {@link WallMapVideo} with the passed {@link InputStream}.
-     * This initializes with align strategy {@link StrategyEnum#CENTER}.
+     * This initializes with align strategy {@link ImageAlignStrategyEnum#CENTER}.
      * The wallWidth is the amount of maps per row in the screen.
      * The wallHeight is the amount of maps per column in the screen.
      * 
      * @see ImageAlignStrategy
-     * @see StrategyEnum
-     * @see StrategyEnum#CENTER
+     * @see ImageAlignStrategyEnum
+     * @see ImageAlignStrategyEnum#CENTER
      * @see VideoFramer#VideoFramer(InputStream)
      * @param stream     the stream to read the video data.
      * @param wallWidth  the width of the screen in maps.
@@ -60,13 +60,13 @@ public class WallMapVideo extends VideoFramer<MapImage[][]> {
 
     /**
      * Constructs a {@link WallMapVideo} with the passed {@link File}.
-     * This initializes with align strategy {@link StrategyEnum#CENTER}.
+     * This initializes with align strategy {@link ImageAlignStrategyEnum#CENTER}.
      * The wallWidth is the amount of maps per row in the screen.
      * The wallHeight is the amount of maps per column in the screen.
      * 
      * @see ImageAlignStrategy
-     * @see StrategyEnum
-     * @see StrategyEnum#CENTER
+     * @see ImageAlignStrategyEnum
+     * @see ImageAlignStrategyEnum#CENTER
      * @see VideoFramer#VideoFramer(File)
      * @param file       the file from where read video data.
      * @param wallWidth  the width of the screen in maps.
@@ -93,7 +93,7 @@ public class WallMapVideo extends VideoFramer<MapImage[][]> {
         screenWidth = wallWidth * mapSize;
         screenHeight = wallHeight * mapSize;
 
-        strategy = StrategyEnum.CENTER.getStrategy();
+        strategy = ImageAlignStrategyEnum.CENTER.getStrategy();
     }
 
     @Override
@@ -150,10 +150,6 @@ public class WallMapVideo extends VideoFramer<MapImage[][]> {
                 int x = corner.x + i;
                 int y = corner.y + j;
 
-                if (x < 0 || y < 0 || x >= width || y >= height) {
-                    continue;
-                }
-
                 int arrayX = x / mapSize;
                 int arrayY = y / mapSize;
 
@@ -194,15 +190,15 @@ public class WallMapVideo extends VideoFramer<MapImage[][]> {
 
     /**
      * Sets the {@link ImageAlignStrategy} object using a
-     * {@link StrategyEnum}.
+     * {@link ImageAlignStrategyEnum}.
      * 
      * @see ImageAlignStrategy
-     * @see StrategyEnum
+     * @see ImageAlignStrategyEnum
      * @param strategy the strategy enum instance to supply the original align
      *                 strategy for this map image.
      * @throws NullPointerException if strategy is null.
      */
-    public void setAlignStrategy(StrategyEnum strategy) {
+    public void setAlignStrategy(ImageAlignStrategyEnum strategy) {
         this.strategy = Objects.requireNonNull(strategy, "strategy").getStrategy();
     }
 

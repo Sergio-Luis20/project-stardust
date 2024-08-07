@@ -61,4 +61,11 @@ public final class InventoryUtils {
         return 9 * Ranges.rangeBETI(rows, 0, 6, "rows");
     }
 
+    public static int checkSize(int size) {
+        if (size <= 0 || size > 54 || size % 9 != 0) {
+            throw new IllegalArgumentException("size must be a non zero multiple of 9 less or equal to 54");
+        }
+        return size;
+    }
+
 }

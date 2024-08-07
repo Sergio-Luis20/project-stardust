@@ -31,7 +31,7 @@ import org.bukkit.map.MapView;
 
 import lombok.experimental.StandardException;
 import net.stardust.base.media.ImageAlignStrategy;
-import net.stardust.base.media.ImageAlignStrategy.StrategyEnum;
+import net.stardust.base.media.ImageAlignStrategy.ImageAlignStrategyEnum;
 import net.stardust.base.utils.ranges.Ranges;
 
 /**
@@ -55,35 +55,39 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
     private ImageAlignStrategy strategy;
 
     /**
-     * Creates a {@link MapImage} with {@link StrategyEnum#CENTER} as
-     * default alignment strategy and an empty non null {@link BufferedImage}.
+     * Creates a {@link MapImage} with {@link ImageAlignStrategyEnum#CENTER} as
+     * default alignment strategy and an empty non null {@link BufferedImage}
+     * with width and height corresponding to {@link #MINECRAFT_DEFAULT_MAP_SIZE},
+     * so it is an empty square that fits the whole map.
      * 
      * @see BufferedImage
      * @see BufferedImage#BufferedImage(int, int, int)
      * @see ImageAlignStrategy
-     * @see StrategyEnum
+     * @see ImageAlignStrategyEnum
+     * @see #MINECRAFT_DEFAULT_MAP_SIZE
      */
     public MapImage() {
         image = new BufferedImage(MINECRAFT_DEFAULT_MAP_SIZE, MINECRAFT_DEFAULT_MAP_SIZE, BufferedImage.TYPE_INT_ARGB);
-        setAlignStrategy(StrategyEnum.CENTER);
+        setAlignStrategy(ImageAlignStrategyEnum.CENTER);
     }
 
     /**
      * Creates a {@link MapImage} with the already created {@link BufferedImage},
      * changing its type to {@link BufferedImage#TYPE_INT_ARGB} if it is not already
-     * that. This uses {@link StrategyEnum#CENTER} as default alignment strategy.
+     * that. This uses {@link ImageAlignStrategyEnum#CENTER} as default alignment
+     * strategy.
      * 
      * @see MapImage
      * @see BufferedImage
      * @see BufferedImage#TYPE_INT_ARGB
      * @see ImageAlignStrategy
-     * @see StrategyEnum
+     * @see ImageAlignStrategyEnum
      * @param image the already created buffered image
      * @throws NullPointerException if image is null
      */
     public MapImage(BufferedImage image) {
         setImage(image);
-        setAlignStrategy(StrategyEnum.CENTER);
+        setAlignStrategy(ImageAlignStrategyEnum.CENTER);
     }
 
     /**
@@ -92,7 +96,7 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
      * does not close the stream, it is your responsability to take care of the
      * closing process. The type will be changed to
      * {@link BufferedImage#TYPE_INT_ARGB} if it is not already that. This uses
-     * {@link StrategyEnum#CENTER} as default alignment strategy.
+     * {@link ImageAlignStrategyEnum#CENTER} as default alignment strategy.
      * 
      * @see MapImage
      * @see BufferedImage
@@ -102,7 +106,7 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
      * @see ImageIO#read(ImageInputStream)
      * @see BufferedImage#TYPE_INT_ARGB
      * @see ImageAlignStrategy
-     * @see StrategyEnum
+     * @see ImageAlignStrategyEnum
      * @param stream the stream from where read image data.
      * @throws NullPointerException  if stream is null.
      * @throws InvalidImageException if {@link ImageIO#read(InputStream)} returns
@@ -118,7 +122,7 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
                 throw new InvalidImageException("Could not create an image from the passed stream");
             }
             checkImageType(image);
-            setAlignStrategy(StrategyEnum.CENTER);
+            setAlignStrategy(ImageAlignStrategyEnum.CENTER);
         } catch (IllegalArgumentException e) {
             NullPointerException exception = new NullPointerException();
             exception.initCause(e);
@@ -449,15 +453,15 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
 
     /**
      * Sets the {@link ImageAlignStrategy} object using a
-     * {@link StrategyEnum}.
+     * {@link ImageAlignStrategyEnum}.
      * 
      * @see ImageAlignStrategy
-     * @see StrategyEnum
+     * @see ImageAlignStrategyEnum
      * @param strategy the strategy enum instance to supply the original align
      *                 strategy for this map image.
      * @throws NullPointerException if strategy is null.
      */
-    public void setAlignStrategy(StrategyEnum strategy) {
+    public void setAlignStrategy(ImageAlignStrategyEnum strategy) {
         this.strategy = Objects.requireNonNull(strategy, "strategy").getStrategy();
     }
 

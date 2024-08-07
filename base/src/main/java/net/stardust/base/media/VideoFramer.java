@@ -184,7 +184,7 @@ public abstract class VideoFramer<T> implements AutoCloseable {
 
             grabber.setTimestamp(nextTimestamp);
 
-            Frame frame = grabber.grabImage();
+            Frame frame = grabFrame(grabber);
             if (frame == null) {
                 return false;
             }
@@ -229,7 +229,7 @@ public abstract class VideoFramer<T> implements AutoCloseable {
             long nextTimestamp = currentTimestamp == 0 ? 0 : (currentTimestamp / 50000 + 1) * 50000;
 
             try (Java2DFrameConverter converter = new Java2DFrameConverter()) {
-                for (Frame frame; (frame = grabber.grabImage()) != null;) {
+                for (Frame frame; (frame = grabFrame(grabber)) != null;) {
                     addFrameToQueue(converter, frame);
                     nextTimestamp += 50000;
                     grabber.setTimestamp(nextTimestamp);
@@ -254,6 +254,20 @@ public abstract class VideoFramer<T> implements AutoCloseable {
         synchronized (frames) {
             frames.add(converted);
         }
+    }
+
+    /**
+     * Grabbs a frame. The default implementation just calls
+     * {@link FFmpegFrameGrabber#grabImage()}, but you can
+     * override this method if you want to grab a different
+     * kind of frame, maybe incluing audio for example.
+     * 
+     * @param grabber the frame grabber.
+     * @return the grabbed frame.
+     * @throws FFmpegFrameGrabber.Exception if an exception occurs during grab.
+     */
+    protected Frame grabFrame(FFmpegFrameGrabber grabber) throws FFmpegFrameGrabber.Exception {
+        return grabber.grabImage();
     }
 
     /**

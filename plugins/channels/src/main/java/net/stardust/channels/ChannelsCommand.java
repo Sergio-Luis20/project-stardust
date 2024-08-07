@@ -35,6 +35,7 @@ import net.stardust.base.database.crud.ChannelStatusCrud;
 import net.stardust.base.model.channel.Channel;
 import net.stardust.base.model.channel.ChannelStatus;
 import net.stardust.base.model.inventory.PseudoInventory;
+import net.stardust.base.model.inventory.PseudoItem;
 import net.stardust.base.utils.ObjectMapperFactory;
 import net.stardust.base.utils.StardustThreads;
 import net.stardust.base.utils.Throwables;
@@ -72,20 +73,23 @@ public class ChannelsCommand extends VirtualCommand<ChannelsPlugin> implements L
         UUID id = uniqueId(player);
 
         final Inventory inventory = StardustThreads.call(plugin, () -> Bukkit.createInventory(player, 
-            pseudoInventory.getSize(), Component.translatable("word.channels")));
-
-        pseudoInventory.getReadOnlyItems().forEach((index, pseudoItem) -> {
+                pseudoInventory.getSize(), Component.translatable("word.channels")));
+            
+        int size = pseudoInventory.getSize();
+        for (int i = 0; i < size; i++) {
+            PseudoItem pseudoItem = pseudoInventory.getItem(i);
             if (pseudoItem == null) {
                 return;
             }
-
+    
             Map<String, String> labels = pseudoItem.getLabels();
             Component displayName = Component.translatable("channel." + labels.get("channelName") + ".name", NamedTextColor.DARK_AQUA);
             ChannelStatus channelStatus = channelCrud.getOrThrow(id);
             boolean status = channelStatus.isChannelActivated(labels.get("channelClassName"), "status");
-
+    
             List<Component> lore = lore(status);
             
+            final int index = i;
             StardustThreads.run(plugin, () -> {
                 ItemStack item = new ItemStack(pseudoItem.getMaterial(), pseudoItem.getAmount());
                 ItemMeta meta = item.getItemMeta();
@@ -94,7 +98,8 @@ public class ChannelsCommand extends VirtualCommand<ChannelsPlugin> implements L
                 item.setItemMeta(meta);
                 inventory.setItem(index, item);
             });
-        });
+        }
+
         inventories.put(id, inventory);
         StardustThreads.run(plugin, () -> player.openInventory(inventory));
     }
@@ -133,8 +138,8 @@ public class ChannelsCommand extends VirtualCommand<ChannelsPlugin> implements L
                     return;
                 }
 
-                String channelClassName = pseudoInventory.getReadOnlyItems().get(inventory
-                    .first(item)).getLabels().get("channelClassName");
+                String channelClassName = pseudoInventory.getItem(inventory
+                        .first(item)).getLabels().get("channelClassName");
 
                 plugin.getVirtual().submit(() -> {
                     ChannelStatus channelStatus = channelCrud.getOrThrow(id);

@@ -11,7 +11,7 @@ import org.bytedeco.javacv.Java2DFrameConverter;
 
 import net.stardust.base.media.ImageAlignStrategy;
 import net.stardust.base.media.VideoFramer;
-import net.stardust.base.media.ImageAlignStrategy.StrategyEnum;
+import net.stardust.base.media.ImageAlignStrategy.ImageAlignStrategyEnum;
 
 /**
  * {@link VideoFramer} implementation for processing frames
@@ -41,27 +41,27 @@ public class MapVideo extends VideoFramer<MapImage> {
 
     /**
      * Creates a new {@link MapVideo} instance with the passed
-     * stream. This initializes with align strategy {@link StrategyEnum#CENTER}.
+     * stream. This initializes with align strategy {@link ImageAlignStrategyEnum#CENTER}.
      * 
      * @see ImageAlignStrategy
-     * @see StrategyEnum
-     * @see StrategyEnum#CENTER
+     * @see ImageAlignStrategyEnum
+     * @see ImageAlignStrategyEnum#CENTER
      * @see VideoFramer#VideoFramer(InputStream)
      * @param stream the stream to read video data
      * @throws NullPointerException if stream is null
      */
     public MapVideo(InputStream stream) {
         super(stream);
-        setAlignStrategy(StrategyEnum.CENTER);
+        setAlignStrategy(ImageAlignStrategyEnum.CENTER);
     }
 
     /**
      * Creates a new {@link MapVideo} instance with the passed
-     * file. This initializes with align strategy {@link StrategyEnum#CENTER}.
+     * file. This initializes with align strategy {@link ImageAlignStrategyEnum#CENTER}.
      * 
      * @see ImageAlignStrategy
-     * @see StrategyEnum
-     * @see StrategyEnum#CENTER
+     * @see ImageAlignStrategyEnum
+     * @see ImageAlignStrategyEnum#CENTER
      * @see VideoFramer#VideoFramer(File)
      * @param file the file from where read the video data
      * @throws NullPointerException  if file is null
@@ -71,7 +71,7 @@ public class MapVideo extends VideoFramer<MapImage> {
      */
     public MapVideo(File file) throws FileNotFoundException {
         super(file);
-        setAlignStrategy(StrategyEnum.CENTER);
+        setAlignStrategy(ImageAlignStrategyEnum.CENTER);
     }
 
     /**
@@ -99,15 +99,15 @@ public class MapVideo extends VideoFramer<MapImage> {
 
     /**
      * Sets the {@link ImageAlignStrategy} object using a
-     * {@link StrategyEnum} from {@link MapImage} class.
+     * {@link ImageAlignStrategyEnum} from {@link MapImage} class.
      * 
      * @see ImageAlignStrategy
-     * @see StrategyEnum
+     * @see ImageAlignStrategyEnum
      * @param strategy the strategy enum instance to supply the original align
      *                 strategy for this map image.
      * @throws NullPointerException if strategy is null.
      */
-    public void setAlignStrategy(StrategyEnum strategy) {
+    public void setAlignStrategy(ImageAlignStrategyEnum strategy) {
         setAlignStrategy(Objects.requireNonNull(strategy, "strategy").getStrategy());
     }
 
