@@ -249,6 +249,11 @@
       <groupId>net.dv8tion</groupId>
       <artifactId>JDA</artifactId>
       <version>${jda.version}</version> 
-  </dependency>
+    </dependency>
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>javacv-platform</artifactId>
+      <version>1.5.10</version>
+    </dependency>
   </dependencies>
 </project>

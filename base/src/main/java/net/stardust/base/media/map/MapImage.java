@@ -1,10 +1,12 @@
-package net.stardust.base.custom.map;
+package net.stardust.base.media.map;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -28,11 +30,14 @@ import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 
 import lombok.experimental.StandardException;
+import net.stardust.base.media.ImageAlignStrategy;
+import net.stardust.base.media.ImageAlignStrategy.StrategyEnum;
 import net.stardust.base.utils.ranges.Ranges;
 
 /**
- * A simple map renderer to draw {@link BufferedImage}s to a
- * Minecraft map. This class is not thread-safe.
+ * A map renderer to draw {@link BufferedImage}s to a
+ * Minecraft map with various utility methods for image manipulation.
+ * This class is not thread-safe.
  * 
  * @see BufferedImage
  * @see MapRenderer
@@ -46,21 +51,39 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
      */
     public static final int MINECRAFT_DEFAULT_MAP_SIZE = 128;
 
-    private BufferedImage image;
+    private transient BufferedImage image;
+    private ImageAlignStrategy strategy;
+
+    /**
+     * Creates a {@link MapImage} with {@link StrategyEnum#CENTER} as
+     * default alignment strategy and an empty non null {@link BufferedImage}.
+     * 
+     * @see BufferedImage
+     * @see BufferedImage#BufferedImage(int, int, int)
+     * @see ImageAlignStrategy
+     * @see StrategyEnum
+     */
+    public MapImage() {
+        image = new BufferedImage(MINECRAFT_DEFAULT_MAP_SIZE, MINECRAFT_DEFAULT_MAP_SIZE, BufferedImage.TYPE_INT_ARGB);
+        setAlignStrategy(StrategyEnum.CENTER);
+    }
 
     /**
      * Creates a {@link MapImage} with the already created {@link BufferedImage},
      * changing its type to {@link BufferedImage#TYPE_INT_ARGB} if it is not already
-     * that.
+     * that. This uses {@link StrategyEnum#CENTER} as default alignment strategy.
      * 
      * @see MapImage
      * @see BufferedImage
      * @see BufferedImage#TYPE_INT_ARGB
+     * @see ImageAlignStrategy
+     * @see StrategyEnum
      * @param image the already created buffered image
      * @throws NullPointerException if image is null
      */
     public MapImage(BufferedImage image) {
         setImage(image);
+        setAlignStrategy(StrategyEnum.CENTER);
     }
 
     /**
@@ -68,8 +91,8 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
      * creating the internal {@link BufferedImage} object from it. This constructor
      * does not close the stream, it is your responsability to take care of the
      * closing process. The type will be changed to
-     * {@link BufferedImage#TYPE_INT_ARGB}
-     * if it is not already that.
+     * {@link BufferedImage#TYPE_INT_ARGB} if it is not already that. This uses
+     * {@link StrategyEnum#CENTER} as default alignment strategy.
      * 
      * @see MapImage
      * @see BufferedImage
@@ -78,6 +101,8 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
      * @see ImageIO
      * @see ImageIO#read(ImageInputStream)
      * @see BufferedImage#TYPE_INT_ARGB
+     * @see ImageAlignStrategy
+     * @see StrategyEnum
      * @param stream the stream from where read image data.
      * @throws NullPointerException  if stream is null.
      * @throws InvalidImageException if {@link ImageIO#read(InputStream)} returns
@@ -93,6 +118,7 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
                 throw new InvalidImageException("Could not create an image from the passed stream");
             }
             checkImageType(image);
+            setAlignStrategy(StrategyEnum.CENTER);
         } catch (IllegalArgumentException e) {
             NullPointerException exception = new NullPointerException();
             exception.initCause(e);
@@ -109,9 +135,11 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
      * 
      *           <pre>
      *           <code>
-     *           new BufferedImage(new FileInputStream(file))
+     *           new BufferedImage(new FileInputStream(Objects.requireNonNull(file, "file")))
      *           </code>
      *           </pre>
+     * 
+     *           to it.
      * 
      * @see MapImage
      * @see File
@@ -154,6 +182,8 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
      * @see BufferedImage
      * @see BufferedImage#getType()
      * @see #getImage()
+     * @see #resizeToMinecraft()
+     * @see #resizeToMinecraftPreservingRatio()
      * @param width  the new width of the image
      * @param height the new height of the image
      * @throws IllegalArgumentException if width or height are 0 or negative.
@@ -183,6 +213,7 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
      * drawn in a map without being clipped.
      * 
      * @see #resize(int, int)
+     * @see #resizeToMinecraftPreservingRatio()
      * @see #MINECRAFT_DEFAULT_MAP_SIZE
      */
     public void resizeToMinecraft() {
@@ -190,15 +221,55 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
     }
 
     /**
-     * Renders the image to the given map. The image will be clipped
-     * if necessary. To avoid that, use {@link #resize(int, int)}.
+     * Resizes the image to fit in a Minecraft map preserving the
+     * ratio between width and height.
      * 
      * @see #resize(int, int)
+     * @see #resizeToMinecraft()
+     */
+    public void resizeToMinecraftPreservingRatio() {
+        int width = getWidth();
+        int height = getHeight();
+
+        double ratio = (double) width / height;
+
+        if (width > height) {
+            width = MapImage.MINECRAFT_DEFAULT_MAP_SIZE;
+            height = (int) (width / ratio);
+        } else if (height > width) {
+            height = MapImage.MINECRAFT_DEFAULT_MAP_SIZE;
+            width = (int) (height * ratio);
+        } else {
+            width = MapImage.MINECRAFT_DEFAULT_MAP_SIZE;
+            height = MapImage.MINECRAFT_DEFAULT_MAP_SIZE;
+        }
+
+        resize(width, height);
+    }
+
+    /**
+     * Renders the image to the given map. The image will be clipped
+     * if necessary. To avoid that, use {@link #resize(int, int)}. Also,
+     * the image will positioned in the map using the coordinates supplied by the
+     * {@link ImageAlignStrategy} to the top-left corner. If the the width of the
+     * image is bigger than {@link #MINECRAFT_DEFAULT_MAP_SIZE}, the x
+     * coordinate of the top-left corner of the image in the map will be 0.
+     * The same logic applies to height.
+     * 
+     * @see ImageAlignStrategy
+     * @see #resize(int, int)
      * @see MapCanvas#drawImage(int, int, Image)
+     * @see #MINECRAFT_DEFAULT_MAP_SIZE
      */
     @Override
     public void render(MapView map, MapCanvas canvas, Player player) {
-        canvas.drawImage(0, 0, image);
+        Point corner = strategy.getCorner(
+                getWidth(),
+                getHeight(),
+                MINECRAFT_DEFAULT_MAP_SIZE,
+                MINECRAFT_DEFAULT_MAP_SIZE);
+
+        canvas.drawImage(corner.x, corner.y, image);
     }
 
     /**
@@ -354,6 +425,43 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
     }
 
     /**
+     * Returns the {@link ImageAlignStrategy} object being
+     * used during render.
+     * 
+     * @see ImageAlignStrategy
+     * @return the align strategy of this map image.
+     */
+    public ImageAlignStrategy getAlignStrategy() {
+        return strategy;
+    }
+
+    /**
+     * Sets the {@link ImageAlignStrategy} object for being
+     * used during render.
+     * 
+     * @see ImageAlignStrategy
+     * @param strategy the new align strategy for this map image.
+     * @throws NullPointerException of strategy is null.
+     */
+    public void setAlignStrategy(ImageAlignStrategy strategy) {
+        this.strategy = Objects.requireNonNull(strategy, "strategy");
+    }
+
+    /**
+     * Sets the {@link ImageAlignStrategy} object using a
+     * {@link StrategyEnum}.
+     * 
+     * @see ImageAlignStrategy
+     * @see StrategyEnum
+     * @param strategy the strategy enum instance to supply the original align
+     *                 strategy for this map image.
+     * @throws NullPointerException if strategy is null.
+     */
+    public void setAlignStrategy(StrategyEnum strategy) {
+        this.strategy = Objects.requireNonNull(strategy, "strategy").getStrategy();
+    }
+
+    /**
      * Creates a deep copy of this {@link MapImage}.
      * 
      * @return a deep copy of this object.
@@ -385,6 +493,8 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
 
     @Serial
     private void writeObject(ObjectOutputStream stream) throws IOException {
+        stream.defaultWriteObject();
+
         stream.writeInt(getWidth());
         stream.writeInt(getHeight());
         stream.writeObject(getPixels());
@@ -392,6 +502,8 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
 
     @Serial
     public void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        stream.defaultReadObject();
+
         int width = stream.readInt();
         int height = stream.readInt();
         int[][] pixels = (int[][]) stream.readObject();
@@ -412,19 +524,6 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
     }
 
     /**
-     * Exception thrown when {@link ImageIO#read(InputStream)} returns null
-     * in {@link MapImage#MapImage(InputStream)}.
-     * 
-     * @see MapImage
-     * @see MapImage#MapImage(InputStream)
-     * @see ImageIO
-     * @see ImageIO#read(InputStream)
-     */
-    @StandardException
-    public class InvalidImageException extends RuntimeException {
-    }
-
-    /**
      * Sets the image changing its type to {@link BufferedImage#TYPE_INT_ARGB}
      * if it is not already that.
      * 
@@ -442,6 +541,19 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
         Graphics2D graphics = this.image.createGraphics();
         graphics.drawImage(image, 0, 0, null);
         graphics.dispose();
+    }
+
+    /**
+     * Exception thrown when {@link ImageIO#read(InputStream)} returns null
+     * in {@link MapImage#MapImage(InputStream)}.
+     * 
+     * @see MapImage
+     * @see MapImage#MapImage(InputStream)
+     * @see ImageIO
+     * @see ImageIO#read(InputStream)
+     */
+    @StandardException
+    public class InvalidImageException extends RuntimeException {
     }
 
 }
