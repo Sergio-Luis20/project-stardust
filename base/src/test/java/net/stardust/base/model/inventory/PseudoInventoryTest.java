@@ -1,18 +1,16 @@
 package net.stardust.base.model.inventory;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import net.stardust.base.Stardust;
+import net.stardust.base.utils.ObjectMapperFactory;
 import org.bukkit.Material;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
-import net.stardust.base.Stardust;
-import net.stardust.base.utils.ObjectMapperFactory;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PseudoInventoryTest {
     
@@ -32,7 +30,7 @@ public class PseudoInventoryTest {
         diamondSword.getLabels().put("mortadela", "com salsicha");
         diamondSword.getLabels().put("e salsicha", "com scooby-doo");
         diamondSword.getEnchantments().add(new PseudoEnchantment(Stardust.key("alou:boneca"), 1000));
-        diamondSword.getTags().add(new PersistentObject(Stardust.key("meu:pau"), -1));
+        diamondSword.getTags().add(new PersistentTag(Stardust.key("meu:pau"), -1));
         inventory.setItem(4, diamonds);
         inventory.setItem(0, diamondSword);
         return inventory;

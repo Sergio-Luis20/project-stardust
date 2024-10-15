@@ -1,4 +1,4 @@
 name: communication
 version: 3.0
 main: net.stardust.communication.CommunicationServer
-api-version: 1.19
+api-version: 1.21

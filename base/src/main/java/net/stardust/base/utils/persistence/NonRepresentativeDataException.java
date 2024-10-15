@@ -3,9 +3,9 @@ package net.stardust.base.utils.persistence;
 import lombok.experimental.StandardException;
 
 /**
- * Exception thrown when a serialized object into a
+ * Exception thrown when a serialized object in a
  * {@link PersistentDataContainer}
- * does not follows a schema defined by a {@link KeyMapper}. Se
+ * does not follow a schema defined by a {@link KeyMapper}. See
  * {@link KeyMapper}
  * documentation for more details.
  * 

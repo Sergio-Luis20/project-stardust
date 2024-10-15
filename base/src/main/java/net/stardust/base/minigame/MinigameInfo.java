@@ -12,23 +12,30 @@ public record MinigameInfo(String name, int minPlayers, int maxPlayers, int rewa
                            File mapsFolder, Location lobby, int index) {
 
     public MinigameInfo {
-        if(Objects.requireNonNull(name, "name").isBlank())
-            throw new IllegalArgumentException("blank name");
         name = name.trim();
-        minPlayers = Ranges.greaterOrEqual(minPlayers, 2, "minPlayers");
-        maxPlayers = Ranges.greaterOrEqual(maxPlayers, 2, "minPlayers");
+        if(Objects.requireNonNull(name, "name").isEmpty())
+            throw new IllegalArgumentException("empty or blank name");
+        Ranges.greaterOrEqual(minPlayers, 2, "minPlayers");
+        Ranges.greaterOrEqual(maxPlayers, 2, "minPlayers");
         if(minPlayers > maxPlayers)
             throw new IllegalArgumentException("minPlayers must not be greater than maxPlayers");
-        reward = Ranges.greater(reward, 0, "reward");
-        matchTime = Ranges.greater(matchTime, 0, "matchTime");
+        Ranges.greater(reward, 0, "reward");
+        Ranges.greater(matchTime, 0, "matchTime");
         validateMapsFolder(mapsFolder);
         Objects.requireNonNull(lobby, "lobby");
     }
 
     public MinigameInfo(ConfigurationSection section, int index) {
-        this(section.getString("name"), section.getInt("min-players"), section.getInt("max-players"),
-                section.getInt("reward"), section.getInt("match-time"), new File(section.getString("map-path")),
-                WorldUtils.loadWorld(section.getString("lobby")).getSpawnLocation(), index);
+        this(
+                section.getString("name"),
+                section.getInt("min-players"),
+                section.getInt("max-players"),
+                section.getInt("reward"),
+                section.getInt("match-time"),
+                new File(section.getString("map-path")),
+                WorldUtils.loadWorld(section.getString("lobby")).getSpawnLocation(),
+                index
+        );
     }
 
     @Override

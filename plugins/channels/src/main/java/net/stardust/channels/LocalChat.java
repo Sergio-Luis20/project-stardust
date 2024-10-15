@@ -4,7 +4,7 @@ import io.papermc.paper.event.player.AsyncChatEvent;
 import net.stardust.base.events.BaseListener;
 import net.stardust.base.model.channel.Channel;
 import net.stardust.base.model.channel.Local;
-import net.stardust.base.utils.MentionService;
+import net.stardust.base.utils.gameplay.MentionService;
 import net.stardust.base.utils.SingletonException;
 import org.bukkit.Bukkit;
 import org.bukkit.World;

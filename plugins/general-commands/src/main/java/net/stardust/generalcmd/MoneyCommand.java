@@ -38,7 +38,7 @@ import net.stardust.base.model.economy.wallet.Currency;
 import net.stardust.base.model.economy.wallet.Money;
 import net.stardust.base.model.economy.wallet.PlayerWallet;
 import net.stardust.base.model.user.User;
-import net.stardust.base.utils.AutomaticMessages;
+import net.stardust.base.utils.gameplay.AutomaticMessages;
 import net.stardust.base.utils.StardustThreads;
 import net.stardust.base.utils.Throwables;
 

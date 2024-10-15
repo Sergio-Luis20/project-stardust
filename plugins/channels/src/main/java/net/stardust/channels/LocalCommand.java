@@ -9,7 +9,7 @@ import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.DirectCommand;
 import net.stardust.base.model.channel.ChannelException;
 import net.stardust.base.model.channel.Local;
-import net.stardust.base.utils.MentionService;
+import net.stardust.base.utils.gameplay.MentionService;
 
 @BaseCommand(value = "local", types = ConsoleCommandSender.class)
 public class LocalCommand extends DirectCommand<ChannelsPlugin> {

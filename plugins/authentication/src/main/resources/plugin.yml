@@ -1,7 +1,7 @@
 name: authentication
 version: 1.0
 main: net.stardust.authentication.StardustAuthentication
-api-version: 1.19
+api-version: 1.21
 depend: [repository]
 commands:
   login:

@@ -11,7 +11,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.command.AsyncCommand;
 import net.stardust.base.command.CommandEntry;
 import net.stardust.base.model.channel.Channel;
-import net.stardust.base.utils.MentionService;
+import net.stardust.base.utils.gameplay.MentionService;
 
 public abstract class ChannelMessageCommand extends AsyncCommand<ChannelsPlugin> {
 

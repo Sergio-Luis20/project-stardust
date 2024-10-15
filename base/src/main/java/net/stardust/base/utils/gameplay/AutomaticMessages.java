@@ -1,4 +1,4 @@
-package net.stardust.base.utils;
+package net.stardust.base.utils.gameplay;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

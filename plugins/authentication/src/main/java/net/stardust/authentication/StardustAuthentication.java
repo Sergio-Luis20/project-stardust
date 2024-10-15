@@ -1,14 +1,14 @@
 package net.stardust.authentication;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
+import lombok.Getter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.stardust.base.BasePlugin;
+import net.stardust.base.database.crud.UserCrud;
+import net.stardust.base.database.lang.Translation;
+import net.stardust.base.events.BaseListener;
+import net.stardust.base.model.user.User;
+import net.stardust.base.utils.StardustThreads;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -23,18 +23,14 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.stardust.base.BasePlugin;
-import net.stardust.base.database.crud.UserCrud;
-import net.stardust.base.database.lang.Translation;
-import net.stardust.base.events.BaseListener;
-import net.stardust.base.model.user.User;
-import net.stardust.base.utils.StardustThreads;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @BaseListener
 public class StardustAuthentication extends BasePlugin implements Listener {
 
+    @Getter
     private int minPwLength, maxTime, interval;
 
     private UserCrud userCrud;
@@ -119,10 +115,6 @@ public class StardustAuthentication extends BasePlugin implements Listener {
         }
     }
 
-    public  int getMinPwLength() {
-        return minPwLength;
-    }
-    
     public boolean isWaiting(UUID uid) {
     	return waiting.contains(uid);
     }

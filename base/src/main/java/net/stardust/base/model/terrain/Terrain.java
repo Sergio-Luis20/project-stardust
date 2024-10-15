@@ -1,11 +1,5 @@
 package net.stardust.base.model.terrain;
 
-import java.util.Objects;
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-
 import br.sergio.utils.Pair;
 import br.sergio.utils.math.Point;
 import jakarta.persistence.Entity;
@@ -14,12 +8,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import net.stardust.base.database.BaseEntity;
 import net.stardust.base.model.StardustEntity;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+
+import java.util.Objects;
+import java.util.UUID;
 
 @Getter
 @EqualsAndHashCode
 @BaseEntity(UUID.class)
+@NoArgsConstructor
 @Entity
 public class Terrain implements StardustEntity<UUID> {
 

@@ -1,0 +1,440 @@
+{
+  "speed": {
+    "namespacedKey": "minecraft:speed",
+    "typeId": 1,
+    "times": {
+      "normal": 3600,
+      "extended": 9600,
+      "enhanced": 1800
+    },
+    "color": "33EBFF",
+    "potionColor": "33EBFF",
+    "oldColor": "7CAFC6",
+    "instant": false,
+    "category": "BENEFICIAL",
+    "description": "Increases walking speed; higher levels make the affected entity faster and increases the player's field of view when affected."
+  },
+  "slowness": {
+    "namespacedKey": "minecraft:slowness",
+    "typeId": 2,
+    "times": {
+      "normal": 900,
+      "extended": 1800,
+      "enhanced": 400
+    },
+    "color": "8BAFE0",
+    "potionColor": "8BAFE0",
+    "oldColor": "5A6C81",
+    "instant": false,
+    "category": "HARMFUL",
+    "description": "Decreases walking speed; higher levels make the affected entity slower and decreases the player's field of view when affected."
+  },
+  "haste": {
+    "namespacedKey": "minecraft:haste",
+    "typeId": 3,
+    "color": "D9C043",
+    "oldColor": "D9C043",
+    "instant": false,
+    "category": "BENEFICIAL",
+    "description": "Increases mining and attack speed, higher levels increase the player's mining and attack speed."
+  },
+  "mining_fatigue": {
+    "namespacedKey": "minecraft:mining_fatigue",
+    "typeId": 4,
+    "color": "4A4217",
+    "oldColor": "4A4217",
+    "instant": false,
+    "category": "HARMFUL",
+    "description": "Decreases mining and attack speed, higher levels decrease the player's mining and attack speed."
+  },
+  "strength": {
+    "namespacedKey": "minecraft:strength",
+    "typeId": 5,
+    "times": {
+      "normal": 3600,
+      "extended": 9600,
+      "enhanced": 1800
+    },
+    "color": "FFC700",
+    "potionColor": "FFC700",
+    "oldColor": "932423",
+    "instant": false,
+    "category": "BENEFICIAL",
+    "description": "Increases melee damage, higher levels make the affected entity do more melee damage."
+  },
+  "instant_health": {
+    "namespacedKey": "minecraft:instant_health",
+    "typeId": 6,
+    "color": "F82423",
+    "potionColor": "F82423",
+    "oldColor": "F82423",
+    "instant": true,
+    "category": "BENEFICIAL",
+    "description": "Heals living entities, damages undead, higher levels heal more health and do more damage."
+  },
+  "instant_damage": {
+    "namespacedKey": "minecraft:instant_damage",
+    "typeId": 7,
+    "color": "A9656A",
+    "potionColor": "A9656A",
+    "oldColor": "430A09",
+    "instant": true,
+    "category": "HARMFUL",
+    "description": "Damages living entities, heals undead, higher levels do more damage and heal more health."
+  },
+  "jump_boost": {
+    "namespacedKey": "minecraft:jump_boost",
+    "typeId": 8,
+    "times": {
+      "normal": 3600,
+      "extended": 9600,
+      "enhanced": 1800
+    },
+    "color": "FDFF84",
+    "potionColor": "FDFF84",
+    "oldColor": "22FF4C",
+    "instant": false,
+    "category": "BENEFICIAL",
+    "description": "Increases jump height and reduces fall damage, higher levels make the affected entity jump higher and reduces more fall damage."
+  },
+  "nausea": {
+    "namespacedKey": "minecraft:nausea",
+    "typeId": 9,
+    "color": "551D4A",
+    "oldColor": "551D4A",
+    "instant": false,
+    "category": "HARMFUL",
+    "description": "Wobbles and warps the screen, and increasingly gets worse."
+  },
+  "regeneration": {
+    "namespacedKey": "minecraft:regeneration",
+    "typeId": 10,
+    "times": {
+      "normal": 900,
+      "extended": 1800,
+      "enhanced": 450
+    },
+    "color": "CD5CAB",
+    "potionColor": "CD5CAB",
+    "oldColor": "CD5CAB",
+    "category": "BENEFICIAL",
+    "instant": false,
+    "description": "Regenerates health over time, higher levels make health regenerate quicker."
+  },
+  "resistance": {
+    "namespacedKey": "minecraft:resistance",
+    "typeId": 11,
+    "color": "9146F0",
+    "potionColor": "8D82E6",
+    "oldColor": "99453A",
+    "instant": false,
+    "category": "BENEFICIAL",
+    "description": "Reduces damage, higher levels reduce more damage."
+  },
+  "fire_resistance": {
+    "namespacedKey": "minecraft:fire_resistance",
+    "typeId": 12,
+    "times": {
+      "normal": 3600,
+      "extended": 9600
+    },
+    "color": "FF9900",
+    "potionColor": "FF9900",
+    "oldColor": "E49A3A",
+    "instant": false,
+    "category": "BENEFICIAL",
+    "description": "Prevents the affected entity from taking damage due to fire, lava and other sources of fire damage."
+  },
+  "water_breathing": {
+    "namespacedKey": "minecraft:water_breathing",
+    "typeId": 13,
+    "times": {
+      "normal": 3600,
+      "extended": 9600
+    },
+    "color": "98DAC0",
+    "potionColor": "98DAC0",
+    "oldColor": "2E5299",
+    "instant": false,
+    "category": "BENEFICIAL",
+    "description": "Prevents drowning and lets the affected entity breathe underwater."
+  },
+  "invisibility": {
+    "namespacedKey": "minecraft:invisibility",
+    "typeId": 14,
+    "times": {
+      "normal": 3600,
+      "extended": 9600
+    },
+    "color": "F6F6F6",
+    "potionColor": "F6F6F6",
+    "oldColor": "7F8392",
+    "instant": false,
+    "category": "BENEFICIAL",
+    "description": "Grants Invisibility, making the affected entity invisible (but not the item they hold or the armor they wear), and reduces other mobs' detection range for the affected entity, higher levels reduce other mobs' detection range more."
+  },
+  "blindness": {
+    "namespacedKey": "minecraft:blindness",
+    "typeId": 15,
+    "color": "1F1F23",
+    "oldColor": "1F1F23",
+    "instant": false,
+    "category": "HARMFUL",
+    "description": "Impairs vision by adding close black fog and disables the ability to sprint and critical hit."
+  },
+  "night_vision": {
+    "namespacedKey": "minecraft:night_vision",
+    "typeId": 16,
+    "times": {
+      "normal": 3600,
+      "extended": 9600
+    },
+    "color": "C2FF66",
+    "potionColor": "C2FF66",
+    "oldColor": "1F1FA1",
+    "instant": false,
+    "category": "BENEFICIAL",
+    "description": "Lets the player see well in darkness and underwater."
+  },
+  "hunger": {
+    "namespacedKey": "minecraft:hunger",
+    "typeId": 17,
+    "color": "587653",
+    "oldColor": "587653",
+    "instant": false,
+    "category": "HARMFUL",
+    "description": "Increases food exhaustion, higher levels cause the player to starve quicker."
+  },
+  "weakness": {
+    "namespacedKey": "minecraft:weakness",
+    "typeId": 18,
+    "times": {
+      "normal": 1800,
+      "extended": 4800
+    },
+    "color": "484D48",
+    "potionColor": "484D48",
+    "oldColor": "484D48",
+    "instant": false,
+    "category": "HARMFUL",
+    "description": "Decreases melee damage, higher levels decrease more melee damage."
+  },
+  "poison": {
+    "namespacedKey": "minecraft:poison",
+    "typeId": 19,
+    "times": {
+      "normal": 900,
+      "extended": 1800,
+      "enhanced": 432
+    },
+    "color": "87A363",
+    "potionColor": "87A363",
+    "oldColor": "4E9331",
+    "instant": false,
+    "category": "HARMFUL",
+    "description": "Inflicts damage over time (but can't kill), higher levels do more damage per second, doesn't affect undead."
+  },
+  "wither": {
+    "namespacedKey": "minecraft:wither",
+    "typeId": 20,
+    "times": {
+      "normal": 800
+    },
+    "color": "736156",
+    "potionColor": "736156",
+    "oldColor": "352A27",
+    "instant": false,
+    "category": "HARMFUL",
+    "description": "Inflicts damage over time (can kill), higher levels do more damage per second."
+  },
+  "health_boost": {
+    "namespacedKey": "minecraft:health_boost",
+    "typeId": 21,
+    "color": "F87D23",
+    "oldColor": "F87D23",
+    "instant": false,
+    "category": "BENEFICIAL",
+    "description": "Increases maximum health, higher levels give the affected entity more maximum health."
+  },
+  "absorption": {
+    "namespacedKey": "minecraft:absorption",
+    "typeId": 22,
+    "color": "2552A5",
+    "oldColor": "2552A5",
+    "instant": false,
+    "category": "BENEFICIAL",
+    "description": "Adds damage absorption (additional hearts that can't be regenerated), higher levels give more absorption."
+  },
+  "saturation": {
+    "namespacedKey": "minecraft:saturation",
+    "typeId": 23,
+    "color": "F82423",
+    "oldColor": "F82423",
+    "instant": true,
+    "category": "BENEFICIAL",
+    "description": "Restores hunger and saturation."
+  },
+  "glowing": {
+    "namespacedKey": "minecraft:glowing",
+    "typeId": 24,
+    "color": "94A061",
+    "oldColor": "94A061",
+    "instant": false,
+    "category": "NEUTRAL",
+    "description": "Outlines the affected entity (the outline can be seen through blocks)."
+  },
+  "levitation": {
+    "namespacedKey": "minecraft:levitation",
+    "typeId": 25,
+    "color": "CEFFFF",
+    "oldColor": "CEFFFF",
+    "instant": false,
+    "category": "HARMFUL",
+    "description": "Floats the affected entity upward, higher levels make the affected entity float up faster."
+  },
+  "luck": {
+    "namespacedKey": "minecraft:luck",
+    "typeId": 26,
+    "times": {
+      "normal": 6000
+    },
+    "color": "59C106",
+    "potionColor": "59C106",
+    "oldColor": "339900",
+    "instant": false,
+    "category": "BENEFICIAL",
+    "description": "Increases chances of better and more loot, higher levels increase the chances of better and more loot."
+  },
+  "unluck": {
+    "namespacedKey": "minecraft:unluck",
+    "typeId": 27,
+    "color": "C0A44D",
+    "oldColor": "C0A44D",
+    "instant": false,
+    "category": "HARMFUL",
+    "description": "Reduces chances of better and more loot from fishing and chests, higher levels reduces the chances of good loot even more."
+  },
+  "slow_falling": {
+    "namespacedKey": "minecraft:slow_falling",
+    "typeId": 28,
+    "times": {
+      "normal": 1800,
+      "extended": 4800
+    },
+    "color": "F3CFB9",
+    "potionColor": "F3CFB9",
+    "oldColor": "FFEFD1",
+    "instant": false,
+    "category": "BENEFICIAL",
+    "description": "Decreases falling speed and negates fall damage."
+  },
+  "conduit_power": {
+    "namespacedKey": "minecraft:conduit_power",
+    "typeId": 29,
+    "color": "1DC2D1",
+    "oldColor": "1DC2D1",
+    "instant": false,
+    "category": "BENEFICIAL",
+    "description": "\tIncreases underwater visibility and mining speed, prevents drowning."
+  },
+  "dolphins_grace": {
+    "namespacedKey": "minecraft:dolphins_grace",
+    "typeId": 30,
+    "color": "88A3BE",
+    "oldColor": "88A3BE",
+    "instant": false,
+    "category": "BENEFICIAL",
+    "description": "Increases swimming speed (only obtainable from dolphins and commands)."
+  },
+  "bad_omen": {
+    "namespacedKey": "minecraft:bad_omen",
+    "typeId": 31,
+    "color": "0B6138",
+    "oldColor": "0B6138",
+    "instant": false,
+    "category": "NEUTRAL",
+    "description": "Causes an ominous event upon entering a village or the trial chambers."
+  },
+  "hero_of_the_village": {
+    "namespacedKey": "minecraft:hero_of_the_village",
+    "typeId": 32,
+    "color": "44FF44",
+    "oldColor": "44FF44",
+    "instant": false,
+    "category": "BENEFICIAL",
+    "description": "Gives discounts on trades with villagers, and makes villagers throw items at the player depending on their profession."
+  },
+  "darkness": {
+    "namespacedKey": "minecraft:darkness",
+    "typeId": 33,
+    "color": "292721",
+    "oldColor": "292721",
+    "instant": false,
+    "category": "HARMFUL",
+    "description": "Adds a pulsating darkening affect to the players screen and pulsating black fog."
+  },
+  "trial_omen": {
+    "namespacedKey": "minecraft:trial_omen",
+    "typeId": 34,
+    "color": "16A6A6",
+    "instant": false,
+    "category": "NEUTRAL",
+    "description": "Transforms nearby trial spawners into ominous trial spawners."
+  },
+  "raid_omen": {
+    "namespacedKey": "minecraft:raid_omen",
+    "typeId": 35,
+    "color": "DE4058",
+    "instant": false,
+    "category": "NEUTRAL",
+    "description": "Starts a raid at the location the player gained the Raid Omen, once the effect expires."
+  },
+  "wind_charged": {
+    "namespacedKey": "minecraft:wind_charged",
+    "typeId": 36,
+    "times": {
+      "normal": 3600
+    },
+    "color": "8C9B8C",
+    "potionColor": "BDC9FF",
+    "instant": false,
+    "category": "HARMFUL",
+    "description": "Affected entities emit a burst of wind upon death."
+  },
+  "weaving": {
+    "namespacedKey": "minecraft:weaving",
+    "typeId": 37,
+    "times": {
+      "normal": 3600
+    },
+    "color": "99FFA3",
+    "potionColor": "78695A",
+    "instant": false,
+    "category": "HARMFUL",
+    "description": "Affected entities spread cobweb blocks upon death."
+  },
+  "oozing": {
+    "namespacedKey": "minecraft:oozing",
+    "typeId": 38,
+    "times": {
+      "normal": 3600
+    },
+    "color": "78695A",
+    "potionColor": "99FFA3",
+    "instant": false,
+    "category": "HARMFUL",
+    "description": "Makes the entity spawn 2 slimes upon death."
+  },
+  "infested": {
+    "namespacedKey": "minecraft:infested",
+    "typeId": 39,
+    "times": {
+      "normal": 3600
+    },
+    "color": "BDC9FF",
+    "potionColor": "8C9B8C",
+    "instant": false,
+    "category": "HARMFUL",
+    "description": "Gives the entity a 10% chance to spawn between 1 and 3 silverfish when hurt."
+  }
+}

@@ -1,19 +1,5 @@
 package net.stardust.base;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
-import org.apache.commons.lang.NullArgumentException;
-import org.bukkit.NamespacedKey;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -23,11 +9,23 @@ import net.stardust.base.utils.BatchList;
 import net.stardust.base.utils.StardustThreads;
 import net.stardust.base.utils.message.Messager;
 import net.stardust.base.utils.plugin.PluginConfig;
+import org.bukkit.NamespacedKey;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * The Stardust class brings together utility methods for use in a general
  * context of the application.
- * 
+ *
  * @author Sergio Luis
  */
 public final class Stardust {
@@ -50,15 +48,15 @@ public final class Stardust {
      * Creates a {@link NamespacedKey} instance using the
      * {@link #STARDUST_NAMESPACE}
      * value as namespace and the String parameter as key.
-     * 
-     * @see NamespacedKey
-     * @see #STARDUST_NAMESPACE
+     *
      * @param key the key of the namespacedkey
      * @return the namespacedkey
      * @throws IllegalArgumentException if key is null or invalid (see
      *                                  {@link NamespacedKey}
      *                                  documentation about its syntax for this
      *                                  validation concept).
+     * @see NamespacedKey
+     * @see #STARDUST_NAMESPACE
      */
     public static NamespacedKey stardust(String key) {
         return new NamespacedKey(STARDUST_NAMESPACE, key);
@@ -70,7 +68,7 @@ public final class Stardust {
      * in the class that accepts them. Note that the arguments in the array
      * are order-sensitive, they must be in the same order of the parameters
      * requested by the constructor.
-     * 
+     *
      * @param className       the fully qualified class name
      * @param constructorArgs the arguments to be passed to a public constructor
      * @return a new instance of the class whose name was passed
@@ -99,7 +97,7 @@ public final class Stardust {
     /**
      * Works the same way as {@link #newInstance(String, Object...)}, but tries to
      * access the constructor even if it is not public.
-     * 
+     *
      * @param className       the fully qualified class name
      * @param constructorArgs the arguments to be passed to a public constructor
      * @return a new instance of the class whose name was passed
@@ -128,21 +126,20 @@ public final class Stardust {
 
     /**
      * Returns an {@link Identifier} object for a passed {@link CommandSender}.
-     * 
+     *
+     * @param sender the command sender to create a new identifier
+     * @return the identifier of the sender
+     * @throws NullPointerException if sender is null
      * @implNote If sender is a player, returns a {@link PlayerIdentifier},
-     *           otherwise
-     *           any other type of {@link CommandSender} implementation is treated
-     *           as a Server
-     *           sender, so {@link ServerIdentifier#INSTANCE} is returned.
-     * 
+     * otherwise
+     * any other type of {@link CommandSender} implementation is treated
+     * as a Server
+     * sender, so {@link ServerIdentifier#INSTANCE} is returned.
      * @see CommandSender
      * @see Identifier
      * @see PlayerIdentifier
      * @see ServerIdentifier
      * @see ServerIdentifier#INSTANCE
-     * @param sender the command sender to create a new identifier
-     * @return the identifier of the sender
-     * @throws NullPointerException if sender is null
      */
     public static Identifier<?> getIdentifier(CommandSender sender) {
         Objects.requireNonNull(sender, "sender");
@@ -181,33 +178,17 @@ public final class Stardust {
      * This String syntax is the same followed by the one returned by
      * {@link NamespacedKey#asString()},
      * as that is the "String representation" that this method reverse parses.
-     * 
+     *
      * <p>
      * Examples:
-     * 
+     *
      * <pre>
      * <code>
      * NamespacedKey nsk = Stardust.key("stardust:something_crazy");
      * NamespacedKey mineNsk = Stardust.key("creeper"); // minecraft:creeper
      * </code>
      * </pre>
-     * 
-     * @implNote This method interpretes that the passed parameter is the String
-     *           representation
-     *           of a {@link NamespacedKey}, and by representation we can also say
-     *           "equivalence", so for a
-     *           null String parameter, a null {@link NamespacedKey} will be
-     *           returned.
-     * @implNote If the String parameter does not contain a colon, then this method
-     *           treates the
-     *           parameter no more as a whole {@link NamespacedKey} String
-     *           representation, but only the
-     *           key of it, and takes {@link NamespacedKey#MINECRAFT} as the
-     *           namespace.
-     * 
-     * @see NamespacedKey
-     * @see NamespacedKey#asString()
-     * @see NamespacedKey#MINECRAFT
+     *
      * @param str the String representation of a {@link NamespacedKey}, such as
      *            returned by
      *            {@link NamespacedKey#asString()}.
@@ -216,6 +197,21 @@ public final class Stardust {
      *                                  more, contains more than one colon, the
      *                                  namespace does not match its regex or the
      *                                  key does not match its regex
+     * @implNote This method interpretes that the passed parameter is the String
+     * representation
+     * of a {@link NamespacedKey}, and by representation we can also say
+     * "equivalence", so for a
+     * null String parameter, a null {@link NamespacedKey} will be
+     * returned.
+     * @implNote If the String parameter does not contain a colon, then this method
+     * treates the
+     * parameter no more as a whole {@link NamespacedKey} String
+     * representation, but only the
+     * key of it, and takes {@link NamespacedKey#MINECRAFT} as the
+     * namespace.
+     * @see NamespacedKey
+     * @see NamespacedKey#asString()
+     * @see NamespacedKey#MINECRAFT
      */
     public static NamespacedKey key(String str) {
         if (str == null)
@@ -247,7 +243,7 @@ public final class Stardust {
      * {@link #listPageableString(CommandSender, int, Stream, String, Function)}.
      * This method just call that one passing {@link Collection#stream()} as
      * argument.
-     * 
+     *
      * @param <T>             the type of the elements that will be converted to
      *                        {@link String} messages, and then to {@link Component}
      *                        ones
@@ -265,7 +261,7 @@ public final class Stardust {
      * @throws NullPointerException
      */
     public static <T> void listPageableString(CommandSender sender, int page, Collection<T> elements,
-            String pageableListKey, Function<T, String> toMessage) {
+                                              String pageableListKey, Function<T, String> toMessage) {
         listPageableString(sender, page, elements.stream(), pageableListKey, toMessage);
     }
 
@@ -276,14 +272,14 @@ public final class Stardust {
      * String obtained
      * by this function parameter into a {@link Component}. The function in question
      * is this:
-     * 
+     *
      * <pre>
      * <code>
-     * element -> Component.text("» " + toMessage.apply(element), 
+     * element -> Component.text("» " + toMessage.apply(element),
      *          NamedTextColor.GREEN, TextDecoration.ITALIC)
      * </code>
      * </pre>
-     * 
+     *
      * @param <T>             the type of the elements that will be converted to
      *                        {@link String} messages, and then to {@link Component}
      *                        ones
@@ -301,7 +297,7 @@ public final class Stardust {
      * @throws NullPointerException if any parameter is null
      */
     public static <T> void listPageableString(CommandSender sender, int page, Stream<T> elements,
-            String pageableListKey, Function<T, String> toMessage) {
+                                              String pageableListKey, Function<T, String> toMessage) {
         listPageable(sender, page, elements, pageableListKey,
                 element -> Component.text("» " + toMessage.apply(element), NamedTextColor.GREEN,
                         TextDecoration.ITALIC));
@@ -312,10 +308,7 @@ public final class Stardust {
      * {@link #listPageable(CommandSender, int, Stream, String, Function)}.
      * This method just call that one passing {@link Collection#stream()} as
      * argument.
-     * 
-     * @see #listPageable(CommandSender, int, Stream, String, Function)
-     * @see #listPageableString(CommandSender, int, Collection, String, Function)
-     * @see #listPageableString(CommandSender, int, Stream, String, Function)
+     *
      * @param <T>             the type of the elements that will be converted to
      *                        {@link Component} messages
      * @param sender          the {@link CommandSender} to send messages
@@ -328,9 +321,12 @@ public final class Stardust {
      *                        {@link Component}s; it is recommended this function to
      *                        absolutely never return null
      * @throws NullPointerException if any parameter is null
+     * @see #listPageable(CommandSender, int, Stream, String, Function)
+     * @see #listPageableString(CommandSender, int, Collection, String, Function)
+     * @see #listPageableString(CommandSender, int, Stream, String, Function)
      */
     public static <T> void listPageable(CommandSender sender, int page, Collection<T> elements,
-            String pageableListKey, Function<T, Component> toMessage) {
+                                        String pageableListKey, Function<T, Component> toMessage) {
         listPageable(sender, page, elements.stream(), pageableListKey, toMessage);
     }
 
@@ -341,7 +337,7 @@ public final class Stardust {
      * elements of a page and a header indicating what page it is and what kind of
      * elements are in the page.
      * </p>
-     * 
+     *
      * <p>
      * The pages are obtained from a {@link Stream} of elements, collecting them
      * into a
@@ -355,7 +351,7 @@ public final class Stardust {
      * parameter,
      * making them suitable for being sent to the {@link CommandSender} parameter.
      * </p>
-     * 
+     *
      * <p>
      * No parameter is allowed to be null, and the page number initiates count from
      * 1,
@@ -365,21 +361,13 @@ public final class Stardust {
      * {@link CommandSender}, no
      * exception will be thrown.
      * </p>
-     * 
+     *
      * <p>
      * The purpose of this method is just allowing the {@link CommandSender} to
      * choose
      * a page of elements to view by text.
      * </p>
-     * 
-     * @implNote This method ensures that messages will be sent in Bukkit Main
-     *           thread,
-     *           so it is thread-safe in that context.
-     * 
-     * @see #listPageable(CommandSender, int, Collection, String, Function)
-     * @see #listPageableString(CommandSender, int, Collection, String, Function)
-     * @see #listPageableString(CommandSender, int, Stream, String, Function)
-     * @see #DEFAULT_PAGE_SIZE
+     *
      * @param <T>             the type of the elements that will be converted to
      *                        {@link Component} messages
      * @param sender          the {@link CommandSender} to send messages
@@ -394,9 +382,16 @@ public final class Stardust {
      *                        is recommended this function to absolutely never
      *                        return null
      * @throws NullPointerException if any parameter is null
+     * @implNote This method ensures that messages will be sent in Bukkit Main
+     * thread,
+     * so it is thread-safe in that context.
+     * @see #listPageable(CommandSender, int, Collection, String, Function)
+     * @see #listPageableString(CommandSender, int, Collection, String, Function)
+     * @see #listPageableString(CommandSender, int, Stream, String, Function)
+     * @see #DEFAULT_PAGE_SIZE
      */
     public static <T> void listPageable(CommandSender sender, int page, Stream<T> elements,
-            String pageableListKey, Function<T, Component> toMessage) {
+                                        String pageableListKey, Function<T, Component> toMessage) {
         notNull(sender, elements, pageableListKey, toMessage);
         Messager messager = PluginConfig.get().getPlugin().getMessager();
         int index = page - 1;
@@ -426,10 +421,10 @@ public final class Stardust {
      * Utility method for nullity checking of multiple objects at once.
      * If any of the objects are null, a {@link NullPointerException} is
      * thrown.
-     * 
-     * @see #notNull(String, Object...)
+     *
      * @param objects the objects to check nullity
      * @throws NullPointerException if any object is null
+     * @see #notNull(String, Object...)
      */
     public static void notNull(Object... objects) {
         notNull("Argument must not be null", objects);
@@ -439,18 +434,159 @@ public final class Stardust {
      * Utility method for nullity checking of multiple objects at once.
      * If any of the objects are null, a {@link NullPointerException} is
      * thrown with the String message parameter.
-     * 
-     * @see #notNull(Object...)
+     *
      * @param message the message of the {@link NullPointerException}, if thrown
      * @param objects the objects to check nullity
      * @throws NullPointerException if any object is null
+     * @see #notNull(Object...)
      */
     public static void notNull(String message, Object... objects) {
         for (Object obj : objects) {
             if (obj == null) {
-                throw new NullArgumentException(message);
+                throw new NullPointerException(message);
             }
         }
+    }
+
+    /**
+     * Returns if a class is basic, that is, primitive, their respective wrappers or String.
+     *
+     * @param clazz the class to verify if it is basic.
+     * @return true if basic, false otherwise.
+     * @throws NullPointerException if clazz is null.
+     */
+    public static boolean isBasic(Class<?> clazz) {
+        return clazz.isPrimitive() || clazz == Byte.class || clazz == Short.class
+                || clazz == Integer.class || clazz == Long.class || clazz == Float.class
+                || clazz == Double.class || clazz == Boolean.class || clazz == Character.class
+                || clazz == String.class;
+    }
+
+    /**
+     * <p>
+     * Parses a value in its String format to the object format for basic values,
+     * that is, primitive, their respective wrapper values or a string value. If
+     * the class is not a basic type, an AssertionError is thrown.
+     *
+     * <p>
+     * If a null value is passed as the String parameter:
+     * <ul>
+     *     <li>if the class is primitive, throws a NullPointerException;</li>
+     *     <li>if the class is non primitive, returns null.</li>
+     * </ul>
+     *
+     * <p>
+     * If the value passed is not primitive neither wrapper, an AssertionError
+     * is thrown.
+     *
+     * @param basicClass the primitive or wrapper class to parse the string value.
+     * @param value      the string representation of the primitive or wrapper value.
+     * @return the object parsed from string representation. Note that even if
+     * the basicClass is primitive, the returned object is wrapped into a wrapper
+     * because it returns as an Object.
+     * @throws NullPointerException     if basicClass is null or basicClass is primitive
+     *                                  and value is null.
+     * @throws IllegalArgumentException if the string value doesn't represent any
+     *                                  of the basic values. See implementation note.
+     * @throws AssertionError           if basicClass is not a primitive or wrapper class.
+     * @implNote For numeric values (byte, short, int, long, float and double), just
+     * valueOf() method is called from their respective wrapper classes.
+     * <p>
+     * For booleans, <code>true</code> is returned if the string is equals,
+     * ignoring case, to the string "true" and false if it is equals, ignoring case,
+     * to the string "false". For any other value, an IllegalArgumentException is thrown.
+     * <p>
+     * For characters, if the string contains only 1 character, that character
+     * is returned, otherwise an IllegalArgumentException is thrown.
+     * <p>
+     * For a string class passed as parameter, the value itself is returned.
+     */
+    public static Object parseBasic(Class<?> basicClass, String value) {
+        Objects.requireNonNull(basicClass, "basicClass");
+        if (value == null) {
+            if (basicClass.isPrimitive()) {
+                throw new NullPointerException("Primitive types do not allow null");
+            }
+            return null;
+        }
+        if (basicClass == byte.class || basicClass == Byte.class) return Byte.valueOf(value);
+        if (basicClass == short.class || basicClass == Short.class) return Short.valueOf(value);
+        if (basicClass == int.class || basicClass == Integer.class) return Integer.valueOf(value);
+        if (basicClass == long.class || basicClass == Long.class) return Long.valueOf(value);
+        if (basicClass == float.class || basicClass == Float.class) return Float.valueOf(value);
+        if (basicClass == double.class || basicClass == Double.class) return Double.valueOf(value);
+        if (basicClass == boolean.class || basicClass == Boolean.class) {
+            return switch (value.toLowerCase()) {
+                case "true" -> true;
+                case "false" -> false;
+                default -> throw new IllegalArgumentException("Not a boolean: " + value);
+            };
+        }
+        if (basicClass == char.class || basicClass == Character.class) {
+            if (value.length() != 1) {
+                throw new IllegalArgumentException("Not a character: " + value);
+            }
+            return value.charAt(0);
+        }
+        if (basicClass == String.class) return value;
+        throw new AssertionError("Value is not primitive neither wrapper");
+    }
+
+    public static boolean equals(Object obj1, Object obj2) {
+        if (obj1 == null) {
+            return obj2 == null;
+        } else if (obj2 == null) {
+            return false;
+        } else {
+            return switch (obj1) {
+                case byte[] a -> obj2 instanceof byte[] b && Arrays.equals(a, b);
+                case short[] a -> obj2 instanceof short[] b && Arrays.equals(a, b);
+                case int[] a -> obj2 instanceof int[] b && Arrays.equals(a, b);
+                case long[] a -> obj2 instanceof long[] b && Arrays.equals(a, b);
+                case float[] a -> obj2 instanceof float[] b && Arrays.equals(a, b);
+                case double[] a -> obj2 instanceof double[] b && Arrays.equals(a, b);
+                case boolean[] a -> obj2 instanceof boolean[] b && Arrays.equals(a, b);
+                case char[] a -> obj2 instanceof char[] b && Arrays.equals(a, b);
+                case Object[] a -> obj2 instanceof Object[] b && Arrays.deepEquals(a, b);
+                default -> obj1.equals(obj2);
+            };
+        }
+    }
+
+    public static int hashCode(Object obj) {
+        if (obj == null) {
+            return 0;
+        }
+        return switch (obj) {
+            case byte[] a -> Arrays.hashCode(a);
+            case short[] a -> Arrays.hashCode(a);
+            case int[] a -> Arrays.hashCode(a);
+            case long[] a -> Arrays.hashCode(a);
+            case float[] a -> Arrays.hashCode(a);
+            case double[] a -> Arrays.hashCode(a);
+            case boolean[] a -> Arrays.hashCode(a);
+            case char[] a -> Arrays.hashCode(a);
+            case Object[] a -> Arrays.deepHashCode(a);
+            default -> obj.hashCode();
+        };
+    }
+
+    public static String toString(Object obj) {
+        if (obj == null) {
+            return "null";
+        }
+        return switch (obj) {
+            case byte[] array -> Arrays.toString(array);
+            case short[] array -> Arrays.toString(array);
+            case int[] array -> Arrays.toString(array);
+            case long[] array -> Arrays.toString(array);
+            case float[] array -> Arrays.toString(array);
+            case double[] array -> Arrays.toString(array);
+            case boolean[] array -> Arrays.toString(array);
+            case char[] array -> Arrays.toString(array);
+            case Object[] array -> Arrays.deepToString(array);
+            default -> obj.toString();
+        };
     }
 
 }

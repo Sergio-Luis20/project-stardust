@@ -1,4 +1,4 @@
-package net.stardust.base.utils;
+package net.stardust.base.utils.gameplay;
 
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.bossbar.BossBar.Color;
@@ -19,8 +19,7 @@ public final class BossBarUtils {
     }
 
     public static void removeAll(BossBar bar) {
-        List<Player> viewers = new ArrayList<>(viewers(bar));
-        viewers.forEach(bar::removeViewer);
+        viewers(bar).forEach(bar::removeViewer);
     }
 
     public static boolean contains(BossBar bar, Player player) {

@@ -1,18 +1,17 @@
-package net.stardust.base.utils;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Sound;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+package net.stardust.base.utils.gameplay;
 
 import br.sergio.utils.Pair;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.stardust.base.model.channel.Channel;
+import org.bukkit.Bukkit;
+import org.bukkit.Sound;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 public class MentionService {
 

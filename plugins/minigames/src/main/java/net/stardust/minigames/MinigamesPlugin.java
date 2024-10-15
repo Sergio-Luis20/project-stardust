@@ -18,10 +18,7 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 public class MinigamesPlugin extends BasePlugin {
@@ -111,11 +108,11 @@ public class MinigamesPlugin extends BasePlugin {
         }
     }
 
-    public Minigame getMatch(Player player) {
+    public Optional<Minigame> getMatch(Player player) {
         World world = player.getWorld();
         String worldName = world.getName();
         if(!worldName.startsWith("minigame")) {
-            return null;
+            return Optional.empty();
         }
         String[] split = worldName.split("-");
         String minigameName = split[1];
@@ -127,15 +124,15 @@ public class MinigamesPlugin extends BasePlugin {
             }
         }
         if(list == null) {
-            return null;
+            return Optional.empty();
         }
         for(MatchSign sign : list) {
             Minigame match = sign.getMatch();
             if(world.equals(match.getWorld())) {
-                return match;
+                return Optional.of(match);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     public MinigameInfo getMinigameInfo(String minigame, int index) {

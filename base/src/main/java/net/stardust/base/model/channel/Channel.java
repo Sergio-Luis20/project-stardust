@@ -38,23 +38,25 @@ public abstract class Channel implements MessageFormatter<CommandSender>, Commun
         this.plugin = Objects.requireNonNull(plugin, "plugin");
         messager = plugin.getMessager();
         this.name = Objects.requireNonNull(name, "name");
-        if(participants == null) participants = new HashSet<>();
-        this.participants = Collections.synchronizedSet(new HashSet<>(participants));
+
+        Set<CommandSender> set = participants == null ? new HashSet<>() : new HashSet<>(participants);
+
+        this.participants = Collections.synchronizedSet(set);
         this.participants.add(Bukkit.getConsoleSender());
         conditions = Collections.synchronizedList(new ArrayList<>());
     }
-    
+
     public List<ChannelCondition> getConditions() {
         return new ArrayList<>();
     }
 
     public boolean canSendMessages(CommandSender sender) {
-        if(!invokedConditions) {
+        if (!invokedConditions) {
             conditions.addAll(getConditions());
             invokedConditions = true;
         }
-        for(ChannelCondition condition : conditions) {
-            if(!condition.test(sender)) {
+        for (ChannelCondition condition : conditions) {
+            if (!condition.test(sender)) {
                 messager.message(sender, condition.getNotAllowedMessage(sender));
                 return false;
             }
@@ -77,26 +79,29 @@ public abstract class Channel implements MessageFormatter<CommandSender>, Commun
     public Set<CommandSender> getParticipants() {
         return Collections.unmodifiableSet(participants);
     }
-    
+
     public void sendMessage(CommandSender sender, String message) {
         LegacyComponentSerializer serializer = LegacyComponentSerializer.legacySection();
         sendMessage(sender, serializer.deserialize(message));
     }
 
     public void sendMessage(CommandSender sender, Component component) {
-        if(!containsParticipant(sender)) return;
-        if(!canSendMessages(sender)) return;
+        if (!containsParticipant(sender))
+            return;
+        if (!canSendMessages(sender))
+            return;
         messager.message(participants, formatMessage(sender, component));
     }
 
     public static Set<String> getChannels(Communicable communicable) {
         Set<String> channels = new HashSet<>();
-        try(BufferedReader reader = new BufferedReader(new InputStreamReader(Channel.class.getResourceAsStream("/Channels.txt")))) {
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(Channel.class.getResourceAsStream("/Channels.txt")))) {
             String line;
-            while((line = reader.readLine()) != null) {
+            while ((line = reader.readLine()) != null) {
                 channels.add(line);
             }
-        } catch(IOException e) {
+        } catch (IOException e) {
             Throwables.send(communicable.getId(), e);
         }
         return channels;

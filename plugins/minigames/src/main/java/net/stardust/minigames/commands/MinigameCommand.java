@@ -8,7 +8,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.DirectCommand;
-import net.stardust.base.utils.AutomaticMessages;
+import net.stardust.base.utils.gameplay.AutomaticMessages;
 import net.stardust.minigames.MinigamesPlugin;
 
 @BaseCommand(value = "minigame", types = Player.class)

@@ -1,10 +1,21 @@
 package net.stardust.base.model.inventory;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.node.NullNode;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.stardust.base.model.inventory.PseudoInventory.PseudoInventoryDeserializer;
+import net.stardust.base.model.inventory.PseudoInventory.PseudoInventorySerializer;
+import net.stardust.base.utils.PseudoObject;
+import net.stardust.base.utils.inventory.InventoryUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -12,21 +23,14 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonRootName;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.*;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.stardust.base.utils.PseudoObject;
-import net.stardust.base.utils.inventory.InventoryUtils;
-
-@JsonRootName("inventory")
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
-@EqualsAndHashCode
 @ToString
+@EqualsAndHashCode
+@JsonSerialize(using = PseudoInventorySerializer.class)
+@JsonDeserialize(using = PseudoInventoryDeserializer.class)
 public class PseudoInventory implements PseudoObject<Inventory>, Serializable, Cloneable {
 
     private String titleJson;
@@ -77,6 +81,12 @@ public class PseudoInventory implements PseudoObject<Inventory>, Serializable, C
             PseudoItem item = inventory.getItem(i);
             items[i] = item == null ? null : item.clone();
         }
+    }
+
+    private PseudoInventory(String titleJson, PseudoItem[] items, Map<String, String> labels) {
+        this.titleJson = titleJson;
+        this.items = items;
+        this.labels = labels;
     }
 
     private void setupItems(Inventory inventory) {
@@ -151,6 +161,10 @@ public class PseudoInventory implements PseudoObject<Inventory>, Serializable, C
         this.items = items;
     }
 
+    public String getTitleJson() {
+        return titleJson;
+    }
+
     public String getTitleAsString() {
         if (titleJson == null) {
             return null;
@@ -199,9 +213,7 @@ public class PseudoInventory implements PseudoObject<Inventory>, Serializable, C
     }
 
     public Map<String, String> getLabels() {
-        Map<String, String> copy = new HashMap<>();
-        copy.putAll(labels);
-        return copy;
+        return Collections.unmodifiableMap(labels);
     }
     
     public void clear() {
@@ -210,7 +222,68 @@ public class PseudoInventory implements PseudoObject<Inventory>, Serializable, C
 
     @Override
     public PseudoInventory clone() {
-        return new PseudoInventory(this);
+        PseudoInventory copy = new PseudoInventory();
+        copy.items = items.clone();
+        copy.titleJson = titleJson;
+        copy.labels = getLabels();
+        return copy;
+    }
+
+    private record ItemEntry(int slot, PseudoItem item) {
+    }
+
+    private record Items(int size, ItemEntry[] entries) {
+
+        public PseudoItem[] restoreArray() {
+            PseudoItem[] items = new PseudoItem[size];
+            for (ItemEntry entry : entries) {
+                items[entry.slot()] = entry.item();
+            }
+            return items;
+        }
+
+    }
+
+    private Items convertItems() {
+        List<ItemEntry> entries = new ArrayList<>();
+        int size = items.length;
+        for (int i = 0; i < size; i++) {
+            PseudoItem item = items[i];
+            if (item != null) {
+                entries.add(new ItemEntry(i, item));
+            }
+        }
+        return new Items(size, entries.toArray(ItemEntry[]::new));
+    }
+
+    static class PseudoInventorySerializer extends JsonSerializer<PseudoInventory> {
+
+        @Override
+        public void serialize(PseudoInventory value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+            gen.writeStartObject();
+            gen.writeStringField("titleJson", value.titleJson);
+            gen.writeObjectField("items", value.convertItems());
+            gen.writeObjectField("labels", value.labels);
+            gen.writeEndObject();
+        }
+
+    }
+
+    static class PseudoInventoryDeserializer extends JsonDeserializer<PseudoInventory> {
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public PseudoInventory deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
+            JsonNode node = p.getCodec().readTree(p);
+
+            JsonNode titleNode = node.get("titleJson");
+            String titleJson = titleNode instanceof NullNode ? null : titleNode.asText();
+            Items items = p.getCodec().treeToValue(node.get("items"), Items.class);
+            Map<String, String> labels = p.getCodec().treeToValue(node.get("labels"), HashMap.class);
+
+            return new PseudoInventory(titleJson, items.restoreArray(), labels);
+        }
+
     }
 
 }

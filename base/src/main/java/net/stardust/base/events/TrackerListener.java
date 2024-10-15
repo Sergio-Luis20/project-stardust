@@ -3,7 +3,7 @@ package net.stardust.base.events;
 import br.sergio.utils.Pair;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.stardust.base.utils.Tracker;
+import net.stardust.base.utils.gameplay.Tracker;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;

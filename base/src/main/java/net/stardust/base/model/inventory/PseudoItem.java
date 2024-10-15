@@ -1,37 +1,24 @@
 package net.stardust.base.model.inventory;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import lombok.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.stardust.base.utils.PseudoObject;
+import net.stardust.base.utils.item.ItemUtils;
+import net.stardust.base.utils.persistence.DataManager;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonRootName;
-
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.ToString;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.stardust.base.utils.item.ItemUtils;
-import net.stardust.base.utils.PseudoObject;
-import net.stardust.base.utils.persistence.DataManager;
+import java.io.Serializable;
+import java.util.*;
 
 @Getter
-@EqualsAndHashCode
 @ToString
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
-@JsonRootName("item")
+@EqualsAndHashCode
 public class PseudoItem implements PseudoObject<ItemStack>, Serializable, Cloneable {
-    
+
     @Setter
     @NonNull
     private Material material;
@@ -41,7 +28,7 @@ public class PseudoItem implements PseudoObject<ItemStack>, Serializable, Clonea
     private String displayName;
     private List<String> lore = new ArrayList<>();
     private List<PseudoEnchantment> enchantments = new ArrayList<>();
-    private List<PersistentObject> tags = new ArrayList<>();
+    private List<PersistentTag> tags = new ArrayList<>();
     private Map<String, String> labels = new HashMap<>();
 
     public PseudoItem() {
@@ -71,11 +58,11 @@ public class PseudoItem implements PseudoObject<ItemStack>, Serializable, Clonea
         }
         LegacyComponentSerializer serializer = LegacyComponentSerializer.legacySection();
         setDisplayName(serializer.serialize(meta.displayName()));
-        lore.addAll(meta.lore().stream().map(compoment -> serializer.serialize(compoment)).toList());
+        lore.addAll(meta.lore().stream().map(serializer::serialize).toList());
         meta.getEnchants().forEach((enchant, level) -> enchantments.add(new PseudoEnchantment(enchant, level)));
         DataManager<ItemMeta> dataManager = new DataManager<>(meta);
         for(NamespacedKey key : dataManager) {
-            tags.add(new PersistentObject(key, dataManager.readObject(key)));
+            tags.add(new PersistentTag(key, dataManager.readObject(key)));
         }
     }
 
@@ -89,6 +76,7 @@ public class PseudoItem implements PseudoObject<ItemStack>, Serializable, Clonea
         labels.putAll(item.labels);
     }
 
+    @Override
     public ItemStack toOriginal() {
         ItemStack item = ItemUtils.item(material, amount);
         ItemMeta meta;

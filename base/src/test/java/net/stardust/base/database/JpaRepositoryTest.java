@@ -1,23 +1,14 @@
 package net.stardust.base.database;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
+import br.sergio.utils.math.Point;
+import jakarta.persistence.EntityManagerFactory;
+import net.stardust.base.BasePlugin;
+import net.stardust.base.database.Repository.SaveResult;
+import net.stardust.base.database.repositories.JpaRepository;
+import net.stardust.base.model.gameplay.Rank;
+import net.stardust.base.model.rpg.*;
+import net.stardust.base.model.user.User;
+import net.stardust.base.utils.security.PasswordException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,21 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import br.sergio.utils.math.Point;
-import jakarta.persistence.EntityManagerFactory;
-import net.stardust.base.BasePlugin;
-import net.stardust.base.database.Repository.SaveResult;
-import net.stardust.base.database.repositories.JpaRepository;
-import net.stardust.base.model.gameplay.Rank;
-import net.stardust.base.model.rpg.Level;
-import net.stardust.base.model.rpg.LevelFunctions;
-import net.stardust.base.model.rpg.Multiplier;
-import net.stardust.base.model.rpg.NumberComposition;
-import net.stardust.base.model.rpg.PlayerAttribute;
-import net.stardust.base.model.rpg.RPGPlayer;
-import net.stardust.base.model.rpg.Skill;
-import net.stardust.base.model.user.User;
-import net.stardust.base.utils.security.PasswordException;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 public class JpaRepositoryTest {
 
@@ -191,7 +174,7 @@ public class JpaRepositoryTest {
         List<UUID> ids = users.stream().map(User::getEntityId).toList();
         List<User> retrievedUsers = userRepository.findAll(ids);
 
-        Comparator<User> comparator = (u1, u2) -> u1.getId().compareTo(u2.getId());
+        Comparator<User> comparator = Comparator.comparing(User::getId);
 
         users.sort(comparator);
         retrievedUsers.sort(comparator);

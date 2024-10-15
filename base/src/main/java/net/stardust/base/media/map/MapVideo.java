@@ -10,8 +10,8 @@ import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
 
 import net.stardust.base.media.ImageAlignStrategy;
-import net.stardust.base.media.VideoFramer;
 import net.stardust.base.media.ImageAlignStrategy.ImageAlignStrategyEnum;
+import net.stardust.base.media.VideoFramer;
 
 /**
  * {@link VideoFramer} implementation for processing frames
@@ -41,7 +41,8 @@ public class MapVideo extends VideoFramer<MapImage> {
 
     /**
      * Creates a new {@link MapVideo} instance with the passed
-     * stream. This initializes with align strategy {@link ImageAlignStrategyEnum#CENTER}.
+     * stream. This initializes with align strategy
+     * {@link ImageAlignStrategyEnum#CENTER}.
      * 
      * @see ImageAlignStrategy
      * @see ImageAlignStrategyEnum
@@ -57,7 +58,8 @@ public class MapVideo extends VideoFramer<MapImage> {
 
     /**
      * Creates a new {@link MapVideo} instance with the passed
-     * file. This initializes with align strategy {@link ImageAlignStrategyEnum#CENTER}.
+     * file. This initializes with align strategy
+     * {@link ImageAlignStrategyEnum#CENTER}.
      * 
      * @see ImageAlignStrategy
      * @see ImageAlignStrategyEnum

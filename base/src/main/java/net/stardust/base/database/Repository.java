@@ -1,9 +1,22 @@
 package net.stardust.base.database;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 import net.stardust.base.model.StardustEntity;
+import net.stardust.base.utils.Serializer;
 
+/**
+ * A basic interface for manipulation of data stored in any
+ * kind of database.
+ * 
+ * @author Sergio Luis
+ */
 public interface Repository<K, V extends StardustEntity<K>> extends AutoCloseable {
 
 	/**
@@ -41,7 +54,7 @@ public interface Repository<K, V extends StardustEntity<K>> extends AutoCloseabl
 	 * 
 	 * @param id the key (id) for checking existence.
 	 * @return true if the value exists in the repository,
-	 * false otherwise.
+	 *         false otherwise.
 	 */
 	boolean existsById(K id);
 
@@ -52,7 +65,7 @@ public interface Repository<K, V extends StardustEntity<K>> extends AutoCloseabl
 	 * 
 	 * @param data the value to save.
 	 * @return the result of the save operation, as described in
-	 * the enum SaveResult.
+	 *         the enum SaveResult.
 	 */
 	default SaveResult save(V data) {
 		return save(data, false);
@@ -64,11 +77,11 @@ public interface Repository<K, V extends StardustEntity<K>> extends AutoCloseabl
 	 * true. If {@code update} is false, then the behavior
 	 * of this method should be the same as {@link #save(V)}.
 	 * 
-	 * @param data the value to save.
+	 * @param data   the value to save.
 	 * @param update true for creating or updating, false for
-	 * creating only.
+	 *               creating only.
 	 * @return the result of the save operation, as described in
-	 * the enum SaveResult.
+	 *         the enum SaveResult.
 	 */
 	SaveResult save(V data, boolean update);
 
@@ -79,7 +92,7 @@ public interface Repository<K, V extends StardustEntity<K>> extends AutoCloseabl
 	 * 
 	 * @param list the list of values to save.
 	 * @return the result of the save operation, as described in
-	 * the enum SaveResult.
+	 *         the enum SaveResult.
 	 */
 	default SaveResult saveAll(List<V> list) {
 		return saveAll(list, false);
@@ -91,11 +104,11 @@ public interface Repository<K, V extends StardustEntity<K>> extends AutoCloseabl
 	 * must has the same effect of {@link #save(V, boolean)} for
 	 * each value.
 	 * 
-	 * @param list the list of values to save.
+	 * @param list   the list of values to save.
 	 * @param update true for creating or updating, false for
-	 * creating only.
+	 *               creating only.
 	 * @return the result of the save operation, as described in
-	 * the enum SaveResult.
+	 *         the enum SaveResult.
 	 */
 	SaveResult saveAll(List<V> list, boolean update);
 
@@ -107,7 +120,7 @@ public interface Repository<K, V extends StardustEntity<K>> extends AutoCloseabl
 	 * 
 	 * @param id the key (id) of the value for delete.
 	 * @return boolean true if the value was successfully deleted, false
-	 * otherwise.
+	 *         otherwise.
 	 */
 	boolean delete(K id);
 
@@ -118,7 +131,7 @@ public interface Repository<K, V extends StardustEntity<K>> extends AutoCloseabl
 	 * 
 	 * @param list the list of keys (ids) to delete.
 	 * @return true if all values were successfully deleted,
-	 * false otherwise.
+	 *         false otherwise.
 	 */
 	boolean deleteAll(List<K> list);
 
@@ -156,11 +169,67 @@ public interface Repository<K, V extends StardustEntity<K>> extends AutoCloseabl
 		DUPLICATE,
 
 		/**
-		 * Should be returnd if the save operation failed by
+		 * Should be returned if the save operation failed by
 		 * some other reason.
 		 */
 		FAIL;
 
+	}
+
+	/**
+	 * Returns a String representation of an id that follows the contract of
+	 * {@link StardustEntity#getEntityId()}. If the object is just a String,
+	 * return itself. If it is some primitive type, wrapper type, {@link UUID},
+	 * {@link BigInteger} or {@link BigDecimal}, returns {@link Object#toString()}.
+	 * If it is any other {@link Serializable} type, then it will check if the
+	 * class has been marked with {@link IdToString} annotation; it yes, just
+	 * return {@link Object#toString()}, otherwise, it will serialize the object
+	 * into a byte array and will wrap it in a String, which is the one that will
+	 * be returned.
+	 * 
+	 * @see IdToString
+	 * @see StardustEntity#getEntityId()
+	 * @param obj the id object to get String representation.
+	 * @return the String representation of the id.
+	 * @throws IllegalArgumentException if the id doesn't follow the contract
+	 *                                  specified in
+	 *                                  {@link StardustEntity#getEntityId()} or an
+	 *                                  {@link IOException}
+	 *                                  occurs during byte serialization. The
+	 *                                  IOException will the be cause of
+	 *                                  the thrown IllegalArgumentException.
+	 * @throws NullPointerException     if obj is null.
+	 */
+	static String keyToString(Object obj) {
+		Objects.requireNonNull(obj, "obj");
+		return switch (obj) {
+			case Byte b -> b.toString();
+			case Short s -> s.toString();
+			case Integer i -> i.toString();
+			case Long l -> l.toString();
+			case Float f -> f.toString();
+			case Double d -> d.toString();
+			case Boolean b -> b.toString();
+			case Character c -> c.toString();
+			case UUID u -> u.toString();
+			case BigInteger b -> b.toString();
+			case BigDecimal b -> b.toString();
+			case String s -> s;
+			case Serializable s -> {
+				if (s.getClass().isAnnotationPresent(IdToString.class)) {
+					yield s.toString();
+				} else {
+					byte[] data;
+					try {
+						data = Serializer.serialize(s);
+					} catch (IOException e) {
+						throw new IllegalArgumentException("Could not serialize key", e);
+					}
+					yield new String(data);
+				}
+			}
+			default -> throw new IllegalArgumentException("Illegal key");
+		};
 	}
 
 }

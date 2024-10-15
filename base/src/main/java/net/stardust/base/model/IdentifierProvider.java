@@ -6,7 +6,7 @@ import java.io.Serializable;
  * This interface represents an object that can
  * supply an identifier of any kind. This is util
  * for classes that can't extend some identifier class
- * and but don't need to rewrite internal code to
+ * and don't need to rewrite internal code to
  * implement the same functionality of {@link Identifier}.
  * 
  * @see Identifier

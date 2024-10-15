@@ -2,9 +2,14 @@ package net.stardust.base.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
+import java.util.stream.Stream;
 
 public class BatchList<E> extends ArrayList<E> {
     
@@ -22,6 +27,11 @@ public class BatchList<E> extends ArrayList<E> {
     public BatchList(int batchSize, int initialCapacity) {
         super(initialCapacity);
         setBatchSize(batchSize);
+    }
+
+    public BatchList(int batchSize, Stream<? extends E> stream) {
+        setBatchSize(batchSize);
+        addAll(stream.collect(collector(batchSize)));
     }
 
     public List<E> getBatch(int index) {
@@ -60,7 +70,7 @@ public class BatchList<E> extends ArrayList<E> {
             return 0;
         }
         int totalBatches = size / batchSize;
-        if(totalBatches == 0 || size % totalBatches != 0) {
+        if(totalBatches == 0 || size % batchSize != 0) {
             totalBatches++;
         }
         return totalBatches;
@@ -71,10 +81,55 @@ public class BatchList<E> extends ArrayList<E> {
     }
 
     private void setBatchSize(int batchSize) {
-        if(batchSize < 0) {
-            throw new IllegalArgumentException("negative batch size");
+        if(batchSize <= 0) {
+            throw new IllegalArgumentException("Batch size must be greater than 0 but is " + batchSize);
         }
         this.batchSize = batchSize;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!super.equals(o)) {
+            return false;
+        }
+        if (o instanceof BatchList<?> list) {
+            return batchSize == list.batchSize;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * super.hashCode() * Integer.hashCode(batchSize);
+    }
+
+    @Override
+    public String toString() {
+        Iterator<E> iterator = iterator();
+        if (!iterator.hasNext()) {
+            return "(" + batchSize + ")[]";
+        }
+        int counter = 0;
+        StringBuilder builder = new StringBuilder().append("(" + batchSize + ")[");
+        while (true) {
+            E element = iterator.next();
+            if (counter % batchSize == 0) {
+                if (counter != 0) {
+                    builder.append("], ");
+                }
+                builder.append("[");
+            }
+            builder.append(element == this ? "(this Collection)" : element);
+            if (!iterator.hasNext()) {
+                builder.append("]");
+                break;
+            }
+            if ((counter + 1) % batchSize != 0) {
+                builder.append(", ");
+            }
+            counter++;
+        }
+        return builder.append("]").toString();
     }
 
     public static <E> BatchList<E> withBatchSize(int batchSize) {
@@ -84,10 +139,14 @@ public class BatchList<E> extends ArrayList<E> {
     }
 
     public static <E> Collector<E, ?, BatchList<E>> collector(int batchSize) {
-        return Collector.of(() -> withBatchSize(batchSize), List::add, (left, right) -> {
+        Supplier<BatchList<E>> supplier = () -> withBatchSize(batchSize);
+        BiConsumer<BatchList<E>, E> accumulator = BatchList::add;
+        BinaryOperator<BatchList<E>> combiner = (left, right) -> {
             left.addAll(right);
             return left;
-        }, Characteristics.IDENTITY_FINISH);
+        };
+        Characteristics[] characteristics = {Characteristics.CONCURRENT, Characteristics.IDENTITY_FINISH};
+        return Collector.of(supplier, accumulator, combiner, characteristics);
     }
 
 }

@@ -1,14 +1,14 @@
 package net.stardust.base.model.minigame;
 
-import java.io.Serializable;
-import java.util.Objects;
-import java.util.UUID;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.util.Objects;
+import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
@@ -37,11 +37,19 @@ public class MinigamePlayer implements Serializable, Comparable<MinigamePlayer> 
         this.wins = wins;
     }
 
+    public void addWin() {
+        wins++;
+    }
+
     public void setLosses(int losses) {
         if(losses < 0) {
             throw new IllegalArgumentException("loses < 0");
         }
         this.losses = losses;
+    }
+
+    public void addLoss() {
+        losses++;
     }
 
     @Override

@@ -1,24 +1,20 @@
 package net.stardust.base.model.inventory;
 
-import java.io.Serializable;
-
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
-import org.bukkit.enchantments.Enchantment;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonRootName;
-
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
+import lombok.*;
 import net.stardust.base.utils.PseudoObject;
+import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
+
+import java.io.Serializable;
 
 @Getter
+@ToString
 @EqualsAndHashCode
-@JsonRootName("enchantment")
 public class PseudoEnchantment implements PseudoObject<Enchantment>, Serializable, Cloneable {
     
     @Setter
@@ -30,7 +26,9 @@ public class PseudoEnchantment implements PseudoObject<Enchantment>, Serializabl
         this(ench.getKey(), level);
     }
 
-    public PseudoEnchantment(@JsonProperty("namespacedKey") NamespacedKey namespacedKey, @JsonProperty("level") int level) {
+    @JsonCreator
+    public PseudoEnchantment(@JsonProperty(value = "namespacedKey", required = true) NamespacedKey namespacedKey,
+                             @JsonProperty(value = "level", required = true) int level) {
         setNamespacedKey(namespacedKey);
         setLevel(level);
     }
@@ -40,8 +38,9 @@ public class PseudoEnchantment implements PseudoObject<Enchantment>, Serializabl
         level = ench.level;
     }
 
+    @Override
     public Enchantment toOriginal() {
-        return Registry.ENCHANTMENT.get(namespacedKey);
+        return RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT).get(namespacedKey);
     }
 
     public void setLevel(int level) {

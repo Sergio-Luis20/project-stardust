@@ -1,4 +1,4 @@
-package net.stardust.base.utils;
+package net.stardust.base.utils.gameplay;
 
 import net.stardust.base.utils.persistence.DataManager;
 import org.bukkit.Material;

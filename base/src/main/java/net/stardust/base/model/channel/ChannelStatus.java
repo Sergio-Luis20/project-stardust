@@ -1,20 +1,24 @@
 package net.stardust.base.model.channel;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import net.stardust.base.database.BaseEntity;
+import net.stardust.base.model.StardustEntity;
+import net.stardust.base.utils.ObjectMapperFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import net.stardust.base.database.BaseEntity;
-import net.stardust.base.model.StardustEntity;
-
 @Getter
 @EqualsAndHashCode
 @BaseEntity(UUID.class)
+@NoArgsConstructor
 @Entity
 public class ChannelStatus implements StardustEntity<UUID>, Cloneable {
     
@@ -23,7 +27,11 @@ public class ChannelStatus implements StardustEntity<UUID>, Cloneable {
 
     // Key: channel class name. Value: places where it is activated.
     @Getter
+    @Transient
     private Map<String, Map<String, Boolean>> properties;
+
+    @Column(columnDefinition = "TEXT")
+    private String json;
 
     public ChannelStatus(UUID id) {
         this(id, new HashMap<>());
@@ -42,6 +50,17 @@ public class ChannelStatus implements StardustEntity<UUID>, Cloneable {
             throw ex;
         }
         return props.getOrDefault(place, false);
+    }
+
+    @PrePersist
+    private void convertToJson() throws JsonProcessingException {
+        json = ObjectMapperFactory.getDefault().writeValueAsString(properties);
+    }
+
+    @PostLoad
+    private void convertToMap() throws JsonProcessingException {
+        properties = ObjectMapperFactory.getDefault().readValue(json, new TypeReference<>() {});
+        json = null;
     }
 
     @Override

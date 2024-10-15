@@ -6,7 +6,7 @@ import java.util.Objects;
 
 /**
  * Interface to define the strategy of how to position
- * the image in the map during rendering. Note that this
+ * the image in the screen during rendering. Note that this
  * interface extends {@link Serializable}. Make sure to
  * follow its contract.
  * 

@@ -1,6 +1,7 @@
 output/
 ideias.txt
 config.yml
+.env
 
 # Compiled class file
 *.class

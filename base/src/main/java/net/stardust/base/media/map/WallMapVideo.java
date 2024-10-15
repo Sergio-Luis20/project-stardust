@@ -13,6 +13,7 @@ import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
 
 import net.stardust.base.media.ImageAlignStrategy;
+import net.stardust.base.media.ImageAlignStrategy.ConstantStrategy;
 import net.stardust.base.media.ImageAlignStrategy.ImageAlignStrategyEnum;
 import net.stardust.base.media.VideoFramer;
 import net.stardust.base.utils.ranges.Ranges;
@@ -113,15 +114,7 @@ public class WallMapVideo extends VideoFramer<MapImage[][]> {
                 height = screenHeight;
                 width = (int) (height * ratio);
             } else {
-                int squareSize;
-
-                if (screenWidth > screenHeight) {
-                    squareSize = screenWidth;
-                } else {
-                    squareSize = screenHeight;
-                }
-
-                width = height = squareSize;
+                width = height = screenWidth > screenHeight ? screenWidth : screenHeight;
             }
 
             Image scaled = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
@@ -133,32 +126,42 @@ public class WallMapVideo extends VideoFramer<MapImage[][]> {
 
             image = resized;
         }
-
+        
+        MapImage[][] convertedFrame = new MapImage[wallWidth][wallHeight];
+        Point corner = strategy.getCorner(width, height, screenWidth, screenHeight);
         int mapSize = MapImage.MINECRAFT_DEFAULT_MAP_SIZE;
 
-        Point corner = strategy.getCorner(width, height, screenWidth, screenHeight);
-        MapImage[][] convertedFrame = new MapImage[wallWidth][wallHeight];
+        int firstFilledSquareHIndex = corner.x / mapSize;
+        int lastFilledSquareHIndex = (corner.x + width - 1) / mapSize;
+        int firstFilledSquareVIndex = corner.y / mapSize;
+        int lastFilledSquareVIndex = (corner.y + height - 1) / mapSize;
 
         for (int i = 0; i < wallWidth; i++) {
             for (int j = 0; j < wallHeight; j++) {
-                convertedFrame[i][j] = new MapImage();
-            }
-        }
-
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                int x = corner.x + i;
-                int y = corner.y + j;
-
-                int arrayX = x / mapSize;
-                int arrayY = y / mapSize;
-
-                int mapX = x % mapSize;
-                int mapY = y % mapSize;
-
-                int pixel = image.getRGB(i, j);
-
-                convertedFrame[arrayX][arrayY].setPixelColor(mapX, mapY, pixel);
+                MapImage img = null;
+        
+                if (i >= firstFilledSquareHIndex && i <= lastFilledSquareHIndex
+                        && j >= firstFilledSquareVIndex && j <= lastFilledSquareVIndex) {
+                    int initialX = Math.max(corner.x, i * mapSize);
+                    int initialY = Math.max(corner.y, j * mapSize);
+                    int finalX = Math.min(corner.x + width, (i + 1) * mapSize);
+                    int finalY = Math.min(corner.y + height, (j + 1) * mapSize);
+        
+                    int fragmentWidth = finalX - initialX;
+                    int fragmentHeight = finalY - initialY;
+                    int imageX = initialX - corner.x;
+                    int imageY = initialY - corner.y;
+        
+                    BufferedImage fragment = image.getSubimage(imageX, imageY, fragmentWidth, fragmentHeight);
+        
+                    int fragmentCornerX = initialX % mapSize;
+                    int fragmentCornerY = initialY % mapSize;
+        
+                    img = new MapImage(fragment);
+                    img.setAlignStrategy(new ConstantStrategy(fragmentCornerX, fragmentCornerY));
+                }
+        
+                convertedFrame[i][j] = img != null ? img : new MapImage();
             }
         }
 

@@ -4,7 +4,7 @@ import lombok.Getter;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.stardust.base.utils.SoundPack;
+import net.stardust.base.utils.gameplay.SoundPack;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;

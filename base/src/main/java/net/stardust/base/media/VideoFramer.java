@@ -19,7 +19,7 @@ import org.bytedeco.javacv.Java2DFrameConverter;
 /**
  * <p>
  * Class that represents everything that can process frames of
- * a video and put then in a queue for use.
+ * a video and put them in a queue for use.
  * </p>
  * 
  * <p>
@@ -36,22 +36,30 @@ import org.bytedeco.javacv.Java2DFrameConverter;
  * 
  * <p>
  * Closing an instance closes the {@link InputStream} passed as parameter during
- * construction and the internal {@link FFmpegFrameGrabber}, but do not
- * clears the queue, so any frame inside it before the close call will still
- * be there for use.
+ * construction, the internal {@link FFmpegFrameGrabber} and the internal
+ * {@link Java2DFrameConverter}, but do not clears the queue, so any frame
+ * inside it before the close call will still be there for use.
  * </p>
  * 
  * @see InputStream
  * @see FFmpegFrameGrabber
+ * @see Java2DFrameConverter
  * 
  * @author Sergio Luis
  */
 public abstract class VideoFramer<T> implements AutoCloseable {
 
+    /**
+     * The time of a Minecraft tick in microseconds.
+     */
+    public static final long MINECRAFT_TICK_MICROS = 50000;
+
     private final InputStream stream;
+    private volatile long timestamp;
     private volatile boolean started, closed;
     private Queue<T> frames;
     private FFmpegFrameGrabber grabber;
+    private Java2DFrameConverter converter;
 
     /**
      * Creates a new MapVideo instance from an {@link InputStream}. This method
@@ -60,13 +68,14 @@ public abstract class VideoFramer<T> implements AutoCloseable {
      * 
      * @see InputStream
      * @see BufferedInputStream
-     * @param stream   the stream to read the video data
-     * @throws NullPointerException if any parameter is null
+     * @param stream the stream to read the video data
+     * @throws NullPointerException if stream is null
      */
     public VideoFramer(InputStream stream) {
         this.stream = Objects.requireNonNull(stream, "stream");
 
         grabber = new FFmpegFrameGrabber(stream);
+        converter = new Java2DFrameConverter();
         frames = new LinkedList<>();
     }
 
@@ -88,7 +97,7 @@ public abstract class VideoFramer<T> implements AutoCloseable {
      * 
      * @see VideoFramer#VideoFramer(InputStream)
      * @param file the file from where read video data
-     * @throws NullPointerException  if any parameter is null
+     * @throws NullPointerException  if file is null
      * @throws FileNotFoundException if the file does not exist, is a directory
      *                               rather than a regular file, or for some other
      *                               reason cannot be opened for reading.
@@ -124,8 +133,18 @@ public abstract class VideoFramer<T> implements AutoCloseable {
     }
 
     /**
-     * Polls a frame from the queue. This method synchronizes the queue,
-     * so it can block if some other operation is being done by other thread.
+     * Returns the number of frames available for polling in the queue.
+     * 
+     * @return the number of available frames.
+     */
+    public int availableFrames() {
+        synchronized (frames) {
+            return frames.size();
+        }
+    }
+
+    /**
+     * Polls a frame from the queue.
      * 
      * @see Queue#poll()
      * @see #pollAllFrames()
@@ -138,9 +157,7 @@ public abstract class VideoFramer<T> implements AutoCloseable {
     }
 
     /**
-     * Polls all frames to a returning list. Note that this method clears the
-     * queue. This method synchronizes the queue, so it can block if some
-     * other operation is being done by other thread.
+     * Polls all frames to a returning list.
      * 
      * @see #pollFrame()
      * @return a list of all frames in the queue or an empty list if it is empty.
@@ -175,23 +192,12 @@ public abstract class VideoFramer<T> implements AutoCloseable {
                 return false;
             }
 
-            /*
-             * Sets the timestamp of the video to corresponde to a multiple
-             * of 50 milliseconds (50000 microseconds), which is 1 tick in Minecraft.
-             */
-            long currentTimestamp = grabber.getTimestamp();
-            long nextTimestamp = currentTimestamp == 0 ? 0 : (currentTimestamp / 50000 + 1) * 50000;
-
-            grabber.setTimestamp(nextTimestamp);
-
             Frame frame = grabFrame(grabber);
             if (frame == null) {
                 return false;
             }
 
-            try (Java2DFrameConverter converter = new Java2DFrameConverter()) {
-                addFrameToQueue(converter, frame);
-            }
+            addFrameToQueue(frame);
 
             return true;
         }
@@ -201,8 +207,8 @@ public abstract class VideoFramer<T> implements AutoCloseable {
      * <p>
      * Process all remaining frames in the video and adds them to the queue
      * for polling. Note that depending on the size of the video, this method
-     * can increase the memory a lot, use it with care. {@link #processNextFrame()}
-     * if preferred for cases when you are not sure about the memory consumption
+     * can increase the memory a lot; use it with care. {@link #processNextFrame()}
+     * is preferred for cases when you are not sure about the memory consumption
      * the video can cause.
      * </p>
      * 
@@ -225,15 +231,8 @@ public abstract class VideoFramer<T> implements AutoCloseable {
                 return false;
             }
 
-            long currentTimestamp = grabber.getTimestamp();
-            long nextTimestamp = currentTimestamp == 0 ? 0 : (currentTimestamp / 50000 + 1) * 50000;
-
-            try (Java2DFrameConverter converter = new Java2DFrameConverter()) {
-                for (Frame frame; (frame = grabFrame(grabber)) != null;) {
-                    addFrameToQueue(converter, frame);
-                    nextTimestamp += 50000;
-                    grabber.setTimestamp(nextTimestamp);
-                }
+            for (Frame frame; (frame = grabFrame(grabber)) != null;) {
+                addFrameToQueue(frame);
             }
 
             return true;
@@ -241,18 +240,23 @@ public abstract class VideoFramer<T> implements AutoCloseable {
     }
 
     /**
-     * Converts and adds the frame to the queue if not null for polling.
+     * Converts and adds the frame to the queue if not null for polling
+     * and updates the timestamp of the grabber to next frame.
      * 
      * @param converter the converter
      * @param frame     the frame to be converted
+     * @throws FFmpegFrameGrabber.Exception
      */
-    private void addFrameToQueue(Java2DFrameConverter converter, Frame frame) {
+    private void addFrameToQueue(Frame frame) throws FFmpegFrameGrabber.Exception {
         T converted = convertFrame(converter, frame);
         if (converted == null) {
             return;
         }
+
         synchronized (frames) {
             frames.add(converted);
+            timestamp += MINECRAFT_TICK_MICROS;
+            grabber.setTimestamp(timestamp);
         }
     }
 
@@ -280,7 +284,19 @@ public abstract class VideoFramer<T> implements AutoCloseable {
     protected abstract T convertFrame(Java2DFrameConverter converter, Frame frame);
 
     /**
-     * Closes the grabber and the stream and sets the
+     * Returns the current timestamp of the video in microseconds.
+     * Note: this is not the timestamp of the last frame calculated,
+     * it is the one that will be used for calculation of the next
+     * frame.
+     * 
+     * @return the current timestamp.
+     */
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    /**
+     * Closes the grabber, the converter and the stream and sets the
      * "closed" internal flag to true.
      * 
      * @see AutoCloseable
@@ -297,6 +313,7 @@ public abstract class VideoFramer<T> implements AutoCloseable {
             }
             try (stream) {
                 grabber.close();
+                converter.close();
             } finally {
                 closed = true;
             }

@@ -1,15 +1,14 @@
 package net.stardust.base.database;
 
-import java.util.Properties;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManagerFactory;
+import net.stardust.base.BasePlugin;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.reflections.Reflections;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityManagerFactory;
-import net.stardust.base.BasePlugin;
+import java.util.Properties;
 
 public final class JPA {
 
@@ -53,7 +52,7 @@ public final class JPA {
 
     public static EntityManagerFactory inMemory(Reflections reflections) {
         Properties props = new HibernateConfigurationBuilder()
-                .url("jdbc:h2:mem:testdb")
+                .url("jdbc:h2:mem:memorydb")
                 .username("sa")
                 .password("")
                 .dialect("org.hibernate.dialect.H2Dialect")

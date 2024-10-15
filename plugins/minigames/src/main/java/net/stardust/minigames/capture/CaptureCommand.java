@@ -1,10 +1,14 @@
 package net.stardust.minigames.capture;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
-import java.util.UUID;
-
+import br.sergio.utils.Pair;
+import net.stardust.base.command.BaseCommand;
+import net.stardust.base.command.CommandEntry;
+import net.stardust.base.command.DirectCommand;
+import net.stardust.base.utils.Throwables;
+import net.stardust.base.utils.gameplay.AutomaticMessages;
+import net.stardust.base.utils.world.DifferentWorldException;
+import net.stardust.base.utils.world.WorldUtils;
+import net.stardust.minigames.MinigamesPlugin;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -13,15 +17,10 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import br.sergio.utils.Pair;
-import net.stardust.base.command.BaseCommand;
-import net.stardust.base.command.CommandEntry;
-import net.stardust.base.command.DirectCommand;
-import net.stardust.base.utils.AutomaticMessages;
-import net.stardust.base.utils.Throwables;
-import net.stardust.base.utils.world.DifferentWorldException;
-import net.stardust.base.utils.world.WorldUtils;
-import net.stardust.minigames.MinigamesPlugin;
+import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.UUID;
 
 @BaseCommand(value = "capture", opOnly = true)
 public class CaptureCommand extends DirectCommand<MinigamesPlugin> {
@@ -34,18 +33,28 @@ public class CaptureCommand extends DirectCommand<MinigamesPlugin> {
     public void help() {
         Player player = sender();
         player.sendMessage("§d» Lista de opções para o comando §c/capture§d:");
-        player.sendMessage("§a/capture §dcreatemap §e-> §bCria um novo mapa de capture com base no atual." +
-                " O que este comando faz é simplesmente criar o arquivo capture.yml na pasta do mundo.");
-        player.sendMessage("§a/capture §dset §6<spawn|bluebase|redbase> §e-> §bDefine as localizações no" +
-                " arquivo capture.yml do atributo passado como parâmetro do comando. A localização coletada" +
-                " é o centro do bloco que você se encontra no momento.");
-        player.sendMessage("§a/capture §dget §6<spawn|bluebase|redbase> §e-> §bObtém a localização do " +
-                "atributo passado como parâmetro do comando.");
-        player.sendMessage("§a/capture §dget §6<worldname> <spawn|bluebase|redbase> §e-> §bObtém a " +
-                "localização do atributo passado como parâmetro do comando para o mundo especificado. " +
-                "O nome do mundo passado possui sensibilidade a maiúsculas e minúsculas");
-        player.sendMessage("§a/capture §dteleport §6<spawn|bluebase|redbase> §e-> §bTeletransporta você " +
-                "para a localização do atributo passado como parâmetro do comando.");
+        player.sendMessage("""
+                §a/capture §dcreatemap §e-> §bCria um novo mapa de capture com base no atual. \
+                O que este comando faz é simplesmente criar o arquivo capture.yml na pasta do mundo.
+                """);
+        player.sendMessage("""
+                §a/capture §dset §6<spawn|bluebase|redbase> §e-> §bDefine as localizações no \
+                arquivo capture.yml do atributo passado como parâmetro do comando. A localização \
+                coletada é o centro do bloco que você se encontra no momento.
+                """);
+        player.sendMessage("""
+                §a/capture §dget §6<spawn|bluebase|redbase> §e-> §bObtém a localização do \
+                atributo passado como parâmetro do comando.
+                """);
+        player.sendMessage("""
+                §a/capture §dget §6<worldname> <spawn|bluebase|redbase> §e-> §bObtém a \
+                localização do atributo passado como parâmetro do comando para o mundo especificado. \
+                O nome do mundo passado possui sensibilidade a maiúsculas e minúsculas.
+                """);
+        player.sendMessage("""
+                §a/capture §dteleport §6<spawn|bluebase|redbase> §e-> §bTeletransporta você \
+                para a localização do atributo passado como parâmetro do comando.
+                """);
         player.sendMessage("§a/capture §dinterrupt §e-> §bInterrompe a partida na qual você se encontra.");
     }
 
@@ -72,9 +81,11 @@ public class CaptureCommand extends DirectCommand<MinigamesPlugin> {
             player.sendMessage("§c» Erro durante a criação do arquivo de configuração na pasta do mapa (" + e + ")");
             Throwables.sendAndThrow(e);
         }
-        player.sendMessage("§a» Mapa de capture criado com sucesso! Não se esqueça de definir as demais " +
-                "propriedades como spawn, base azul e base vermelha. Digite §e/capture help §a para obter " +
-                "detalhes sobre como fazer isso.");
+        player.sendMessage("""
+                §a» Mapa de capture criado com sucesso! Não se esqueça de definir as demais \
+                propriedades como spawn, base azul e base vermelha. Digite §e/capture help §a para obter \
+                detalhes sobre como fazer isso.
+                """);
     }
 
     @CommandEntry(value = "set", types = Player.class)
@@ -122,17 +133,24 @@ public class CaptureCommand extends DirectCommand<MinigamesPlugin> {
             return;
         }
         /*
-         * Tries to imitate Location.toString to avoind calling Bukkit.getWorld
+         * Tries to imitate Location.toString to avoid calling Bukkit.getWorld
          * since we are getting data directly from file and the world may not be loaded.
          * This approach assumes that the world implementation is CraftWorld and the
          * implementations of toString method from both CraftWorld and Location
          * will not change in future API updates. If some of those assumptions
          * aren't correct, this code will not break, but maybe need an update.
          */
-        String worldToString = "CraftWorld{name=" + worldName + "}";
-        sender.sendMessage("§a» Atributo §6" + location.toString().toLowerCase() + " §adefinido como: §e" +
-                "Location{world=" + worldToString + ",x=" + section.getInt("x") + ",y=" +
-                section.getInt("y") + ",z=" + section.getInt("z") + ",pitch=0.0,yaw=0.0}");
+        sender.sendMessage("""
+                §a» Atributo §6%s §adefinido como §eLocation{world=CraftWorld{name=%s},\
+                x=%s,y=%s,z=%s,pitch=0.0,yaw=0.0}
+                """.formatted(
+                        worldName,
+                        location.toString().toLowerCase(),
+                        section.getInt("x"),
+                        section.getInt("y"),
+                        section.getInt("z")
+                )
+        );
     }
 
     @CommandEntry(value = "teleport", types = Player.class)
@@ -156,8 +174,7 @@ public class CaptureCommand extends DirectCommand<MinigamesPlugin> {
     }
 
     private Optional<Capture> getMatch(Player player) {
-        return isCaptureMap(player.getWorld()) ? Optional.of((Capture)
-                plugin.getMatch(player)) : Optional.empty();
+        return isCaptureMap(player.getWorld()) ? plugin.getMatch(player).map(Capture.class::cast) : Optional.empty();
     }
 
     private boolean isCaptureMap(World world) {

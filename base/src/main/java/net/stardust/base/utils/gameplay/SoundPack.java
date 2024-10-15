@@ -1,4 +1,4 @@
-package net.stardust.base.utils;
+package net.stardust.base.utils.gameplay;
 
 import java.io.Serializable;
 import java.util.Objects;

@@ -23,7 +23,7 @@ import net.stardust.base.database.lang.Translation;
 import net.stardust.base.model.minigame.MinigameData;
 import net.stardust.base.model.minigame.MinigamePlayer;
 import net.stardust.base.model.user.User;
-import net.stardust.base.utils.AutomaticMessages;
+import net.stardust.base.utils.gameplay.AutomaticMessages;
 import net.stardust.base.utils.StardustThreads;
 import net.stardust.minigames.MinigamesPlugin;
 

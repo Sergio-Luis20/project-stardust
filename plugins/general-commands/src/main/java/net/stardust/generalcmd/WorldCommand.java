@@ -5,7 +5,7 @@ import net.stardust.base.Stardust;
 import net.stardust.base.command.BaseCommand;
 import net.stardust.base.command.CommandEntry;
 import net.stardust.base.command.DirectCommand;
-import net.stardust.base.utils.AutomaticMessages;
+import net.stardust.base.utils.gameplay.AutomaticMessages;
 import net.stardust.base.utils.Throwables;
 import net.stardust.base.utils.world.WorldUtils;
 import org.bukkit.*;

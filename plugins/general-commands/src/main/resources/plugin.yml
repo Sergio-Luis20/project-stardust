@@ -1,7 +1,7 @@
 name: general-commands
 version: 1.0
 main: net.stardust.generalcmd.GeneralCommandsPlugin
-api-version: 1.19
+api-version: 1.21
 depend: [authentication]
 commands:
   money:

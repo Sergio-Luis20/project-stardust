@@ -1,7 +1,7 @@
 name: terrains
 version: 1.0
 main: net.stardust.terrains.TerrainsPlugin
-api-version: 1.19
+api-version: 1.21
 commands:
   blockservermode:
     aliases: [bsm]

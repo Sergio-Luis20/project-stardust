@@ -1,11 +1,21 @@
 package net.stardust.base.minigame;
 
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-
+import lombok.Getter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.stardust.base.events.WorldListener;
+import net.stardust.base.minigame.Minigame.MinigameState;
+import net.stardust.base.model.economy.transaction.*;
+import net.stardust.base.model.economy.transaction.operation.*;
+import net.stardust.base.model.economy.wallet.Currency;
+import net.stardust.base.model.economy.wallet.Money;
+import net.stardust.base.utils.gameplay.SoundPack;
+import net.stardust.base.utils.inventory.CantStoreItemsException;
+import net.stardust.base.utils.inventory.InventoryUtils;
+import net.stardust.base.utils.item.ItemUtils;
+import net.stardust.base.utils.persistence.DataManager;
+import net.stardust.base.utils.ranges.Ranges;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -22,31 +32,11 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
-import lombok.Getter;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.stardust.base.events.WorldListener;
-import net.stardust.base.minigame.Minigame.MinigameState;
-import net.stardust.base.model.economy.transaction.ItemNegotiators;
-import net.stardust.base.model.economy.transaction.ItemTransaction;
-import net.stardust.base.model.economy.transaction.PlayerItemHolder;
-import net.stardust.base.model.economy.transaction.ServerItemHolder;
-import net.stardust.base.model.economy.transaction.Transaction;
-import net.stardust.base.model.economy.transaction.operation.MoneyNode;
-import net.stardust.base.model.economy.transaction.operation.Operation;
-import net.stardust.base.model.economy.transaction.operation.OperationChain;
-import net.stardust.base.model.economy.transaction.operation.OperationFailedException;
-import net.stardust.base.model.economy.transaction.operation.SpaceNode;
-import net.stardust.base.model.economy.transaction.operation.TransferNode;
-import net.stardust.base.model.economy.wallet.Currency;
-import net.stardust.base.model.economy.wallet.Money;
-import net.stardust.base.utils.SoundPack;
-import net.stardust.base.utils.inventory.CantStoreItemsException;
-import net.stardust.base.utils.inventory.InventoryUtils;
-import net.stardust.base.utils.item.ItemUtils;
-import net.stardust.base.utils.persistence.DataManager;
-import net.stardust.base.utils.ranges.Ranges;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 
 @Getter
 public class MinigameShop extends WorldListener {
@@ -70,12 +60,12 @@ public class MinigameShop extends WorldListener {
     public static MinigameShop newShop(Minigame parent, boolean preMatchOnly, Component inventoryTitle,
                                        int inventorySize, Map<Integer, ItemStack> items) {
         inventorySize = Ranges.rangeBITI(inventorySize, 9, 9 * 6, "inventorySize");
-        if(inventorySize % 9 != 0) {
+        if (inventorySize % 9 != 0) {
             throw new IllegalArgumentException("inventorySize must be a multiple of 9");
         }
-        for(Entry<Integer, ItemStack> entry : Objects.requireNonNull(items, "items").entrySet()) {
+        for (Entry<Integer, ItemStack> entry : Objects.requireNonNull(items, "items").entrySet()) {
             Ranges.rangeBITI(Objects.requireNonNull(entry.getKey(),
-                    "index in map items"), 0 , inventorySize - 1, "index in map items");
+                    "index in map items"), 0, inventorySize - 1, "index in map items");
             Objects.requireNonNull(entry.getValue(), "value in map items");
         }
         MinigameShopInventoryHolder holder = new MinigameShopInventoryHolder();
@@ -88,15 +78,15 @@ public class MinigameShop extends WorldListener {
     public static void giveShopBook(Player player) throws CantStoreItemsException {
         PlayerInventory inventory = player.getInventory();
         boolean set = false;
-        for(int i = 8; i >= 0; i--) {
+        for (int i = 8; i >= 0; i--) {
             ItemStack item = inventory.getItem(i);
-            if(item == null || item.getType() == Material.AIR) {
+            if (item == null || item.getType() == Material.AIR) {
                 inventory.setItem(i, SHOP_BOOK);
                 set = true;
                 break;
             }
         }
-        if(!set) {
+        if (!set) {
             InventoryUtils.tryAdd(inventory, SHOP_BOOK);
         }
     }
@@ -104,16 +94,16 @@ public class MinigameShop extends WorldListener {
     @EventHandler
     public void onIteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if(player.getWorld().equals(parent.getWorld())) {
+        if (player.getWorld().equals(parent.getWorld())) {
             Action action = event.getAction();
-            if(action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) {
+            if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) {
                 return;
             }
             ItemStack item = event.getItem();
-            if(item == null || !isShopBook(item)) {
+            if (item == null || !isShopBook(item)) {
                 return;
             }
-            if(!preMatchOnly || parent.getState() == MinigameState.PRE_MATCH) {
+            if (!preMatchOnly || parent.getState() == MinigameState.PRE_MATCH) {
                 event.getPlayer().openInventory(inventory);
             }
         }
@@ -122,18 +112,18 @@ public class MinigameShop extends WorldListener {
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         Inventory inventory = event.getInventory();
-        if(inventory.getHolder() instanceof MinigameShopInventoryHolder) {
+        if (inventory.getHolder() instanceof MinigameShopInventoryHolder) {
             event.setCancelled(true);
-            if(event.getWhoClicked() instanceof Player player && player.getWorld().equals(parent.getWorld())
+            if (event.getWhoClicked() instanceof Player player && player.getWorld().equals(parent.getWorld())
                     && (!preMatchOnly || parent.getState() == MinigameState.PRE_MATCH)) {
                 ItemStack clickedItem = event.getCurrentItem();
-                if(clickedItem == null || clickedItem.getType() == Material.AIR) {
+                if (clickedItem == null || clickedItem.getType() == Material.AIR) {
                     return;
                 }
                 ItemMeta meta = clickedItem.getItemMeta();
                 DataManager<ItemMeta> manager = new DataManager<>(meta);
                 Money price = manager.readObject(SHOP_ITEM_KEY, Money.class);
-                if(price == null) {
+                if (price == null) {
                     throw new MinigameShopItemWithoutPriceException("Minigame: " + parent.getInfo().name());
                 }
                 Transaction transaction = ItemTransaction.newItemTransaction(price,
@@ -204,9 +194,7 @@ public class MinigameShop extends WorldListener {
         manager.writeObject(SHOP_BOOK_KEY, true);
         SHOP_BOOK.setItemMeta(meta);
 
-        OperationChain chain = new OperationChain();
-        chain.addAll(new MoneyNode(), new SpaceNode(), new TransferNode());
-        buyItem = chain;
+        buyItem = new OperationChain(new MoneyNode(), new SpaceNode(), new TransferNode());
     }
 
 }

@@ -1,7 +1,7 @@
 name: channels
 version: 1.0
 main: net.stardust.channels.ChannelsPlugin
-api-version: 1.19
+api-version: 1.21
 depend: [general-commands]
 commands:
   g:

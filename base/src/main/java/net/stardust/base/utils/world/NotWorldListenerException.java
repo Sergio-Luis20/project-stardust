@@ -10,7 +10,7 @@ import org.bukkit.event.Listener;
 @Setter
 @AllArgsConstructor
 @StandardException
-public class NotWorldListener extends RuntimeException {
+public class NotWorldListenerException extends RuntimeException {
 
     private Listener listener;
 

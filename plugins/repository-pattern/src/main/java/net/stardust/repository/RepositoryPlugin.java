@@ -1,31 +1,24 @@
 package net.stardust.repository;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import br.sergio.comlib.Communication;
 import br.sergio.comlib.ConnectionException;
 import br.sergio.comlib.MethodMapper;
 import br.sergio.comlib.RequestListener;
 import jakarta.persistence.EntityManagerFactory;
 import net.stardust.base.BasePlugin;
-import net.stardust.base.database.BaseEntity;
-import net.stardust.base.database.JPA;
-import net.stardust.base.database.Repository;
-import net.stardust.base.database.RepositoryController;
-import net.stardust.base.database.RepositoryException;
-import net.stardust.base.database.RepositoryFactory;
+import net.stardust.base.database.*;
 import net.stardust.base.database.crud.Crud;
 import net.stardust.base.model.StardustEntity;
 import net.stardust.base.utils.Throwables;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class RepositoryPlugin extends BasePlugin {
 
-	public static final String ENTITIES_PACKAGE = "net.stardust.base.model";
-	
 	private List<RequestListener> requestListeners;
 	private List<Repository<?, ?>> repositories;
 
@@ -34,7 +27,7 @@ public class RepositoryPlugin extends BasePlugin {
 		super.onLoad();
 	}
 
-	@Override
+		@Override
 	public void onEnable() {
 		super.onEnable();
 		Logger log = getLogger();
@@ -52,12 +45,11 @@ public class RepositoryPlugin extends BasePlugin {
 		log.info("Criando request listeners");
 
 		createRequestListeners();
-		
+
 		log.info("Iniciando request listeners");
-		
+
 		requestListeners.forEach(RequestListener::start);
 
-		log.info("Request listeners criados com sucesso");
 		log.info("Repositório online");
 	}
 
@@ -135,7 +127,7 @@ public class RepositoryPlugin extends BasePlugin {
 		}
 	}
 
-	private <K, V extends StardustEntity<K>> void createRequestListeners() {
+	private void createRequestListeners() {
 		requestListeners = new ArrayList<>(repositories.size());
 		for (var repository : repositories) {
 			var controller = new RepositoryController<>(this, repository);

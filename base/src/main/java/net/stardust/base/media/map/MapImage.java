@@ -47,7 +47,7 @@ import net.stardust.base.utils.ranges.Ranges;
 public class MapImage extends MapRenderer implements Serializable, Cloneable {
 
     /**
-     * The default square length of a Minecraft map.
+     * The default square length of a Minecraft map in pixels.
      */
     public static final int MINECRAFT_DEFAULT_MAP_SIZE = 128;
 
@@ -55,7 +55,7 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
     private ImageAlignStrategy strategy;
 
     /**
-     * Creates a {@link MapImage} with {@link ImageAlignStrategyEnum#CENTER} as
+     * Creates a {@link MapImage} with {@link ImageAlignStrategyEnum#TOP_LEFT} as
      * default alignment strategy and an empty non null {@link BufferedImage}
      * with width and height corresponding to {@link #MINECRAFT_DEFAULT_MAP_SIZE},
      * so it is an empty square that fits the whole map.
@@ -68,7 +68,7 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
      */
     public MapImage() {
         image = new BufferedImage(MINECRAFT_DEFAULT_MAP_SIZE, MINECRAFT_DEFAULT_MAP_SIZE, BufferedImage.TYPE_INT_ARGB);
-        setAlignStrategy(ImageAlignStrategyEnum.CENTER);
+        setAlignStrategy(ImageAlignStrategyEnum.TOP_LEFT);
     }
 
     /**
@@ -238,14 +238,14 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
         double ratio = (double) width / height;
 
         if (width > height) {
-            width = MapImage.MINECRAFT_DEFAULT_MAP_SIZE;
+            width = MINECRAFT_DEFAULT_MAP_SIZE;
             height = (int) (width / ratio);
         } else if (height > width) {
-            height = MapImage.MINECRAFT_DEFAULT_MAP_SIZE;
+            height = MINECRAFT_DEFAULT_MAP_SIZE;
             width = (int) (height * ratio);
         } else {
-            width = MapImage.MINECRAFT_DEFAULT_MAP_SIZE;
-            height = MapImage.MINECRAFT_DEFAULT_MAP_SIZE;
+            width = MINECRAFT_DEFAULT_MAP_SIZE;
+            height = MINECRAFT_DEFAULT_MAP_SIZE;
         }
 
         resize(width, height);
@@ -267,13 +267,20 @@ public class MapImage extends MapRenderer implements Serializable, Cloneable {
      */
     @Override
     public void render(MapView map, MapCanvas canvas, Player player) {
-        Point corner = strategy.getCorner(
-                getWidth(),
-                getHeight(),
-                MINECRAFT_DEFAULT_MAP_SIZE,
-                MINECRAFT_DEFAULT_MAP_SIZE);
+        Point corner = getCorner();
 
         canvas.drawImage(corner.x, corner.y, image);
+    }
+
+    /**
+     * Returns the coordinates of the top-left corner of the image
+     * in the map based on the internal {@link ImageAlignStrategy}.
+     * 
+     * @see ImageAlignStrategy
+     * @return the coordinates of the top-left corner.
+     */
+    public Point getCorner() {
+        return strategy.getCorner(getWidth(), getHeight(), MINECRAFT_DEFAULT_MAP_SIZE, MINECRAFT_DEFAULT_MAP_SIZE);
     }
 
     /**

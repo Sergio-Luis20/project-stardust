@@ -20,9 +20,13 @@ import net.stardust.base.model.economy.wallet.Money;
 import net.stardust.base.model.economy.wallet.PlayerWallet;
 import net.stardust.base.model.minigame.MinigameData;
 import net.stardust.base.model.minigame.MinigamePlayer;
-import net.stardust.base.utils.*;
+import net.stardust.base.utils.FileDrawer;
+import net.stardust.base.utils.Throwables;
+import net.stardust.base.utils.gameplay.AutomaticMessages;
+import net.stardust.base.utils.gameplay.BossBarUtils;
+import net.stardust.base.utils.gameplay.PlayerSnapshot;
 import net.stardust.base.utils.plugin.PluginConfig;
-import net.stardust.base.utils.world.NotWorldListener;
+import net.stardust.base.utils.world.NotWorldListenerException;
 import net.stardust.base.utils.world.WorldUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -36,12 +40,16 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public abstract class Minigame implements Listener {
 
     public static final int DEFAULT_POST_MATCH_TIME = 5;
+    protected static final MinigameDataCrud dataCrud = new MinigameDataCrud();
 
     @Getter
     private MinigameInfo info;
@@ -98,15 +106,19 @@ public abstract class Minigame implements Listener {
             }
 
         };
+        String name = info.name();
+        if (dataCrud.getOrNull(name) == null && !dataCrud.create(new MinigameData(name))) {
+            throw new MinigameCreationException("Could not create minigame data in database");
+        }
         ticker.runTaskTimer(PluginConfig.get().getPlugin(), 0, 20);
     }
 
     public void preMatch() {
         setState(MinigameState.PRE_MATCH);
-        if(stopwatch != null) {
+        if (stopwatch != null) {
             stopwatch.cancel();
         }
-        if(world != null) {
+        if (world != null) {
             Bukkit.unloadWorld(world, false);
             world = null;
         }
@@ -148,21 +160,17 @@ public abstract class Minigame implements Listener {
         registerListener(defaultListener);
         stopMatchStopwatch();
         MatchResult result = getMatchResult(winners, losers);
-        if(result != MatchResult.NO_WINNERS) {
-            MinigameDataCrud dataCrud = new MinigameDataCrud();
+        if (result != MatchResult.NO_WINNERS) {
             PlayerWalletCrud walletCrud = new PlayerWalletCrud();
-            MinigameData data = dataCrud.getOrNull(info.name());
-            if(data == null) {
-                data = new MinigameData(info.name());
-            }
+            MinigameData data = dataCrud.getOrThrow(info.name());
             Map<UUID, PlayerWallet> wallets = walletCrud.getAll(winners.stream()
-                            .map(Player::getUniqueId)
-                            .toList())
+                    .map(Player::getUniqueId)
+                    .toList())
                     .stream()
                     .collect(Collectors.toMap(PlayerWallet::getId, wallet -> wallet));
             Map<UUID, MinigamePlayer> minigamePlayers = data.getMinigamePlayers();
             BigInteger reward = new BigInteger(String.valueOf(info.reward()));
-            if(result == MatchResult.NORMAL) {
+            if (result == MatchResult.NORMAL) {
                 onNormalEnding(winners, losers, wallets, minigamePlayers, reward);
             } else {
                 onDrawEnding(wallets, minigamePlayers, reward);
@@ -190,23 +198,24 @@ public abstract class Minigame implements Listener {
     }
 
     private void onNormalEnding(List<Player> winners, List<Player> losers, Map<UUID, PlayerWallet> wallets,
-                                Map<UUID, MinigamePlayer> minigamePlayers, BigInteger reward) {
-        for(Player player : winners) {
+            Map<UUID, MinigamePlayer> minigamePlayers, BigInteger reward) {
+        for (Player player : winners) {
             UUID uniqueId = player.getUniqueId();
             MinigamePlayer minigamePlayer = getMinigamePlayer(minigamePlayers, uniqueId);
             minigamePlayer.setWins(minigamePlayer.getWins() + 1);
             PlayerWallet wallet = wallets.get(uniqueId);
             wallet.getSilver().add(reward);
         }
-        for(Player player : losers) {
+        for (Player player : losers) {
             UUID uniqueId = player.getUniqueId();
             MinigamePlayer minigamePlayer = getMinigamePlayer(minigamePlayers, uniqueId);
             minigamePlayer.setLosses(minigamePlayer.getLosses() + 1);
         }
     }
 
-    private void onDrawEnding(Map<UUID, PlayerWallet> wallets, Map<UUID, MinigamePlayer> minigamePlayers, BigInteger reward) {
-        for(Player player : getWorld().getPlayers()) {
+    private void onDrawEnding(Map<UUID, PlayerWallet> wallets, Map<UUID, MinigamePlayer> minigamePlayers,
+            BigInteger reward) {
+        for (Player player : getWorld().getPlayers()) {
             UUID uniqueId = player.getUniqueId();
             MinigamePlayer minigamePlayer = getMinigamePlayer(minigamePlayers, uniqueId);
             minigamePlayer.setWins(minigamePlayer.getWins() + 1);
@@ -216,7 +225,7 @@ public abstract class Minigame implements Listener {
     }
 
     protected void sendEndMessages(List<Player> winners, List<Player> losers, MatchResult result) {
-        switch(result) {
+        switch (result) {
             case NORMAL -> {
                 Money reward = new Money(Currency.SILVER, new BigInteger(String.valueOf(info.reward())));
                 Component component = reward.toComponent();
@@ -238,14 +247,14 @@ public abstract class Minigame implements Listener {
     }
 
     protected final void sendEndMessages0(Pair<List<Player>, Component> winnersMessage,
-                                          Pair<List<Player>, Component> losersMessage) {
+            Pair<List<Player>, Component> losersMessage) {
         winnersMessage.getMale().forEach(player -> player.sendMessage(winnersMessage.getFemale()));
         losersMessage.getMale().forEach(player -> player.sendMessage(losersMessage.getFemale()));
     }
 
     private static MinigamePlayer getMinigamePlayer(Map<UUID, MinigamePlayer> minigamePlayers, UUID uniqueId) {
         MinigamePlayer minigamePlayer = minigamePlayers.get(uniqueId);
-        if(minigamePlayer == null) {
+        if (minigamePlayer == null) {
             minigamePlayer = new MinigamePlayer(uniqueId);
             minigamePlayers.put(uniqueId, minigamePlayer);
         }
@@ -253,10 +262,54 @@ public abstract class Minigame implements Listener {
     }
 
     private static MatchResult getMatchResult(List<Player> winners, List<Player> losers) {
-        if(winners.isEmpty()) {
+        if (winners.isEmpty()) {
             return losers.isEmpty() ? MatchResult.DRAW : MatchResult.NO_WINNERS;
         }
         return MatchResult.NORMAL;
+    }
+
+    public CompletableFuture<Integer> getWins(Player player) {
+        return CompletableFuture.supplyAsync(() -> getPlayerMatchResult(player,
+                MinigamePlayer::getWins, 0), PluginConfig.get().getPlugin().getVirtual());
+    }
+
+    public CompletableFuture<Integer> getLosses(Player player) {
+        return CompletableFuture.supplyAsync(() -> getPlayerMatchResult(player,
+                MinigamePlayer::getLosses, 0), PluginConfig.get().getPlugin().getVirtual());
+    }
+
+    public CompletableFuture<Float> getRatio(Player player) {
+        return CompletableFuture.supplyAsync(() -> getPlayerMatchResult(player,
+                MinigamePlayer::getRatio, 0f), PluginConfig.get().getPlugin().getVirtual());
+    }
+
+    public void addWin(Player player) {
+        addPlayerMatchResult(player, MinigamePlayer::addWin);
+    }
+
+    public void addLoss(Player player) {
+        addPlayerMatchResult(player, MinigamePlayer::addLoss);
+    }
+
+    private void addPlayerMatchResult(Player player, Consumer<MinigamePlayer> consumer) {
+        UUID playerId = player.getUniqueId();
+        PluginConfig.get().getPlugin().getVirtual().submit(() -> {
+            String name = getInfo().name();
+            MinigameData data = dataCrud.getOrNull(name);
+            Map<UUID, MinigamePlayer> minigamePlayers = data.getMinigamePlayers();
+            MinigamePlayer minigamePlayer = minigamePlayers.computeIfAbsent(playerId, MinigamePlayer::new);
+            consumer.accept(minigamePlayer);
+            dataCrud.update(data);
+        });
+    }
+
+    private <T> T getPlayerMatchResult(Player player, Function<MinigamePlayer, T> fn, T defaultValue) {
+        return getMinigamePlayer(player).map(fn).orElse(defaultValue);
+    }
+
+    private Optional<MinigamePlayer> getMinigamePlayer(Player player) {
+        MinigameData data = dataCrud.getOrThrow(getInfo().name());
+        return Optional.ofNullable(data.getMinigamePlayers().get(player.getUniqueId()));
     }
 
     void enterMatchProcess() {
@@ -272,9 +325,12 @@ public abstract class Minigame implements Listener {
 
     protected abstract void match();
 
-    protected abstract void onSpawnCommand(Player player);
+    protected void onSpawnCommand(Player player) {
+        player.teleport(getInfo().lobby());
+    }
 
-    protected abstract void onMatchInterrupted();
+    protected void onMatchInterrupted() {
+    }
 
     private void startMatchBar() {
         matchStopwatch = new BukkitRunnable() {
@@ -284,7 +340,7 @@ public abstract class Minigame implements Listener {
 
             @Override
             public void run() {
-                if(time <= 0) {
+                if (time <= 0) {
                     cancel();
                     endMatch(Collections.emptyList(), Collections.emptyList());
                 } else {
@@ -293,10 +349,10 @@ public abstract class Minigame implements Listener {
                     String timeString = minutes + ":" + seconds;
                     TextColor color;
                     Color barColor;
-                    if(time <= totalTime / 4) {
+                    if (time <= totalTime / 4) {
                         color = NamedTextColor.RED;
                         barColor = Color.RED;
-                    } else if(time <= totalTime / 2) {
+                    } else if (time <= totalTime / 2) {
                         color = NamedTextColor.YELLOW;
                         barColor = Color.YELLOW;
                     } else {
@@ -319,7 +375,7 @@ public abstract class Minigame implements Listener {
     }
 
     public final void spawnCommandIssued(Player player) {
-        switch(state) {
+        switch (state) {
             case PRE_MATCH -> {
                 removePlayerFromBars(player);
                 player.teleport(info.lobby());
@@ -329,7 +385,8 @@ public abstract class Minigame implements Listener {
                 removePlayerFromBars(player);
                 onSpawnCommand(player);
             }
-            case END_MATCH -> player.sendMessage(Component.translatable("minigame.spawn-in-end-match", NamedTextColor.YELLOW));
+            case END_MATCH ->
+                player.sendMessage(Component.translatable("minigame.spawn-in-end-match", NamedTextColor.YELLOW));
             default -> {
                 IllegalStateException e = new IllegalStateException("Player " + player.getName()
                         + " (UID: " + player.getUniqueId() + ") issued spawn command in minigame "
@@ -341,7 +398,7 @@ public abstract class Minigame implements Listener {
     }
 
     public final void interruptMatch() {
-        if(state == MinigameState.MATCH) {
+        if (state == MinigameState.MATCH) {
             onMatchInterrupted();
         }
         setState(MinigameState.END_MATCH);
@@ -349,7 +406,7 @@ public abstract class Minigame implements Listener {
         unregisterPreMatchListeners();
         unregisterMatchListener();
         stopMatchStopwatch();
-        if(world != null) {
+        if (world != null) {
             Component interruptedMessage = Component.translatable("minigame.match.interrupted",
                     NamedTextColor.RED);
             Location lobby = info.lobby();
@@ -365,10 +422,10 @@ public abstract class Minigame implements Listener {
     }
 
     protected void stopMatchStopwatch() {
-        if(matchStopwatch != null) {
+        if (matchStopwatch != null) {
             try {
                 matchStopwatch.cancel();
-            } catch(IllegalStateException e) {
+            } catch (IllegalStateException e) {
                 // ignored
             } finally {
                 BossBarUtils.removeAll(matchBar);
@@ -378,7 +435,7 @@ public abstract class Minigame implements Listener {
     }
 
     protected void setPostMatchTime(int postMatchTime) {
-        if(postMatchTime < 0) {
+        if (postMatchTime < 0) {
             throw new IllegalArgumentException("postMatchTime must be positive");
         }
         this.postMatchTime = postMatchTime;
@@ -390,10 +447,10 @@ public abstract class Minigame implements Listener {
     }
 
     private void registerMatchListener() {
-        if(matchListener == null) {
+        if (matchListener == null) {
             matchListener = this;
-        } else if(!(matchListener instanceof WorldListener)) {
-            NotWorldListener e = new NotWorldListener("Class: " + matchListener.getClass().getName());
+        } else if (!(matchListener instanceof WorldListener)) {
+            var e = new NotWorldListenerException("Class: " + matchListener.getClass().getName());
             e.setListener(matchListener);
             throw e;
         }
@@ -418,20 +475,20 @@ public abstract class Minigame implements Listener {
     }
 
     private void unregisterListener(Listener listener) {
-        if(listener != null) {
+        if (listener != null) {
             HandlerList.unregisterAll(listener);
         }
     }
 
     private void registerListener(Listener listener) {
-        if(listener != null) {
+        if (listener != null) {
             PluginConfig.get().registerEvents(listener);
         }
     }
 
     private void setState(MinigameState state) {
         this.state = Objects.requireNonNull(state, "state");
-        switch(state) {
+        switch (state) {
             case PRE_MATCH -> stateListeners.forEach(listener -> listener.onPreMatch(this));
             case MATCH -> stateListeners.forEach(listener -> listener.onMatch(this));
             case END_MATCH -> stateListeners.forEach(listener -> listener.onEndMatch(this));
@@ -470,7 +527,7 @@ public abstract class Minigame implements Listener {
         this.matchListener = matchListener;
     }
 
-    public boolean useTracker() {
+    public boolean usesTracker() {
         return trackerListener != null;
     }
 

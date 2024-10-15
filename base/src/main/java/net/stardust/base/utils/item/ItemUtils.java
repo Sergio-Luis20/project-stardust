@@ -3,19 +3,23 @@ package net.stardust.base.utils.item;
 import br.sergio.utils.Pair;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import net.stardust.base.Stardust;
 import net.stardust.base.utils.Throwables;
 import net.stardust.base.utils.plugin.PluginConfig;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
-import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -65,6 +69,38 @@ public class ItemUtils {
         item.setItemMeta(meta);
         return item;
     }
+
+    public static ItemStack potion(PotionType type, Color color, Effect... effects) {
+        ItemStack potion = new ItemStack(type.getMaterial());
+        PotionMeta meta = (PotionMeta) potion.getItemMeta();
+        if (effects != null) {
+            Arrays.asList(effects).forEach(effect -> effect.addTo(meta));
+        }
+        if (color != null) {
+            meta.setColor(color);
+        } else if (effects != null) {
+            int len = effects.length;
+            if (len > 0) {
+                if (len == 1) {
+                    meta.setColor(effects[0].effect().getType().getColor());
+                } else {
+                    Color sum = Arrays.stream(effects).map(effect -> effect.effect().getType().getColor())
+                            .reduce((c1, c2) -> Color.fromARGB(c1.getAlpha() + c2.getAlpha(),
+                                    c1.getRed() + c2.getRed(), c1.getGreen() + c2.getGreen(),
+                                    c1.getBlue() + c2.getBlue())).get();
+                    Color result = Color.fromARGB(sum.getAlpha() / len, sum.getRed() / len,
+                            sum.getGreen() / len, sum.getBlue() / len);
+                    meta.setColor(result);
+                }
+            }
+        }
+        potion.setItemMeta(meta);
+        return potion;
+    }
+
+    public static ItemStack potion(PotionType type, Effect... effects) {
+        return potion(type, null, effects);
+    }
     
     private static ItemStack axe(ItemStack item) {
         if(item == null) return null;
@@ -84,10 +120,12 @@ public class ItemUtils {
 
     private static ItemStack configureAxe(ItemStack item, double damage, double speed) {
         ItemMeta meta = item.getItemMeta();
-        AttributeModifier damageReductor = new AttributeModifier(UUID.randomUUID(), "damage",
-                damage, Operation.ADD_NUMBER, EquipmentSlot.HAND);
-        AttributeModifier speedPreserver = new AttributeModifier(UUID.randomUUID(), "speed",
-                speed, Operation.ADD_NUMBER, EquipmentSlot.HAND);
+        AttributeModifier damageReductor = new AttributeModifier(Stardust
+                .stardust("attribute.damage_reductor"), damage, Operation.ADD_NUMBER,
+                EquipmentSlotGroup.HAND);
+        AttributeModifier speedPreserver = new AttributeModifier(Stardust
+                .stardust("attribute.speed_stabilizer"), speed, Operation.ADD_NUMBER,
+                EquipmentSlotGroup.HAND);
         meta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, damageReductor);
         meta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, speedPreserver);
         item.setItemMeta(meta);

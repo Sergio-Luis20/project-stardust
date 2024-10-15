@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang.NullArgumentException;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataHolder;
@@ -94,7 +93,7 @@ public interface KeyMapper {
             if (nsk == null)
                 throw new NullPointerException("null NamespacedKey in a key mapper map");
             if (c == null)
-                throw new NullArgumentException("null Class in a key mapper map");
+                throw new NullPointerException("null Class in a key mapper map");
             newMap.put(nsk.asString(), c);
         });
         return newMap;

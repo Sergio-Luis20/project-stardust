@@ -30,14 +30,14 @@ public class CaptureMatchListener extends WorldListener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        if(checkWorld(event.getBlock().getWorld())) {
+        if (checkWorld(event.getBlock().getWorld())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onBlockPlacing(BlockPlaceEvent event) {
-        if(checkWorld(event.getBlock().getWorld())) {
+        if (checkWorld(event.getBlock().getWorld())) {
             event.setCancelled(true);
         }
     }
@@ -45,16 +45,16 @@ public class CaptureMatchListener extends WorldListener {
     @EventHandler
     public void handleMoving(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        if(checkWorld(player.getWorld())) {
+        if (checkWorld(player.getWorld())) {
             CaptureTeam team = CaptureTeam.getTeam(capture, player);
-            if(capture.isCaptured(player)) {
+            if (capture.isCaptured(player)) {
                 CaptureTeam enemy = team.other();
-                if(enemy.isOutsideBase(capture, player) && !capture.isBeingCarried(player)) {
+                if (enemy.isOutsideBase(capture, player) && !capture.isBeingCarried(player)) {
                     capture.teleportInWorld(player, enemy.getBase(capture));
                     player.sendMessage(Component.translatable("minigame.capture.cant-escape", NamedTextColor.RED));
                 }
             } else {
-                if(team.isInsideBase(capture, player)) {
+                if (team.isInsideBase(capture, player)) {
                     capture.deliveryCarry(player);
                 }
             }
@@ -63,13 +63,13 @@ public class CaptureMatchListener extends WorldListener {
 
     @EventHandler
     public void handleVoidAndFireDamage(EntityDamageEvent event) {
-        if(event.getEntity() instanceof Player player && checkWorld(player.getWorld())) {
-            if(capture.isCaptured(player) || capture.isBeingCarried(player) || capture.isEnding()) {
+        if (event.getEntity() instanceof Player player && checkWorld(player.getWorld())) {
+            if (capture.isCaptured(player) || capture.isBeingCarried(player) || capture.isEnding()) {
                 event.setCancelled(true);
                 return;
             }
             DamageCause cause = event.getCause();
-            if(cause == DamageCause.VOID) {
+            if (cause == DamageCause.VOID) {
                 event.setCancelled(true);
                 /*
                  * Prevent bugs when a packet of damage by void arrives and
@@ -81,12 +81,12 @@ public class CaptureMatchListener extends WorldListener {
                  * it being captured without even tried to jump into void
                  * voluntarily.
                  */
-                if(!WorldUtils.belowVoid(player.getLocation())) {
+                if (!WorldUtils.belowVoid(player.getLocation())) {
                     return;
                 }
                 capture.dismountAll(player);
                 capture.captured(null, player);
-            } else if((cause != DamageCause.FIRE && cause != DamageCause.FIRE_TICK
+            } else if ((cause != DamageCause.FIRE && cause != DamageCause.FIRE_TICK
                     && cause != DamageCause.ENTITY_ATTACK && cause != DamageCause.PROJECTILE)) {
                 event.setCancelled(true);
             }
@@ -96,11 +96,11 @@ public class CaptureMatchListener extends WorldListener {
     @EventHandler
     public void preventDamageByOthers(EntityDamageByEntityEvent event) {
         Entity entity = event.getEntity();
-        if(checkWorld(entity.getWorld())) {
-            if(!(event.getDamager() instanceof Player damager) || !(entity instanceof Player victim)) {
+        if (checkWorld(entity.getWorld())) {
+            if (!(event.getDamager() instanceof Player damager) || !(entity instanceof Player victim)) {
                 return;
             }
-            if(capture.isCaptured(damager) || capture.isCaptured(victim)
+            if (capture.isCaptured(damager) || capture.isCaptured(victim)
                     || capture.isBeingCarried(damager) || capture.isBeingCarried(victim)) {
                 event.setCancelled(true);
             }
@@ -109,7 +109,7 @@ public class CaptureMatchListener extends WorldListener {
 
     @EventHandler
     public void onDying(PlayerDeathEvent event) {
-        if(checkWorld(event.getPlayer().getWorld())) {
+        if (checkWorld(event.getPlayer().getWorld())) {
             event.setCancelled(true);
             Player player = event.getPlayer();
             Player killer = player.getKiller();
@@ -117,7 +117,7 @@ public class CaptureMatchListener extends WorldListener {
              * This verification is done to prevent bugs
              * when two players kill each other at the same time
              */
-            if(player.equals(capture.getBull(killer).orElse(null))) {
+            if (player.equals(capture.getBull(killer).orElse(null))) {
                 return;
             }
             capture.dismountAll(player);
@@ -128,9 +128,9 @@ public class CaptureMatchListener extends WorldListener {
     @EventHandler
     public void onInteract(PlayerInteractEntityEvent event) {
         Player hero = event.getPlayer();
-        if(checkWorld(hero.getWorld())) {
+        if (checkWorld(hero.getWorld())) {
             event.setCancelled(true);
-            if(event.getRightClicked() instanceof Player princess
+            if (event.getRightClicked() instanceof Player princess
                     && CaptureTeam.areSameTeam(capture, hero, princess) && capture.isCaptured(princess)
                     && !capture.isCaptured(hero) && !capture.isBeingCarried(princess)) {
                 capture.mount(hero, princess);
@@ -141,11 +141,11 @@ public class CaptureMatchListener extends WorldListener {
     @EventHandler
     public void preventDismount(EntityDismountEvent event) {
         Entity entity = event.getEntity();
-        if(checkWorld(entity.getWorld())) {
-            if(entity.getType() == EntityType.ARMOR_STAND) {
+        if (checkWorld(entity.getWorld())) {
+            if (entity.getType() == EntityType.ARMOR_STAND) {
                 return;
             }
-            if(entity instanceof Player player && capture.isBeingCarried(player)) {
+            if (entity instanceof Player player && capture.isBeingCarried(player)) {
                 event.setCancelled(true);
                 player.sendMessage(Component.translatable("minigame.capture.cant-escape", NamedTextColor.RED));
             }
@@ -154,14 +154,15 @@ public class CaptureMatchListener extends WorldListener {
 
     @EventHandler
     public void onDisconnect(PlayerQuitEvent event) {
-        if(checkWorld(event.getPlayer().getWorld())) {
-            capture.leave(event.getPlayer());
+        Player player = event.getPlayer();
+        if (checkWorld(player.getWorld())) {
+            player.teleport(capture.getInfo().lobby());
         }
     }
 
     @EventHandler
     public void onQuittingMatch(PlayerTeleportEvent event) {
-        if(checkWorld(event.getFrom().getWorld()) && !checkWorld(event.getTo().getWorld()) && !capture.isEnding()) {
+        if (checkWorld(event.getFrom().getWorld()) && !checkWorld(event.getTo().getWorld()) && !capture.isEnding()) {
             capture.onQuit(event.getPlayer());
         }
     }
@@ -169,35 +170,35 @@ public class CaptureMatchListener extends WorldListener {
     @EventHandler
     public void removeArrow(ProjectileHitEvent event) {
         Projectile projectile = event.getEntity();
-        if(checkWorld(projectile.getWorld())) {
+        if (checkWorld(projectile.getWorld())) {
             projectile.remove();
         }
     }
 
     @EventHandler
     public void preserveDurability(PlayerItemDamageEvent event) {
-        if(checkWorld(event.getPlayer().getWorld())) {
+        if (checkWorld(event.getPlayer().getWorld())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void preventDroppingItems(PlayerDropItemEvent event) {
-        if(checkWorld(event.getPlayer().getWorld())) {
+        if (checkWorld(event.getPlayer().getWorld())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void preventPickingUpItems(PlayerPickItemEvent event) {
-        if(checkWorld(event.getPlayer().getWorld())) {
+        if (checkWorld(event.getPlayer().getWorld())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void preventReceiveXP(PlayerPickupExperienceEvent event) {
-        if(checkWorld(event.getPlayer().getWorld())) {
+        if (checkWorld(event.getPlayer().getWorld())) {
             event.setCancelled(true);
             event.getExperienceOrb().remove();
         }
@@ -205,16 +206,16 @@ public class CaptureMatchListener extends WorldListener {
 
     @EventHandler
     public void preventHunger(FoodLevelChangeEvent event) {
-        if(event.getEntity() instanceof Player player && checkWorld(player.getWorld())) {
+        if (event.getEntity() instanceof Player player && checkWorld(player.getWorld())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void preventSpawningEntities(EntitySpawnEvent event) {
-        if(checkWorld(event.getLocation().getWorld())) {
+        if (checkWorld(event.getLocation().getWorld())) {
             EntityType type = event.getEntityType();
-            if(type != EntityType.ARROW && type != EntityType.ARMOR_STAND) {
+            if (type != EntityType.ARROW && type != EntityType.ARMOR_STAND) {
                 event.setCancelled(true);
             }
         }
@@ -222,7 +223,7 @@ public class CaptureMatchListener extends WorldListener {
 
     @EventHandler
     public void preventShootingWhileBeingCarried(ProjectileLaunchEvent event) {
-        if(event.getEntity().getShooter() instanceof Player player &&
+        if (event.getEntity().getShooter() instanceof Player player &&
                 checkWorld(player.getWorld()) && (capture.isBeingCarried(player) || capture.isCaptured(player))) {
             event.setCancelled(true);
         }

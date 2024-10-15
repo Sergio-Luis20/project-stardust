@@ -1,0 +1,20 @@
+var1: plain text
+var2: ${VAR_2}
+var3:
+  - a
+  - string
+  - list
+  - of
+  - ${VAR_3}
+var4:
+  var5:
+    var6: ${VAR_6}
+  var7: ${VAR_7}
+  var8:
+    - var9: map list
+      var10:
+        var11: ${VAR_11}
+    - var12: ${VAR_12}
+      var13:
+        var14: ${VAR_11}/${VAR_14}
+var15: ${VAR_15}

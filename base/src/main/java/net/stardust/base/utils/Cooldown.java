@@ -1,16 +1,16 @@
 package net.stardust.base.utils;
 
+import net.stardust.base.Communicable;
+import net.stardust.base.utils.plugin.PluginConfig;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import net.stardust.base.Communicable;
-import net.stardust.base.utils.plugin.PluginConfig;
-
 public class Cooldown implements Communicable {
-    
+
     private static ExecutorService service = Executors.newVirtualThreadPerTaskExecutor();
 
     private boolean sync;
@@ -29,17 +29,17 @@ public class Cooldown implements Communicable {
     }
 
     public void start(int time, TimeUnit unit) {
-        if(tryStart(time, unit)) {
+        if (tryStart(time, unit)) {
             service.submit(() -> {
                 try {
                     Thread.sleep(unit.toMillis(time));
-                } catch(InterruptedException e) {
+                } catch (InterruptedException e) {
                     Throwables.send(getId(), e);
                     complete();
                     return;
                 }
-                if(!canceled.get() && task != null) {
-                    if(sync) {
+                if (!canceled.get() && task != null) {
+                    if (sync) {
                         StardustThreads.run(PluginConfig.get().getPlugin(), () -> task.execute(0, unit));
                     } else {
                         task.execute(0, unit);
@@ -51,24 +51,23 @@ public class Cooldown implements Communicable {
     }
 
     public void startRepeat(int time, TimeUnit unit) {
-        if(tryStart(time, unit)) {
+        if (tryStart(time, unit)) {
             service.submit(() -> {
                 AtomicInteger remainingTime = new AtomicInteger(time);
-                TimeUnit usingUnit = unit;
-                long sleepTime = usingUnit.toMillis(1);
-                while(remainingTime.get() >= 0) {
+                long sleepTime = unit.toMillis(1);
+                while (remainingTime.get() >= 0) {
                     final int t = remainingTime.get();
-                    if(canceled.get()) break;
-                    if(task != null) {
-                        if(sync && StardustThreads.call(PluginConfig.get()
+                    if (canceled.get()) break;
+                    if (task != null) {
+                        if (sync && StardustThreads.call(PluginConfig.get()
                                 .getPlugin(), () -> task.execute(t, unit))) break;
-                        if(task.execute(t, unit)) break;
+                        if (task.execute(t, unit)) break;
                     }
-                    if(t == 0) break;
+                    if (t == 0) break;
                     remainingTime.decrementAndGet();
                     try {
                         Thread.sleep(sleepTime);
-                    } catch(InterruptedException e) {
+                    } catch (InterruptedException e) {
                         Throwables.send(getId(), e);
                         complete();
                         return;
@@ -80,15 +79,15 @@ public class Cooldown implements Communicable {
     }
 
     private boolean tryStart(int time, TimeUnit unit) {
-        if(running.get()) return false;
-        if(time <= 0) throw new IllegalArgumentException("time must be greater than zero");
-        if(unit == null) throw new NullPointerException("unit");
+        if (running.get()) return false;
+        if (time <= 0) throw new IllegalArgumentException("time must be greater than zero");
+        if (unit == null) throw new NullPointerException("unit");
         running.set(true);
         return true;
     }
 
     public void cancel() {
-        if(!running.get()) return;
+        if (!running.get()) return;
         canceled.set(true);
     }
 
@@ -97,7 +96,7 @@ public class Cooldown implements Communicable {
     }
 
     public void reset() {
-        if(running.get()) throw new IllegalStateException("running");
+        if (running.get()) throw new IllegalStateException("running");
         running.set(false);
         canceled.set(false);
     }
@@ -115,7 +114,7 @@ public class Cooldown implements Communicable {
     }
 
     public void setSync(boolean sync) {
-        if(running.get()) throw new IllegalStateException("running");
+        if (running.get()) throw new IllegalStateException("running");
         this.sync = sync;
     }
 
@@ -124,12 +123,12 @@ public class Cooldown implements Communicable {
     }
 
     public void setTask(CooldownTask task) {
-        if(running.get()) throw new IllegalStateException("running");
+        if (running.get()) throw new IllegalStateException("running");
         this.task = task;
     }
 
     @FunctionalInterface
-    public static interface CooldownTask {
+    public interface CooldownTask {
 
         /**
          * Must return if the cooldown should cancel or not.
@@ -137,9 +136,10 @@ public class Cooldown implements Communicable {
          * in {@link Cooldown#startRepeat(int, TimeUnit)} method.
          * The cooldown will stop anyway when the call with
          * <code>remainingTime</code> being 0 is done.
+         *
          * @param remainingTime the remaining time to end the cooldown.
-         * It belongs to the interval [0, initialTime].
-         * @param unit the time unit used in {@link Thread#sleep(long)}
+         *                      It belongs to the interval [0, initialTime].
+         * @param unit          the time unit used in {@link Thread#sleep(long)}
          * @return <code>true</code> if the cooldown should cancel,
          * <code>false</code> otherwise.
          */
